@@ -1,0 +1,5 @@
+*.md
+*.csv
+*.pdf
+*.ipynb
+!README.md
