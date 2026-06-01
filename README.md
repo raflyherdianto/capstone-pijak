@@ -114,3 +114,19 @@ Kolaborasi tim pengembang dalam program Pijak x IBM SkillsBuild:
 *   **Neor Wildan**
     *   Mengembangkan dashboard web responsif mobile-first.
     *   Menampilkan grafik tren interaktif dan peta persebaran harga pangan untuk kemudahan literasi pengguna.
+
+---
+
+## 🌿 Commit & Branch Tracking
+
+Berikut adalah status commit terakhir dan tautan riwayat untuk masing-masing branch pengembangan:
+
+| Nama Branch | Status Commit Terakhir (Shields.io) | Tautan Riwayat |
+| :--- | :--- | :--- |
+| **`main`** | [![Last Commit](https://img.shields.io/github/last-commit/raflyherdianto/capstone-pijak/main?style=flat-square&logo=github&label=main)](https://github.com/raflyherdianto/capstone-pijak/commits/main) | [Lihat Komit](https://github.com/raflyherdianto/capstone-pijak/commits/main) |
+| **`dev`** | [![Last Commit](https://img.shields.io/github/last-commit/raflyherdianto/capstone-pijak/dev?style=flat-square&logo=github&label=dev)](https://github.com/raflyherdianto/capstone-pijak/commits/dev) | [Lihat Komit](https://github.com/raflyherdianto/capstone-pijak/commits/dev) |
+| **`rafly`** | [![Last Commit](https://img.shields.io/github/last-commit/raflyherdianto/capstone-pijak/rafly?style=flat-square&logo=github&label=rafly)](https://github.com/raflyherdianto/capstone-pijak/commits/rafly) | [Lihat Komit](https://github.com/raflyherdianto/capstone-pijak/commits/rafly) |
+| **`wilda`** | [![Last Commit](https://img.shields.io/github/last-commit/raflyherdianto/capstone-pijak/wilda?style=flat-square&logo=github&label=wilda)](https://github.com/raflyherdianto/capstone-pijak/commits/wilda) | [Lihat Komit](https://github.com/raflyherdianto/capstone-pijak/commits/wilda) |
+| **`wildan`** | [![Last Commit](https://img.shields.io/github/last-commit/raflyherdianto/capstone-pijak/wildan?style=flat-square&logo=github&label=wildan)](https://github.com/raflyherdianto/capstone-pijak/commits/wildan) | [Lihat Komit](https://github.com/raflyherdianto/capstone-pijak/commits/wildan) |
+| **`rizky`** | [![Last Commit](https://img.shields.io/github/last-commit/raflyherdianto/capstone-pijak/rizky?style=flat-square&logo=github&label=rizky)](https://github.com/raflyherdianto/capstone-pijak/commits/rizky) | [Lihat Komit](https://github.com/raflyherdianto/capstone-pijak/commits/rizky) |
+
