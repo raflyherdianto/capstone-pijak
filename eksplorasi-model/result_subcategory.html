@@ -1,0 +1,2737 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Analisis Perbandingan Model Prediksi Harga Pangan</title>
+    <meta name="description"
+        content="Dashboard interaktif perbandingan performa model deret waktu SARIMA, SARIMAX, ARIMA, Hybrid ARIMA + RF, Random Forest, XGBoost, dan FB Prophet untuk prediksi harga komoditas pangan pokok tingkat nasional.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Chart.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #070a13;
+            --bg-surface: rgba(15, 22, 42, 0.65);
+            --border-glow: rgba(99, 102, 241, 0.15);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dark: #475569;
+
+            /* Accents */
+            --color-primary: #6366f1;
+            /* Indigo */
+            --color-primary-rgb: 99, 102, 241;
+            --color-secondary: #06b6d4;
+            /* Cyan */
+            --color-success: #10b981;
+            /* Emerald */
+            --color-warning: #f59e0b;
+            /* Amber */
+            --color-danger: #f43f5e;
+            /* Rose */
+
+            --gradient-main: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #06b6d4 100%);
+            --gradient-card: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+            --gradient-accent: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow-glow: 0 8px 32px 0 rgba(99, 102, 241, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2.5rem 1.5rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Decorative Background Orbs */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            top: -200px;
+            left: -100px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            bottom: -200px;
+            right: -100px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header section */
+        header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .badge-header {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #818cf8;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.03em;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 400;
+        }
+
+        /* Interactive controls Grid */
+        .controls-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            backdrop-filter: blur(20px);
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            align-items: center;
+            box-shadow: var(--shadow-glow);
+        }
+
+        @media (max-width: 768px) {
+            .controls-panel {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        /* Beautiful Select Control */
+        .select-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .select-wrapper select {
+            width: 100%;
+            background-color: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            padding: 0.9rem 1.2rem;
+            font-size: 1rem;
+            font-family: var(--font-sans);
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            transition: all 0.3s ease;
+        }
+
+        .select-wrapper select:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .select-wrapper::after {
+            content: "▼";
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            position: absolute;
+            right: 1.2rem;
+            pointer-events: none;
+        }
+
+        /* Custom Segmented Pills for Metrics */
+        .pills-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            background-color: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 0.25rem;
+            gap: 0.25rem;
+        }
+
+        @media (max-width: 640px) {
+            .pills-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .pill-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.75rem 0.5rem;
+            font-size: 0.9rem;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+        }
+
+        .pill-btn:hover {
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .pill-btn.active {
+            color: var(--text-main);
+            background: var(--gradient-accent);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+        }
+
+        /* KPI Quick Stats Cards */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .kpi-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        .kpi-card {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .kpi-card.best .kpi-icon {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--color-success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .kpi-card.avg .kpi-icon {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--color-secondary);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .kpi-card.stability .kpi-icon {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--color-primary);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .kpi-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kpi-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .kpi-value {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-top: 0.2rem;
+        }
+
+        .kpi-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.1rem;
+        }
+
+        /* Dashboard layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.8fr 1.2fr;
+            gap: 2rem;
+            margin-bottom: 3.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards styling */
+        .card {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .chart-card {
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 1rem;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            flex-grow: 1;
+            height: 350px;
+        }
+
+        /* Leaderboard and Complete table side */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.9rem 1.2rem;
+            border-radius: var(--radius-md);
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transition: all 0.2s ease;
+        }
+
+        .leaderboard-item:hover {
+            background-color: rgba(255, 255, 255, 0.04);
+            transform: translateX(4px);
+        }
+
+        .leaderboard-item.rank-1 {
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.02) 100%);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .leaderboard-item.rank-5 {
+            border-color: rgba(244, 63, 94, 0.15);
+        }
+
+        .model-identity {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .rank-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 700;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+        }
+
+        .rank-1 .rank-number {
+            background: var(--color-success);
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .model-name-text {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .metric-score {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.15rem;
+        }
+
+        .rank-1 .metric-score {
+            color: var(--color-success);
+        }
+
+        .rank-5 .metric-score {
+            color: var(--color-danger);
+        }
+
+        /* Dynamic Table for selected commodity */
+        .table-card {
+            overflow: hidden;
+            margin-bottom: 3.5rem;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        table.comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        table.comparison-table th,
+        table.comparison-table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.95rem;
+        }
+
+        table.comparison-table th {
+            font-family: var(--font-display);
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        table.comparison-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        table.comparison-table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        table.comparison-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .highlight-cell {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .best-score-cell {
+            color: var(--color-success);
+            font-weight: 700;
+            background-color: rgba(16, 185, 129, 0.05);
+            border-radius: 4px;
+        }
+
+        /* Production Suitability Section */
+        .section-heading-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-glow);
+            padding-bottom: 0.75rem;
+        }
+
+        .section-heading-row svg {
+            color: var(--color-primary);
+        }
+
+        .section-title-text {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .production-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .prod-card {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .prod-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 8px 30px rgba(6, 182, 212, 0.05);
+        }
+
+        .prod-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 0.75rem;
+        }
+
+        .prod-card-header svg {
+            color: var(--color-secondary);
+        }
+
+        .prod-card-title {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .prod-list {
+            list-style-type: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .prod-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .prod-item-label {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .prod-item-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            padding-left: 0.5rem;
+            border-left: 2px solid var(--border-subtle);
+            margin-top: 0.2rem;
+        }
+
+        .tag-model {
+            font-size: 0.7rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .tag-model.arima {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+        }
+
+        .tag-model.xgb {
+            background: rgba(6, 182, 212, 0.2);
+            color: #67e8f9;
+        }
+
+        .tag-model.prophet {
+            background: rgba(168, 85, 247, 0.2);
+            color: #d8b4fe;
+        }
+
+        .tag-model.knn {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+        }
+
+        .tag-model.lstm {
+            background: rgba(244, 63, 94, 0.2);
+            color: #fca5a5;
+        }
+
+        /* Summary comparison table for production */
+        .prod-table-card {
+            margin-bottom: 2.5rem;
+        }
+
+        .prod-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .prod-table th,
+        .prod-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.9rem;
+        }
+
+        .prod-table th {
+            font-family: var(--font-display);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .status-badge.hijau {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+
+        .status-badge.kuning {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+        }
+
+        .status-badge.merah {
+            background: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+        }
+
+        /* Recommendation Box */
+        .recommendation-panel {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(6, 182, 212, 0.08) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .recommendation-panel {
+                flex-direction: column;
+                gap: 1.5rem;
+                padding: 1.75rem;
+            }
+        }
+
+        .rec-icon-wrapper {
+            background: var(--gradient-accent);
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+        }
+
+        .rec-content h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-main);
+        }
+
+        .rec-content p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+        }
+
+        .bold-text {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .badges-group {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .rec-badge {
+            background-color: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .rec-badge.emerald {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #a7f3d0;
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+
+        .rec-badge.cyan {
+            background-color: rgba(6, 182, 212, 0.15);
+            color: #a5f3fc;
+            border-color: rgba(6, 182, 212, 0.25);
+        }
+
+        /* SVG Icons */
+        .icon-svg {
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="badge-header">
+                <svg width="12" height="12" viewBox="0 0 24 24" class="icon-svg">
+                    <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                    </polygon>
+                </svg>
+                Laporan Komparasi Model
+            </div>
+            <h1>Analisis & Visualisasi Model Prediksi Harga</h1>
+            <p class="subtitle">Evaluasi akurasi 9 model forecasting pada 21 subkategori komoditas pangan pokok
+                strategis untuk kesiapan skala produksi.</p>
+        </header>
+
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <div class="control-group">
+                <label for="commodity-select">Pilih Komoditas Pokok</label>
+                <div class="select-wrapper">
+                    <select id="commodity-select">
+                        <option value="Overall">Rata-rata Keseluruhan</option>
+                        <option value="Bawang Merah Ukuran Sedang">Bawang Merah Ukuran Sedang</option>
+                        <option value="Bawang Putih Ukuran Sedang">Bawang Putih Ukuran Sedang</option>
+                        <option value="Beras Kualitas Bawah I">Beras Kualitas Bawah I</option>
+                        <option value="Beras Kualitas Bawah II">Beras Kualitas Bawah II</option>
+                        <option value="Beras Kualitas Medium I">Beras Kualitas Medium I</option>
+                        <option value="Beras Kualitas Medium II">Beras Kualitas Medium II</option>
+                        <option value="Beras Kualitas Super I">Beras Kualitas Super I</option>
+                        <option value="Beras Kualitas Super II">Beras Kualitas Super II</option>
+                        <option value="Cabai Merah Besar">Cabai Merah Besar</option>
+                        <option value="Cabai Merah Keriting">Cabai Merah Keriting</option>
+                        <option value="Cabai Rawit Hijau">Cabai Rawit Hijau</option>
+                        <option value="Cabai Rawit Merah">Cabai Rawit Merah</option>
+                        <option value="Daging Ayam Ras Segar">Daging Ayam Ras Segar</option>
+                        <option value="Daging Sapi Kualitas 1">Daging Sapi Kualitas 1</option>
+                        <option value="Daging Sapi Kualitas 2">Daging Sapi Kualitas 2</option>
+                        <option value="Gula Pasir Kualitas Premium">Gula Pasir Kualitas Premium</option>
+                        <option value="Gula Pasir Lokal">Gula Pasir Lokal</option>
+                        <option value="Minyak Goreng Curah">Minyak Goreng Curah</option>
+                        <option value="Minyak Goreng Kemasan Bermerk 1">Minyak Goreng Kemasan Bermerk 1</option>
+                        <option value="Minyak Goreng Kemasan Bermerk 2">Minyak Goreng Kemasan Bermerk 2</option>
+                        <option value="Telur Ayam Ras Segar">Telur Ayam Ras Segar</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Pilih Metrik Evaluasi</label>
+                <div class="pills-container">
+                    <button class="pill-btn active" data-metric="R2">R² Score</button>
+                    <button class="pill-btn" data-metric="MAPE">MAPE (%)</button>
+                    <button class="pill-btn" data-metric="MAE">MAE</button>
+                    <button class="pill-btn" data-metric="RMSE">RMSE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Quick Stats Row -->
+        <div class="kpi-row">
+            <!-- Best Model KPI -->
+            <div class="kpi-card best">
+                <div class="kpi-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" class="icon-svg">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                    </svg>
+                </div>
+                <div class="kpi-details">
+                    <span class="kpi-title">Model Akurasi Terbaik</span>
+                    <span class="kpi-value" id="kpi-best-model">-</span>
+                    <span class="kpi-label" id="kpi-best-score">-</span>
+                </div>
+            </div>
+            <!-- Average KPI -->
+            <div class="kpi-card avg">
+                <div class="kpi-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" class="icon-svg">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                </div>
+                <div class="kpi-details">
+                    <span class="kpi-title">Rata-Rata Nilai Metrik</span>
+                    <span class="kpi-value" id="kpi-average-val">-</span>
+                    <span class="kpi-label">Dari Semua Model</span>
+                </div>
+            </div>
+            <!-- Model Stability KPI -->
+            <div class="kpi-card stability">
+                <div class="kpi-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" class="icon-svg">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <div class="kpi-details">
+                    <span class="kpi-title">Stabilitas SARIMA Murni</span>
+                    <span class="kpi-value" id="kpi-stability-model">-</span>
+                    <span class="kpi-label" id="kpi-stability-label">R² Fit Dominan</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard View -->
+        <div class="dashboard-grid">
+            <!-- Chart Container -->
+            <div class="card chart-card">
+                <div class="card-header-inner">
+                    <div class="card-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" class="icon-svg"
+                            style="color: var(--color-primary)">
+                            <path d="M3 3v18h18"></path>
+                            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+                        </svg>
+                        Grafik Perbandingan Performa Model
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Rankings Sidebar -->
+            <div class="card right-column">
+                <div>
+                    <div class="card-header-inner" style="margin-bottom: 1.25rem;">
+                        <div class="card-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" class="icon-svg"
+                                style="color: var(--color-warning)">
+                                <path
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                                </path>
+                            </svg>
+                            Papan Peringkat Model
+                        </div>
+                    </div>
+                    <div class="leaderboard-list" id="leaderboardContainer">
+                        <!-- Leaderboard items injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Full Detailed Table Card -->
+        <div class="card table-card">
+            <div class="card-header-inner">
+                <div class="card-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" class="icon-svg"
+                        style="color: var(--color-secondary)">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="3" y1="15" x2="21" y2="15"></line>
+                    </svg>
+                    Tabel Lengkap Performa Model (<span id="table-commodity-title">Rata-rata Keseluruhan</span>)
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table class="comparison-table" id="comparisonTable">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>R² Score (Tren)</th>
+                            <th>MAPE (%)</th>
+                            <th>MAE</th>
+                            <th>RMSE</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comparisonTableBody">
+                        <!-- Data rows injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Production Scale Deployment Analysis Section -->
+        <div class="section-heading-row">
+            <svg width="24" height="24" viewBox="0 0 24 24" class="icon-svg">
+                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                <line x1="6" y1="18" x2="6.01" y2="18"></line>
+            </svg>
+            <div class="section-title-text">Analisis Kesiapan Pengembangan Skala Produksi</div>
+        </div>
+
+        <div class="production-matrix">
+            <!-- Latency & Inference Card -->
+            <div class="prod-card">
+                <div class="prod-card-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" class="icon-svg">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span class="prod-card-title">Inference Latency & Runtime</span>
+                </div>
+                <div class="prod-list">
+                    <div class="prod-item">
+                        <span class="prod-item-label">
+                            <span class="tag-model xgb">XGBoost</span> Latensi Sangat Rendah (< 1 ms) </span>
+                                <p class="prod-item-desc">Matematika berbasis decision tree XGBoost terkompilasi sangat
+                                    ringan. Sangat efisien jika diekspos melalui REST API mikroservis.</p>
+                    </div>
+                    <div class="prod-item">
+                        <span class="prod-item-label">
+                            <span class="tag-model arima">ARIMA</span> Latensi Menengah (~20 - 50 ms)
+                        </span>
+                        <p class="prod-item-desc">Memerlukan pemanggilan pustaka statsmodels Python yang membebani CPU
+                            karena operasi matriks statistika tradisional.</p>
+                    </div>
+                    <div class="prod-item">
+                        <span class="prod-item-label">
+                            <span class="tag-model prophet">Prophet</span> Latensi Tinggi (> 100 ms)
+                        </span>
+                        <p class="prod-item-desc">Inference Prophet membutuhkan penyusunan komponen additif (tren,
+                            musiman) yang melibatkan kalkulasi kompleks di tingkat backend Python.</p>
+                    </div>
+                    <div class="prod-item">
+                        <span class="prod-item-label">
+                            <span class="tag-model lstm">LSTM</span> Latensi Menengah (~10 - 30 ms)
+                        </span>
+                        <p class="prod-item-desc">Menggunakan model neural network PyTorch. Memerlukan overhead forward-pass tensor, tetapi masih cukup cepat untuk inferensi waktu-nyata pada CPU.</p>
+                    </div>
+                    <div class="prod-item">
+                        <span class="prod-item-label">
+                            <span class="tag-model knn">KNN</span> Latensi Rendah (~2 - 5 ms)
+                        </span>
+                        <p class="prod-item-desc">Mencari tetangga terdekat dari set data pelatihan. Kecepatan inferensi sangat bergantung pada ukuran dataset historis yang disimpan di memori.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pipeline & Retraining Card -->
+            <div class="prod-card">
+                <div class="prod-card-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" class="icon-svg">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                    </svg>
+                    <span class="prod-card-title">Data Pipeline & Retraining</span>
+                </div>
+                <div class="prod-list">
+                    <div class="prod-item">
+                        <span class="prod-item-label">
+                            <span class="tag-model xgb">XGBoost</span> Pipeline Rekayasa Fitur Rumit
+                        </span>
+                        <p class="prod-item-desc">Bergantung pada fitur lags, rolling windows, dan selisih waktu
+                            (*differencing*). Memerlukan Feature Store (seperti Feast) atau database untuk agregasi data
+                            on-the-fly.</p>
+                    </div>
+                    <div class="prod-item">
+                        <span class="prod-item-label">
+                            <span class="tag-model arima">ARIMA / Prophet</span> Retraining Otomatis Berkala
+                        </span>
+                        <p class="prod-item-desc">Sangat terikat dengan data historis terdekat. Harus di-retrain setiap
+                            ada titik data baru masuk (harian/mingguan) agar tidak kehilangan akurasi.</p>
+                    </div>
+                    <div class="prod-item">
+                        <span class="prod-item-label">
+                            <span class="tag-model lstm">LSTM</span> Retraining Overhead Sangat Tinggi
+                        </span>
+                        <p class="prod-item-desc">Membutuhkan fase pelatihan deep learning (epochs, optimization step) menggunakan PyTorch. Sangat berat untuk retraining harian jika terdapat ribuan subkategori komoditas.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operational Scaling Card -->
+            <div class="prod-card">
+                <div class="prod-card-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" class="icon-svg">
+                        <rect x="3" y="3" width="7" height="9"></rect>
+                        <rect x="14" y="3" width="7" height="5"></rect>
+                        <rect x="14" y="12" width="7" height="9"></rect>
+                        <rect x="3" y="16" width="7" height="5"></rect>
+                    </svg>
+                    <span class="prod-card-title">Skalabilitas & Stabilitas Sistem</span>
+                </div>
+                <div class="prod-list">
+                    <div class="prod-item">
+                        <span class="prod-item-label">
+                            <span class="tag-model xgb">XGBoost / RF</span> Robust dan Skalabel
+                        </span>
+                        <p class="prod-item-desc">Sangat stabil melayani ribuan jenis komoditas paralel secara bersamaan
+                            tanpa resiko crash jika ada data pencilan (outlier) ekstrem.</p>
+                    </div>
+                    <div class="prod-item">
+                        <span class="prod-item-label">
+                            <span class="tag-model arima">ARIMA</span> Rawan Gagal Konvergensi
+                        </span>
+                        <p class="prod-item-desc">Algoritma optimasi numerik ARIMA (seperti L-BFGS-B) sering gagal
+                            konvergen atau crash saat dilatih otomatis pada data real-world yang tidak stasioner atau
+                            ber-outlier.</p>
+                    </div>
+                    <div class="prod-item">
+                        <span class="prod-item-label">
+                            <span class="tag-model prophet">Prophet</span> Dukungan Hari Libur Nasional Otomatis
+                        </span>
+                        <p class="prod-item-desc">Sangat baik dalam mendeteksi dan beradaptasi terhadap libur Lebaran
+                            dan Ramadhan secara bawaan, meminimalisir intervensi manual pada kode pipeline.</p>
+                    </div>
+                    <div class="prod-item">
+                        <span class="prod-item-label">
+                            <span class="tag-model knn">KNN</span> Stabilitas Komputasi Tinggi
+                        </span>
+                        <p class="prod-item-desc">Sangat stabil karena operasinya hanya menghitung jarak Euclidean/Manhattan. Bebas dari masalah konvergensi, tetapi memakan memori seiring bertambahnya ukuran data.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Production Characteristics Summary Table -->
+        <div class="card prod-table-card">
+            <div class="card-header-inner">
+                <div class="card-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" class="icon-svg"
+                        style="color: var(--color-primary)">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                    </svg>
+                    Matriks Perbandingan Karakteristik Operasional Produksi
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table class="prod-table">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Inference Latency</th>
+                            <th>Retraining Overhead</th>
+                            <th>Feature Store Required</th>
+                            <th>Operational Stability</th>
+                            <th>Skalabilitas (1000+ Series)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="bold-text">SARIMA Murni</td>
+                            <td><span class="status-badge kuning">Sedang (20-50ms)</span></td>
+                            <td><span class="status-badge merah">Tinggi (Sering Retrain)</span></td>
+                            <td><span class="status-badge hijau">Tidak</span></td>
+                            <td><span class="status-badge merah">Rendah (Rawan Crash)</span></td>
+                            <td><span class="status-badge kuning">Sedang</span></td>
+                        </tr>
+                        <tr>
+                            <td class="bold-text">SARIMAX (dengan Exog)</td>
+                            <td><span class="status-badge kuning">Sedang (25-55ms)</span></td>
+                            <td><span class="status-badge merah">Tinggi (Sering Retrain)</span></td>
+                            <td><span class="status-badge hijau">Tidak (Exog Dummy)</span></td>
+                            <td><span class="status-badge kuning">Sedang (is_weekend Stabil)</span></td>
+                            <td><span class="status-badge kuning">Sedang</span></td>
+                        </tr>
+                        <tr>
+                            <td class="bold-text">ARIMA Murni</td>
+                            <td><span class="status-badge kuning">Sedang (20-50ms)</span></td>
+                            <td><span class="status-badge merah">Tinggi (Sering Retrain)</span></td>
+                            <td><span class="status-badge hijau">Tidak</span></td>
+                            <td><span class="status-badge merah">Rendah (Rawan Crash)</span></td>
+                            <td><span class="status-badge kuning">Sedang</span></td>
+                        </tr>
+                        <tr>
+                            <td class="bold-text">Hybrid ARIMA + RF</td>
+                            <td><span class="status-badge kuning">Sedang (30-60ms)</span></td>
+                            <td><span class="status-badge merah">Tinggi</span></td>
+                            <td><span class="status-badge kuning">Sebagian</span></td>
+                            <td><span class="status-badge kuning">Sedang</span></td>
+                            <td><span class="status-badge kuning">Sedang</span></td>
+                        </tr>
+                        <tr>
+                            <td class="bold-text">Random Forest</td>
+                            <td><span class="status-badge hijau">Cepat (&lt;2ms)</span></td>
+                            <td><span class="status-badge hijau">Rendah (Bulanan)</span></td>
+                            <td><span class="status-badge merah">Ya (Lags/Rolling)</span></td>
+                            <td><span class="status-badge hijau">Tinggi (Sangat Stabil)</span></td>
+                            <td><span class="status-badge hijau">Tinggi</span></td>
+                        </tr>
+                        <tr>
+                            <td class="bold-text">XGBoost</td>
+                            <td><span class="status-badge hijau">Sangat Cepat (&lt;1ms)</span></td>
+                            <td><span class="status-badge hijau">Rendah (Bulanan)</span></td>
+                            <td><span class="status-badge merah">Ya (Lags/Rolling)</span></td>
+                            <td><span class="status-badge hijau">Tinggi (Sangat Stabil)</span></td>
+                            <td><span class="status-badge hijau">Tinggi</span></td>
+                        </tr>
+                        <tr>
+                            <td class="bold-text">FB Prophet</td>
+                            <td><span class="status-badge merah">Lambat (&gt;100ms)</span></td>
+                            <td><span class="status-badge kuning">Sedang (Mingguan)</span></td>
+                            <td><span class="status-badge hijau">Tidak</span></td>
+                            <td><span class="status-badge hijau">Tinggi (Bawaan Libur)</span></td>
+                            <td><span class="status-badge kuning">Sedang</span></td>
+                        </tr>
+                        <tr>
+                            <td class="bold-text">KNN</td>
+                            <td><span class="status-badge hijau">Cepat (&lt;5ms)</span></td>
+                            <td><span class="status-badge hijau">Sangat Rendah (Fit Instan)</span></td>
+                            <td><span class="status-badge merah">Ya (Lags/Scaling)</span></td>
+                            <td><span class="status-badge hijau">Tinggi (Sangat Stabil)</span></td>
+                            <td><span class="status-badge kuning">Sedang</span></td>
+                        </tr>
+                        <tr>
+                            <td class="bold-text">LSTM</td>
+                            <td><span class="status-badge kuning">Sedang (10-30ms)</span></td>
+                            <td><span class="status-badge merah">Sangat Tinggi (Latihan GPU/CPU)</span></td>
+                            <td><span class="status-badge merah">Ya (Sequence Windowing)</span></td>
+                            <td><span class="status-badge hijau">Tinggi (Model Terlatih)</span></td>
+                            <td><span class="status-badge merah">Rendah</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recommendation Panel -->
+        <div class="recommendation-panel">
+            <div class="rec-icon-wrapper">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="icon-svg">
+                    <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                    </polygon>
+                </svg>
+            </div>
+            <div class="rec-content">
+                <h3>Rekomendasi Utama Deployment Skala Produksi</h3>
+                <p>
+                    Berdasarkan perbandingan performa akurasi statistik dan kelayakan teknis operasional, rekomendasi
+                    deployment dibagi menjadi dua skenario utama:
+                </p>
+                <p>
+                    1. <span class="bold-text" style="color: var(--color-success)">Skenario Akurasi & Prediksi Jangka
+                        Pendek (Pilihan Utama)</span>: <span class="bold-text">SARIMA Murni</span> merupakan pemenang
+                    mutlak secara akurasi statistik dengan rata-rata R² Score mencapai <span
+                        class="bold-text">0.8166</span> dan MAPE terkecil sebesar <span class="bold-text">0.37%</span>.
+                    Model ini sangat direkomendasikan jika sistem menggunakan pipeline otomatis yang matang (seperti
+                    Apache Airflow) untuk melakukan retraining secara berkala (misal harian) di background worker dan
+                    memiliki handling error untuk mengatasi error konvergensi numerik. Namun, untuk beberapa komoditas musiman/volatile seperti Daging Ayam Ras Segar dan Beras Kualitas Super, model <span class="bold-text">SARIMAX (dengan Exog Kalender)</span> memberikan hasil yang lebih baik dengan memanfaatkan fitur kalender <code>is_weekend</code>.
+                </p>
+                <p>
+                    2. <span class="bold-text" style="color: var(--color-secondary)">Skenario Operasional Skala Besar
+                        (1.000+ Komoditas & Wilayah)</span>: <span class="bold-text">XGBoost</span> adalah pilihan
+                    paling tangguh. Meskipun XGBoost memiliki error rata-rata yang lebih tinggi pada pengujian baseline
+                    ini (R² Score: -0.0854, MAPE: 1.51%), XGBoost memiliki latensi inferensi sub-milidetik (<span
+                        class="bold-text">&lt; 1 ms</span>), stabil secara matematis (tidak pernah crash saat
+                    inferensi/training), serta sangat hemat biaya komputasi untuk melayani ribuan model secara paralel.
+                </p>
+                <p>
+                    3. <span class="bold-text" style="color: var(--color-primary)">Alternatif Model Non-Linear (Deep Learning)</span>: <span class="bold-text">LSTM</span> menunjukkan performa terbaik di antara model berbasis Machine Learning/Deep Learning non-linear, dengan rata-rata R² Score <span class="bold-text">0.4750</span>. Ini jauh mengungguli Random Forest (0.1570) and XGBoost (-0.0854), menjadikannya kandidat kuat jika pola tren jangka panjang sangat kompleks dan non-linear.
+                </p>
+                <div class="badges-group">
+                    <span class="rec-badge emerald">
+                        <svg width="12" height="12" viewBox="0 0 24 24" class="icon-svg">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Akurasi Terbaik: SARIMA Murni
+                    </span>
+                    <span class="rec-badge cyan">
+                        <svg width="12" height="12" viewBox="0 0 24 24" class="icon-svg">
+                            <path
+                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                            </path>
+                        </svg>
+                        Skalabilitas & Latensi: XGBoost
+                    </span>
+                    <span class="rec-badge">
+                        <svg width="12" height="12" viewBox="0 0 24 24" class="icon-svg">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        Handal Event Lebaran/Hari Libur: FB Prophet
+                    </span>
+                    <span class="rec-badge" style="background-color: rgba(244, 63, 94, 0.15); color: #fca5a5; border-color: rgba(244, 63, 94, 0.25);">
+                        <svg width="12" height="12" viewBox="0 0 24 24" class="icon-svg">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                        Deep Learning Unggul: LSTM
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        // Data derived from result.md
+        const modelData = {
+"SARIMA Murni": {
+        "Bawang Merah Ukuran Sedang": {
+            "MAE": 221.4642,
+            "RMSE": 438.7853,
+            "MAPE": 0.4698,
+            "R2": 0.9763
+        },
+        "Bawang Putih Ukuran Sedang": {
+            "MAE": 68.0826,
+            "RMSE": 118.5896,
+            "MAPE": 0.171,
+            "R2": 0.9621
+        },
+        "Beras Kualitas Bawah I": {
+            "MAE": 20.468,
+            "RMSE": 75.3343,
+            "MAPE": 0.1428,
+            "R2": 0.2985
+        },
+        "Beras Kualitas Bawah II": {
+            "MAE": 9.529,
+            "RMSE": 25.3923,
+            "MAPE": 0.0657,
+            "R2": 0.9006
+        },
+        "Beras Kualitas Medium I": {
+            "MAE": 18.5186,
+            "RMSE": 63.518,
+            "MAPE": 0.1162,
+            "R2": 0.5105
+        },
+        "Beras Kualitas Medium II": {
+            "MAE": 28.3932,
+            "RMSE": 94.0324,
+            "MAPE": 0.1808,
+            "R2": 0.2497
+        },
+        "Beras Kualitas Super I": {
+            "MAE": 29.8193,
+            "RMSE": 94.2901,
+            "MAPE": 0.1744,
+            "R2": 0.412
+        },
+        "Beras Kualitas Super II": {
+            "MAE": 27.6175,
+            "RMSE": 92.0663,
+            "MAPE": 0.166,
+            "R2": 0.4051
+        },
+        "Cabai Merah Besar": {
+            "MAE": 492.8826,
+            "RMSE": 823.2106,
+            "MAPE": 0.9969,
+            "R2": 0.9804
+        },
+        "Cabai Merah Keriting": {
+            "MAE": 657.7261,
+            "RMSE": 1146.7842,
+            "MAPE": 1.2983,
+            "R2": 0.9719
+        },
+        "Cabai Rawit Hijau": {
+            "MAE": 624.7038,
+            "RMSE": 1365.5506,
+            "MAPE": 1.1742,
+            "R2": 0.9111
+        },
+        "Cabai Rawit Merah": {
+            "MAE": 921.9845,
+            "RMSE": 1500.378,
+            "MAPE": 1.2724,
+            "R2": 0.9793
+        },
+        "Daging Ayam Ras Segar": {
+            "MAE": 182.611,
+            "RMSE": 401.8841,
+            "MAPE": 0.4468,
+            "R2": 0.8961
+        },
+        "Daging Sapi Kualitas 1": {
+            "MAE": 317.1839,
+            "RMSE": 974.0326,
+            "MAPE": 0.2183,
+            "R2": 0.8855
+        },
+        "Daging Sapi Kualitas 2": {
+            "MAE": 299.8724,
+            "RMSE": 756.1686,
+            "MAPE": 0.2185,
+            "R2": 0.9189
+        },
+        "Gula Pasir Kualitas Premium": {
+            "MAE": 12.2893,
+            "RMSE": 41.2311,
+            "MAPE": 0.0615,
+            "R2": 0.9411
+        },
+        "Gula Pasir Lokal": {
+            "MAE": 17.5235,
+            "RMSE": 34.1566,
+            "MAPE": 0.0935,
+            "R2": 0.9928
+        },
+        "Minyak Goreng Curah": {
+            "MAE": 24.325,
+            "RMSE": 43.1811,
+            "MAPE": 0.1234,
+            "R2": 0.9962
+        },
+        "Minyak Goreng Kemasan Bermerk 1": {
+            "MAE": 29.5646,
+            "RMSE": 60.1639,
+            "MAPE": 0.1265,
+            "R2": 0.9864
+        },
+        "Minyak Goreng Kemasan Bermerk 2": {
+            "MAE": 25.2702,
+            "RMSE": 39.446,
+            "MAPE": 0.1138,
+            "R2": 0.9948
+        },
+        "Telur Ayam Ras Segar": {
+            "MAE": 63.4341,
+            "RMSE": 114.7656,
+            "MAPE": 0.198,
+            "R2": 0.9798
+        },
+        "Overall": {
+            "MAE": 194.9173,
+            "RMSE": 395.3791,
+            "MAPE": 0.3728,
+            "R2": 0.8166
+        }
+    },
+    "SARIMAX (dengan Exog Kalender)": {
+        "Bawang Merah Ukuran Sedang": {
+            "MAE": 314.6858,
+            "RMSE": 507.947,
+            "MAPE": 0.6679,
+            "R2": 0.9682
+        },
+        "Bawang Putih Ukuran Sedang": {
+            "MAE": 68.1536,
+            "RMSE": 118.6202,
+            "MAPE": 0.1711,
+            "R2": 0.9621
+        },
+        "Beras Kualitas Bawah I": {
+            "MAE": 19.9583,
+            "RMSE": 75.5722,
+            "MAPE": 0.1393,
+            "R2": 0.2941
+        },
+        "Beras Kualitas Bawah II": {
+            "MAE": 9.7347,
+            "RMSE": 25.5037,
+            "MAPE": 0.0671,
+            "R2": 0.8997
+        },
+        "Beras Kualitas Medium I": {
+            "MAE": 18.6992,
+            "RMSE": 63.7158,
+            "MAPE": 0.1173,
+            "R2": 0.5074
+        },
+        "Beras Kualitas Medium II": {
+            "MAE": 32.6255,
+            "RMSE": 96.3821,
+            "MAPE": 0.2074,
+            "R2": 0.2118
+        },
+        "Beras Kualitas Super I": {
+            "MAE": 28.5778,
+            "RMSE": 93.8526,
+            "MAPE": 0.1669,
+            "R2": 0.4175
+        },
+        "Beras Kualitas Super II": {
+            "MAE": 24.953,
+            "RMSE": 91.3614,
+            "MAPE": 0.1499,
+            "R2": 0.4142
+        },
+        "Cabai Merah Besar": {
+            "MAE": 496.2217,
+            "RMSE": 825.4405,
+            "MAPE": 1.0037,
+            "R2": 0.9803
+        },
+        "Cabai Merah Keriting": {
+            "MAE": 652.1457,
+            "RMSE": 1134.7869,
+            "MAPE": 1.2881,
+            "R2": 0.9725
+        },
+        "Cabai Rawit Hijau": {
+            "MAE": 626.8835,
+            "RMSE": 1368.5511,
+            "MAPE": 1.1784,
+            "R2": 0.9107
+        },
+        "Cabai Rawit Merah": {
+            "MAE": 1014.6793,
+            "RMSE": 1645.8029,
+            "MAPE": 1.4049,
+            "R2": 0.9751
+        },
+        "Daging Ayam Ras Segar": {
+            "MAE": 182.1606,
+            "RMSE": 397.6272,
+            "MAPE": 0.4455,
+            "R2": 0.8983
+        },
+        "Daging Sapi Kualitas 1": {
+            "MAE": 323.5942,
+            "RMSE": 971.8088,
+            "MAPE": 0.2229,
+            "R2": 0.886
+        },
+        "Daging Sapi Kualitas 2": {
+            "MAE": 303.9746,
+            "RMSE": 758.8246,
+            "MAPE": 0.2215,
+            "R2": 0.9183
+        },
+        "Gula Pasir Kualitas Premium": {
+            "MAE": 13.1028,
+            "RMSE": 40.637,
+            "MAPE": 0.0656,
+            "R2": 0.9428
+        },
+        "Gula Pasir Lokal": {
+            "MAE": 17.5735,
+            "RMSE": 33.6534,
+            "MAPE": 0.0937,
+            "R2": 0.993
+        },
+        "Minyak Goreng Curah": {
+            "MAE": 25.0541,
+            "RMSE": 43.3642,
+            "MAPE": 0.1272,
+            "R2": 0.9962
+        },
+        "Minyak Goreng Kemasan Bermerk 1": {
+            "MAE": 29.7865,
+            "RMSE": 59.8431,
+            "MAPE": 0.1275,
+            "R2": 0.9865
+        },
+        "Minyak Goreng Kemasan Bermerk 2": {
+            "MAE": 25.5971,
+            "RMSE": 38.7843,
+            "MAPE": 0.1153,
+            "R2": 0.995
+        },
+        "Telur Ayam Ras Segar": {
+            "MAE": 63.9005,
+            "RMSE": 114.5669,
+            "MAPE": 0.1995,
+            "R2": 0.9798
+        },
+        "Overall": {
+            "MAE": 204.3839,
+            "RMSE": 405.0784,
+            "MAPE": 0.3896,
+            "R2": 0.8147
+        }
+    },
+            "ARIMA Murni": {
+                "Bawang Merah Ukuran Sedang": {
+                    "MAE": 220.69,
+                    "RMSE": 424.6043,
+                    "MAPE": 0.4678,
+                    "R2": 0.9778
+                },
+                "Bawang Putih Ukuran Sedang": {
+                    "MAE": 69.9466,
+                    "RMSE": 116.6753,
+                    "MAPE": 0.1755,
+                    "R2": 0.9634
+                },
+                "Beras Kualitas Bawah I": {
+                    "MAE": 18.8747,
+                    "RMSE": 74.8254,
+                    "MAPE": 0.1317,
+                    "R2": 0.3079
+                },
+                "Beras Kualitas Bawah II": {
+                    "MAE": 9.4095,
+                    "RMSE": 25.4488,
+                    "MAPE": 0.0649,
+                    "R2": 0.9002
+                },
+                "Beras Kualitas Medium I": {
+                    "MAE": 21.7443,
+                    "RMSE": 61.7029,
+                    "MAPE": 0.1365,
+                    "R2": 0.5381
+                },
+                "Beras Kualitas Medium II": {
+                    "MAE": 32.7873,
+                    "RMSE": 91.7822,
+                    "MAPE": 0.2087,
+                    "R2": 0.2852
+                },
+                "Beras Kualitas Super I": {
+                    "MAE": 30.3179,
+                    "RMSE": 91.7531,
+                    "MAPE": 0.1772,
+                    "R2": 0.4432
+                },
+                "Beras Kualitas Super II": {
+                    "MAE": 27.5769,
+                    "RMSE": 92.037,
+                    "MAPE": 0.1658,
+                    "R2": 0.4055
+                },
+                "Cabai Merah Besar": {
+                    "MAE": 482.9998,
+                    "RMSE": 846.8157,
+                    "MAPE": 0.9853,
+                    "R2": 0.9792
+                },
+                "Cabai Merah Keriting": {
+                    "MAE": 640.5301,
+                    "RMSE": 1170.4772,
+                    "MAPE": 1.2748,
+                    "R2": 0.9707
+                },
+                "Cabai Rawit Hijau": {
+                    "MAE": 616.4945,
+                    "RMSE": 1358.3229,
+                    "MAPE": 1.1576,
+                    "R2": 0.912
+                },
+                "Cabai Rawit Merah": {
+                    "MAE": 1057.1332,
+                    "RMSE": 1734.7225,
+                    "MAPE": 1.4777,
+                    "R2": 0.9723
+                },
+                "Daging Ayam Ras Segar": {
+                    "MAE": 188.4206,
+                    "RMSE": 400.5927,
+                    "MAPE": 0.4615,
+                    "R2": 0.8968
+                },
+                "Daging Sapi Kualitas 1": {
+                    "MAE": 293.2744,
+                    "RMSE": 969.0002,
+                    "MAPE": 0.2018,
+                    "R2": 0.8867
+                },
+                "Daging Sapi Kualitas 2": {
+                    "MAE": 250.4871,
+                    "RMSE": 758.5326,
+                    "MAPE": 0.1826,
+                    "R2": 0.9184
+                },
+                "Gula Pasir Kualitas Premium": {
+                    "MAE": 17.6857,
+                    "RMSE": 42.3076,
+                    "MAPE": 0.0885,
+                    "R2": 0.938
+                },
+                "Gula Pasir Lokal": {
+                    "MAE": 19.1083,
+                    "RMSE": 33.2043,
+                    "MAPE": 0.102,
+                    "R2": 0.9932
+                },
+                "Minyak Goreng Curah": {
+                    "MAE": 27.5343,
+                    "RMSE": 42.84,
+                    "MAPE": 0.1398,
+                    "R2": 0.9963
+                },
+                "Minyak Goreng Kemasan Bermerk 1": {
+                    "MAE": 30.7436,
+                    "RMSE": 60.053,
+                    "MAPE": 0.1316,
+                    "R2": 0.9865
+                },
+                "Minyak Goreng Kemasan Bermerk 2": {
+                    "MAE": 25.0731,
+                    "RMSE": 38.0232,
+                    "MAPE": 0.1132,
+                    "R2": 0.9952
+                },
+                "Telur Ayam Ras Segar": {
+                    "MAE": 69.3171,
+                    "RMSE": 113.787,
+                    "MAPE": 0.216,
+                    "R2": 0.9801
+                },
+                "Overall": {
+                    "MAE": 197.6261,
+                    "RMSE": 407.0242,
+                    "MAPE": 0.3838,
+                    "R2": 0.8213
+                }
+            },
+            "Hybrid ARIMA + RF": {
+                "Bawang Merah Ukuran Sedang": {
+                    "MAE": 238.6137,
+                    "RMSE": 427.2455,
+                    "MAPE": 0.5058,
+                    "R2": 0.9775
+                },
+                "Bawang Putih Ukuran Sedang": {
+                    "MAE": 102.236,
+                    "RMSE": 144.3697,
+                    "MAPE": 0.2562,
+                    "R2": 0.9439
+                },
+                "Beras Kualitas Bawah I": {
+                    "MAE": 33.5798,
+                    "RMSE": 77.0655,
+                    "MAPE": 0.2338,
+                    "R2": 0.2659
+                },
+                "Beras Kualitas Bawah II": {
+                    "MAE": 27.3414,
+                    "RMSE": 38.0773,
+                    "MAPE": 0.1889,
+                    "R2": 0.7765
+                },
+                "Beras Kualitas Medium I": {
+                    "MAE": 37.2938,
+                    "RMSE": 64.9605,
+                    "MAPE": 0.2339,
+                    "R2": 0.488
+                },
+                "Beras Kualitas Medium II": {
+                    "MAE": 47.1454,
+                    "RMSE": 90.7889,
+                    "MAPE": 0.2992,
+                    "R2": 0.3006
+                },
+                "Beras Kualitas Super I": {
+                    "MAE": 40.4169,
+                    "RMSE": 92.3618,
+                    "MAPE": 0.2362,
+                    "R2": 0.4358
+                },
+                "Beras Kualitas Super II": {
+                    "MAE": 38.8753,
+                    "RMSE": 94.1864,
+                    "MAPE": 0.2337,
+                    "R2": 0.3774
+                },
+                "Cabai Merah Besar": {
+                    "MAE": 787.0949,
+                    "RMSE": 1102.2653,
+                    "MAPE": 1.6549,
+                    "R2": 0.9648
+                },
+                "Cabai Merah Keriting": {
+                    "MAE": 778.6344,
+                    "RMSE": 1306.398,
+                    "MAPE": 1.5618,
+                    "R2": 0.9636
+                },
+                "Cabai Rawit Hijau": {
+                    "MAE": 672.3335,
+                    "RMSE": 1383.1452,
+                    "MAPE": 1.247,
+                    "R2": 0.9088
+                },
+                "Cabai Rawit Merah": {
+                    "MAE": 1150.9606,
+                    "RMSE": 1835.6876,
+                    "MAPE": 1.606,
+                    "R2": 0.969
+                },
+                "Daging Ayam Ras Segar": {
+                    "MAE": 256.9377,
+                    "RMSE": 446.2811,
+                    "MAPE": 0.6262,
+                    "R2": 0.8719
+                },
+                "Daging Sapi Kualitas 1": {
+                    "MAE": 962.3395,
+                    "RMSE": 1394.8773,
+                    "MAPE": 0.6579,
+                    "R2": 0.7652
+                },
+                "Daging Sapi Kualitas 2": {
+                    "MAE": 880.8261,
+                    "RMSE": 1195.0935,
+                    "MAPE": 0.6377,
+                    "R2": 0.7973
+                },
+                "Gula Pasir Kualitas Premium": {
+                    "MAE": 27.9565,
+                    "RMSE": 48.0649,
+                    "MAPE": 0.1401,
+                    "R2": 0.92
+                },
+                "Gula Pasir Lokal": {
+                    "MAE": 25.9521,
+                    "RMSE": 43.4337,
+                    "MAPE": 0.1396,
+                    "R2": 0.9884
+                },
+                "Minyak Goreng Curah": {
+                    "MAE": 34.0357,
+                    "RMSE": 49.3631,
+                    "MAPE": 0.1745,
+                    "R2": 0.9951
+                },
+                "Minyak Goreng Kemasan Bermerk 1": {
+                    "MAE": 37.4585,
+                    "RMSE": 62.2285,
+                    "MAPE": 0.1611,
+                    "R2": 0.9855
+                },
+                "Minyak Goreng Kemasan Bermerk 2": {
+                    "MAE": 30.5095,
+                    "RMSE": 43.8919,
+                    "MAPE": 0.1381,
+                    "R2": 0.9936
+                },
+                "Telur Ayam Ras Segar": {
+                    "MAE": 82.4414,
+                    "RMSE": 124.9563,
+                    "MAPE": 0.2558,
+                    "R2": 0.976
+                },
+                "Overall": {
+                    "MAE": 299.6658,
+                    "RMSE": 479.2734,
+                    "MAPE": 0.5328,
+                    "R2": 0.7936
+                }
+            },
+            "Random Forest Baseline": {
+                "Bawang Merah Ukuran Sedang": {
+                    "MAE": 305.7944,
+                    "RMSE": 486.0119,
+                    "MAPE": 0.6474,
+                    "R2": 0.9709
+                },
+                "Bawang Putih Ukuran Sedang": {
+                    "MAE": 262.3608,
+                    "RMSE": 373.4945,
+                    "MAPE": 0.6609,
+                    "R2": 0.6245
+                },
+                "Beras Kualitas Bawah I": {
+                    "MAE": 28.8929,
+                    "RMSE": 76.3347,
+                    "MAPE": 0.201,
+                    "R2": 0.2797
+                },
+                "Beras Kualitas Bawah II": {
+                    "MAE": 28.4349,
+                    "RMSE": 36.8286,
+                    "MAPE": 0.1962,
+                    "R2": 0.7909
+                },
+                "Beras Kualitas Medium I": {
+                    "MAE": 38.2695,
+                    "RMSE": 68.4172,
+                    "MAPE": 0.2391,
+                    "R2": 0.4321
+                },
+                "Beras Kualitas Medium II": {
+                    "MAE": 44.6804,
+                    "RMSE": 92.563,
+                    "MAPE": 0.2825,
+                    "R2": 0.273
+                },
+                "Beras Kualitas Super I": {
+                    "MAE": 35.324,
+                    "RMSE": 90.1581,
+                    "MAPE": 0.2056,
+                    "R2": 0.4624
+                },
+                "Beras Kualitas Super II": {
+                    "MAE": 52.4616,
+                    "RMSE": 95.3733,
+                    "MAPE": 0.3128,
+                    "R2": 0.3616
+                },
+                "Cabai Merah Besar": {
+                    "MAE": 695.043,
+                    "RMSE": 981.5291,
+                    "MAPE": 1.4392,
+                    "R2": 0.9721
+                },
+                "Cabai Merah Keriting": {
+                    "MAE": 944.5813,
+                    "RMSE": 1390.033,
+                    "MAPE": 1.8914,
+                    "R2": 0.9587
+                },
+                "Cabai Rawit Hijau": {
+                    "MAE": 857.3,
+                    "RMSE": 1472.2095,
+                    "MAPE": 1.5965,
+                    "R2": 0.8966
+                },
+                "Cabai Rawit Merah": {
+                    "MAE": 1329.5024,
+                    "RMSE": 1925.9498,
+                    "MAPE": 1.815,
+                    "R2": 0.9659
+                },
+                "Daging Ayam Ras Segar": {
+                    "MAE": 1328.6558,
+                    "RMSE": 1651.6229,
+                    "MAPE": 3.1751,
+                    "R2": -0.7548
+                },
+                "Daging Sapi Kualitas 1": {
+                    "MAE": 2723.1518,
+                    "RMSE": 3778.3455,
+                    "MAPE": 1.8462,
+                    "R2": -0.7228
+                },
+                "Daging Sapi Kualitas 2": {
+                    "MAE": 2906.0506,
+                    "RMSE": 3894.6254,
+                    "MAPE": 2.0888,
+                    "R2": -1.1522
+                },
+                "Gula Pasir Kualitas Premium": {
+                    "MAE": 170.9134,
+                    "RMSE": 200.0878,
+                    "MAPE": 0.8531,
+                    "R2": -0.3867
+                },
+                "Gula Pasir Lokal": {
+                    "MAE": 139.213,
+                    "RMSE": 208.7938,
+                    "MAPE": 0.7333,
+                    "R2": 0.7318
+                },
+                "Minyak Goreng Curah": {
+                    "MAE": 609.5936,
+                    "RMSE": 920.1524,
+                    "MAPE": 3.0162,
+                    "R2": -0.7051
+                },
+                "Minyak Goreng Kemasan Bermerk 1": {
+                    "MAE": 579.0042,
+                    "RMSE": 773.3355,
+                    "MAPE": 2.476,
+                    "R2": -1.2467
+                },
+                "Minyak Goreng Kemasan Bermerk 2": {
+                    "MAE": 611.0,
+                    "RMSE": 808.6386,
+                    "MAPE": 2.7269,
+                    "R2": -1.1836
+                },
+                "Telur Ayam Ras Segar": {
+                    "MAE": 270.3318,
+                    "RMSE": 420.6777,
+                    "MAPE": 0.8218,
+                    "R2": 0.7282
+                },
+                "Overall": {
+                    "MAE": 664.7885,
+                    "RMSE": 940.2468,
+                    "MAPE": 1.2964,
+                    "R2": 0.157
+                }
+            },
+            "XGBoost": {
+                "Bawang Merah Ukuran Sedang": {
+                    "MAE": 479.4487,
+                    "RMSE": 652.0824,
+                    "MAPE": 1.0139,
+                    "R2": 0.9476
+                },
+                "Bawang Putih Ukuran Sedang": {
+                    "MAE": 765.8858,
+                    "RMSE": 946.744,
+                    "MAPE": 1.9322,
+                    "R2": -1.4129
+                },
+                "Beras Kualitas Bawah I": {
+                    "MAE": 27.5332,
+                    "RMSE": 74.6465,
+                    "MAPE": 0.1916,
+                    "R2": 0.3112
+                },
+                "Beras Kualitas Bawah II": {
+                    "MAE": 48.4386,
+                    "RMSE": 68.9671,
+                    "MAPE": 0.3334,
+                    "R2": 0.2669
+                },
+                "Beras Kualitas Medium I": {
+                    "MAE": 41.206,
+                    "RMSE": 69.4709,
+                    "MAPE": 0.2573,
+                    "R2": 0.4144
+                },
+                "Beras Kualitas Medium II": {
+                    "MAE": 58.2483,
+                    "RMSE": 100.219,
+                    "MAPE": 0.3674,
+                    "R2": 0.1477
+                },
+                "Beras Kualitas Super I": {
+                    "MAE": 51.1206,
+                    "RMSE": 96.0475,
+                    "MAPE": 0.2966,
+                    "R2": 0.3899
+                },
+                "Beras Kualitas Super II": {
+                    "MAE": 62.9895,
+                    "RMSE": 104.6396,
+                    "MAPE": 0.3751,
+                    "R2": 0.2315
+                },
+                "Cabai Merah Besar": {
+                    "MAE": 741.2855,
+                    "RMSE": 1070.1523,
+                    "MAPE": 1.522,
+                    "R2": 0.9668
+                },
+                "Cabai Merah Keriting": {
+                    "MAE": 1070.9836,
+                    "RMSE": 1470.6621,
+                    "MAPE": 2.1886,
+                    "R2": 0.9538
+                },
+                "Cabai Rawit Hijau": {
+                    "MAE": 994.5267,
+                    "RMSE": 1592.5063,
+                    "MAPE": 1.8193,
+                    "R2": 0.879
+                },
+                "Cabai Rawit Merah": {
+                    "MAE": 1398.5102,
+                    "RMSE": 1813.4178,
+                    "MAPE": 1.9184,
+                    "R2": 0.9698
+                },
+                "Daging Ayam Ras Segar": {
+                    "MAE": 1705.6788,
+                    "RMSE": 2004.7986,
+                    "MAPE": 4.0865,
+                    "R2": -1.5855
+                },
+                "Daging Sapi Kualitas 1": {
+                    "MAE": 3360.6992,
+                    "RMSE": 4468.8664,
+                    "MAPE": 2.2816,
+                    "R2": -1.41
+                },
+                "Daging Sapi Kualitas 2": {
+                    "MAE": 3592.0323,
+                    "RMSE": 4509.1045,
+                    "MAPE": 2.5886,
+                    "R2": -1.8849
+                },
+                "Gula Pasir Kualitas Premium": {
+                    "MAE": 154.4348,
+                    "RMSE": 197.1025,
+                    "MAPE": 0.7691,
+                    "R2": -0.3456
+                },
+                "Gula Pasir Lokal": {
+                    "MAE": 142.1508,
+                    "RMSE": 222.4251,
+                    "MAPE": 0.7464,
+                    "R2": 0.6957
+                },
+                "Minyak Goreng Curah": {
+                    "MAE": 606.5517,
+                    "RMSE": 917.3461,
+                    "MAPE": 3.0006,
+                    "R2": -0.6947
+                },
+                "Minyak Goreng Kemasan Bermerk 1": {
+                    "MAE": 561.9384,
+                    "RMSE": 754.6588,
+                    "MAPE": 2.4023,
+                    "R2": -1.1395
+                },
+                "Minyak Goreng Kemasan Bermerk 2": {
+                    "MAE": 606.4753,
+                    "RMSE": 809.6181,
+                    "MAPE": 2.7054,
+                    "R2": -1.1889
+                },
+                "Telur Ayam Ras Segar": {
+                    "MAE": 309.7286,
+                    "RMSE": 446.0558,
+                    "MAPE": 0.9425,
+                    "R2": 0.6944
+                },
+                "Overall": {
+                    "MAE": 799.0413,
+                    "RMSE": 1066.1682,
+                    "MAPE": 1.5114,
+                    "R2": -0.0854
+                }
+            },
+            "Prophet": {
+                "Bawang Merah Ukuran Sedang": {
+                    "MAE": 6916.777,
+                    "RMSE": 8466.3569,
+                    "MAPE": 15.0598,
+                    "R2": -7.8402
+                },
+                "Bawang Putih Ukuran Sedang": {
+                    "MAE": 3232.6272,
+                    "RMSE": 3506.5978,
+                    "MAPE": 8.0325,
+                    "R2": -32.101
+                },
+                "Beras Kualitas Bawah I": {
+                    "MAE": 228.4275,
+                    "RMSE": 296.0116,
+                    "MAPE": 1.5774,
+                    "R2": -9.8308
+                },
+                "Beras Kualitas Bawah II": {
+                    "MAE": 202.7151,
+                    "RMSE": 254.4201,
+                    "MAPE": 1.3981,
+                    "R2": -8.9771
+                },
+                "Beras Kualitas Medium I": {
+                    "MAE": 402.5167,
+                    "RMSE": 504.8044,
+                    "MAPE": 2.517,
+                    "R2": -29.9177
+                },
+                "Beras Kualitas Medium II": {
+                    "MAE": 498.3031,
+                    "RMSE": 599.4892,
+                    "MAPE": 3.1491,
+                    "R2": -29.4954
+                },
+                "Beras Kualitas Super I": {
+                    "MAE": 317.7649,
+                    "RMSE": 406.0332,
+                    "MAPE": 1.847,
+                    "R2": -9.9033
+                },
+                "Beras Kualitas Super II": {
+                    "MAE": 249.8551,
+                    "RMSE": 321.6443,
+                    "MAPE": 1.4939,
+                    "R2": -6.2611
+                },
+                "Cabai Merah Besar": {
+                    "MAE": 49629.8327,
+                    "RMSE": 52378.1312,
+                    "MAPE": 106.4727,
+                    "R2": -78.4383
+                },
+                "Cabai Merah Keriting": {
+                    "MAE": 104768.8065,
+                    "RMSE": 112280.6791,
+                    "MAPE": 222.6472,
+                    "R2": -268.1621
+                },
+                "Cabai Rawit Hijau": {
+                    "MAE": 25401.5236,
+                    "RMSE": 27511.6158,
+                    "MAPE": 47.6258,
+                    "R2": -35.099
+                },
+                "Cabai Rawit Merah": {
+                    "MAE": 19444.6111,
+                    "RMSE": 21922.5869,
+                    "MAPE": 26.0601,
+                    "R2": -3.4161
+                },
+                "Daging Ayam Ras Segar": {
+                    "MAE": 1447.0167,
+                    "RMSE": 1889.9735,
+                    "MAPE": 3.604,
+                    "R2": -1.2978
+                },
+                "Daging Sapi Kualitas 1": {
+                    "MAE": 1335.9581,
+                    "RMSE": 1866.5413,
+                    "MAPE": 0.9174,
+                    "R2": 0.5796
+                },
+                "Daging Sapi Kualitas 2": {
+                    "MAE": 2655.167,
+                    "RMSE": 3024.8268,
+                    "MAPE": 1.9216,
+                    "R2": -0.2982
+                },
+                "Gula Pasir Kualitas Premium": {
+                    "MAE": 164.9116,
+                    "RMSE": 192.6358,
+                    "MAPE": 0.8257,
+                    "R2": -0.2853
+                },
+                "Gula Pasir Lokal": {
+                    "MAE": 278.0062,
+                    "RMSE": 364.3322,
+                    "MAPE": 1.4766,
+                    "R2": 0.1835
+                },
+                "Minyak Goreng Curah": {
+                    "MAE": 975.554,
+                    "RMSE": 1233.6761,
+                    "MAPE": 4.8905,
+                    "R2": -2.065
+                },
+                "Minyak Goreng Kemasan Bermerk 1": {
+                    "MAE": 565.5453,
+                    "RMSE": 686.8389,
+                    "MAPE": 2.4298,
+                    "R2": -0.7722
+                },
+                "Minyak Goreng Kemasan Bermerk 2": {
+                    "MAE": 482.3635,
+                    "RMSE": 697.5794,
+                    "MAPE": 2.1432,
+                    "R2": -0.625
+                },
+                "Telur Ayam Ras Segar": {
+                    "MAE": 5963.8077,
+                    "RMSE": 6549.3679,
+                    "MAPE": 18.5631,
+                    "R2": -64.884
+                },
+                "Overall": {
+                    "MAE": 10722.0043,
+                    "RMSE": 11664.483,
+                    "MAPE": 22.6025,
+                    "R2": -28.0432
+                }
+            },
+            "KNN": {
+                "Bawang Merah Ukuran Sedang": {
+                    "MAE": 1616.771,
+                    "RMSE": 2295.2543,
+                    "MAPE": 3.3118,
+                    "R2": 0.3539
+                },
+                "Bawang Putih Ukuran Sedang": {
+                    "MAE": 750.7146,
+                    "RMSE": 863.4865,
+                    "MAPE": 1.886,
+                    "R2": -1.0043
+                },
+                "Beras Kualitas Bawah I": {
+                    "MAE": 70.9935,
+                    "RMSE": 107.2959,
+                    "MAPE": 0.4935,
+                    "R2": -0.4229
+                },
+                "Beras Kualitas Bawah II": {
+                    "MAE": 44.3478,
+                    "RMSE": 55.5177,
+                    "MAPE": 0.306,
+                    "R2": 0.5168
+                },
+                "Beras Kualitas Medium I": {
+                    "MAE": 55.3064,
+                    "RMSE": 75.8006,
+                    "MAPE": 0.346,
+                    "R2": 0.3004
+                },
+                "Beras Kualitas Medium II": {
+                    "MAE": 84.2285,
+                    "RMSE": 116.6817,
+                    "MAPE": 0.5318,
+                    "R2": -0.1561
+                },
+                "Beras Kualitas Super I": {
+                    "MAE": 66.0921,
+                    "RMSE": 103.2839,
+                    "MAPE": 0.3851,
+                    "R2": 0.2937
+                },
+                "Beras Kualitas Super II": {
+                    "MAE": 72.3961,
+                    "RMSE": 110.0336,
+                    "MAPE": 0.4319,
+                    "R2": 0.1502
+                },
+                "Cabai Merah Besar": {
+                    "MAE": 3988.499,
+                    "RMSE": 5253.5,
+                    "MAPE": 8.908,
+                    "R2": 0.1899
+                },
+                "Cabai Merah Keriting": {
+                    "MAE": 4550.2392,
+                    "RMSE": 5447.5953,
+                    "MAPE": 9.7708,
+                    "R2": 0.3454
+                },
+                "Cabai Rawit Hijau": {
+                    "MAE": 2354.1438,
+                    "RMSE": 3160.5644,
+                    "MAPE": 4.2254,
+                    "R2": 0.5259
+                },
+                "Cabai Rawit Merah": {
+                    "MAE": 4058.0859,
+                    "RMSE": 4939.296,
+                    "MAPE": 5.5093,
+                    "R2": 0.7764
+                },
+                "Daging Ayam Ras Segar": {
+                    "MAE": 1787.653,
+                    "RMSE": 2087.2262,
+                    "MAPE": 4.2892,
+                    "R2": -1.7911
+                },
+                "Daging Sapi Kualitas 1": {
+                    "MAE": 2791.0424,
+                    "RMSE": 3748.5235,
+                    "MAPE": 1.8941,
+                    "R2": -0.705
+                },
+                "Daging Sapi Kualitas 2": {
+                    "MAE": 3000.1373,
+                    "RMSE": 3869.7089,
+                    "MAPE": 2.1592,
+                    "R2": -1.1412
+                },
+                "Gula Pasir Kualitas Premium": {
+                    "MAE": 147.0751,
+                    "RMSE": 188.9633,
+                    "MAPE": 0.7326,
+                    "R2": -0.2353
+                },
+                "Gula Pasir Lokal": {
+                    "MAE": 171.1425,
+                    "RMSE": 223.0902,
+                    "MAPE": 0.9069,
+                    "R2": 0.6928
+                },
+                "Minyak Goreng Curah": {
+                    "MAE": 690.9402,
+                    "RMSE": 948.8027,
+                    "MAPE": 3.4423,
+                    "R2": -0.8137
+                },
+                "Minyak Goreng Kemasan Bermerk 1": {
+                    "MAE": 600.4967,
+                    "RMSE": 780.0288,
+                    "MAPE": 2.571,
+                    "R2": -1.2847
+                },
+                "Minyak Goreng Kemasan Bermerk 2": {
+                    "MAE": 585.3407,
+                    "RMSE": 800.7536,
+                    "MAPE": 2.6075,
+                    "R2": -1.1393
+                },
+                "Telur Ayam Ras Segar": {
+                    "MAE": 531.4663,
+                    "RMSE": 697.4448,
+                    "MAPE": 1.6209,
+                    "R2": 0.2571
+                },
+                "Overall": {
+                    "MAE": 1334.1482,
+                    "RMSE": 1708.231,
+                    "MAPE": 2.6823,
+                    "R2": -0.2043
+                }
+            },
+            "LSTM": {
+                "Bawang Merah Ukuran Sedang": {
+                    "MAE": 589.787,
+                    "RMSE": 750.7886,
+                    "MAPE": 1.2523,
+                    "R2": 0.9312
+                },
+                "Bawang Putih Ukuran Sedang": {
+                    "MAE": 511.7843,
+                    "RMSE": 592.6195,
+                    "MAPE": 1.2837,
+                    "R2": 0.073
+                },
+                "Beras Kualitas Bawah I": {
+                    "MAE": 46.9926,
+                    "RMSE": 89.8761,
+                    "MAPE": 0.3265,
+                    "R2": 0.0004
+                },
+                "Beras Kualitas Bawah II": {
+                    "MAE": 24.2306,
+                    "RMSE": 33.3154,
+                    "MAPE": 0.1674,
+                    "R2": 0.7992
+                },
+                "Beras Kualitas Medium I": {
+                    "MAE": 48.3567,
+                    "RMSE": 75.1489,
+                    "MAPE": 0.303,
+                    "R2": 0.2916
+                },
+                "Beras Kualitas Medium II": {
+                    "MAE": 65.756,
+                    "RMSE": 109.2292,
+                    "MAPE": 0.4172,
+                    "R2": -0.0162
+                },
+                "Beras Kualitas Super I": {
+                    "MAE": 48.9055,
+                    "RMSE": 106.4436,
+                    "MAPE": 0.286,
+                    "R2": 0.2455
+                },
+                "Beras Kualitas Super II": {
+                    "MAE": 114.1962,
+                    "RMSE": 148.4437,
+                    "MAPE": 0.6813,
+                    "R2": -0.5499
+                },
+                "Cabai Merah Besar": {
+                    "MAE": 2871.0975,
+                    "RMSE": 3539.1151,
+                    "MAPE": 6.1256,
+                    "R2": 0.5975
+                },
+                "Cabai Merah Keriting": {
+                    "MAE": 2215.6604,
+                    "RMSE": 2789.6338,
+                    "MAPE": 4.5916,
+                    "R2": 0.7936
+                },
+                "Cabai Rawit Hijau": {
+                    "MAE": 2185.5407,
+                    "RMSE": 2989.082,
+                    "MAPE": 3.8768,
+                    "R2": 0.5917
+                },
+                "Cabai Rawit Merah": {
+                    "MAE": 2858.5548,
+                    "RMSE": 3681.824,
+                    "MAPE": 3.917,
+                    "R2": 0.8803
+                },
+                "Daging Ayam Ras Segar": {
+                    "MAE": 567.1635,
+                    "RMSE": 789.5158,
+                    "MAPE": 1.3677,
+                    "R2": 0.6142
+                },
+                "Daging Sapi Kualitas 1": {
+                    "MAE": 1611.1711,
+                    "RMSE": 1950.4308,
+                    "MAPE": 1.1,
+                    "R2": 0.5202
+                },
+                "Daging Sapi Kualitas 2": {
+                    "MAE": 1282.0844,
+                    "RMSE": 1657.8062,
+                    "MAPE": 0.9246,
+                    "R2": 0.584
+                },
+                "Gula Pasir Kualitas Premium": {
+                    "MAE": 73.5901,
+                    "RMSE": 83.5413,
+                    "MAPE": 0.3688,
+                    "R2": 0.7594
+                },
+                "Gula Pasir Lokal": {
+                    "MAE": 67.4257,
+                    "RMSE": 80.3696,
+                    "MAPE": 0.3597,
+                    "R2": 0.959
+                },
+                "Minyak Goreng Curah": {
+                    "MAE": 372.8365,
+                    "RMSE": 517.0981,
+                    "MAPE": 1.8547,
+                    "R2": 0.4609
+                },
+                "Minyak Goreng Kemasan Bermerk 1": {
+                    "MAE": 285.9448,
+                    "RMSE": 400.8873,
+                    "MAPE": 1.219,
+                    "R2": 0.3974
+                },
+                "Minyak Goreng Kemasan Bermerk 2": {
+                    "MAE": 274.9271,
+                    "RMSE": 391.1783,
+                    "MAPE": 1.2211,
+                    "R2": 0.4921
+                },
+                "Telur Ayam Ras Segar": {
+                    "MAE": 464.7026,
+                    "RMSE": 553.1752,
+                    "MAPE": 1.4251,
+                    "R2": 0.5502
+                },
+                "Overall": {
+                    "MAE": 789.5575,
+                    "RMSE": 1015.6915,
+                    "MAPE": 1.5747,
+                    "R2": 0.475
+                }
+            }
+        };
+
+        const commoditySelect = document.getElementById("commodity-select");
+        const leaderboardContainer = document.getElementById("leaderboardContainer");
+        const tableBody = document.getElementById("comparisonTableBody");
+        const tableCommodityTitle = document.getElementById("table-commodity-title");
+
+        // KPI DOM elements
+        const kpiBestModel = document.getElementById("kpi-best-model");
+        const kpiBestScore = document.getElementById("kpi-best-score");
+        const kpiAverageVal = document.getElementById("kpi-average-val");
+        const kpiStabilityModel = document.getElementById("kpi-stability-model");
+        const kpiStabilityLabel = document.getElementById("kpi-stability-label");
+
+        let activeMetric = "R2";
+        let chartInstance = null;
+
+        // Metric buttons logic
+        document.querySelectorAll(".pill-btn").forEach(btn => {
+            btn.addEventListener("click", function () {
+                document.querySelector(".pill-btn.active").classList.remove("active");
+                this.classList.add("active");
+                activeMetric = this.getAttribute("data-metric");
+                updateDashboard();
+            });
+        });
+
+        function formatValue(value, metric) {
+            if (metric === "MAPE") {
+                return value.toFixed(2) + "%";
+            }
+            if (metric === "R2") {
+                return value.toFixed(4);
+            }
+            return Math.round(value).toLocaleString('id-ID');
+        }
+
+        function updateDashboard() {
+            const selectedCommodity = commoditySelect.value;
+            tableCommodityTitle.innerText = selectedCommodity === "Overall" ? "Rata-rata Keseluruhan" : selectedCommodity;
+
+            const models = Object.keys(modelData);
+
+            // Extract values for the active metric
+            const dataValues = models.map(model => {
+                const commData = modelData[model][selectedCommodity];
+                return commData ? commData[activeMetric] : 0;
+            });
+
+            // Sort models to determine ranking
+            const rankedModels = models.map((model, idx) => ({
+                name: model,
+                value: dataValues[idx]
+            })).sort((a, b) => {
+                if (activeMetric === "R2") {
+                    return b.value - a.value; // Higher is better
+                } else {
+                    return a.value - b.value; // Lower is better
+                }
+            });
+
+            // 1. Update KPI Rows
+            const bestModel = rankedModels[0];
+            kpiBestModel.innerText = bestModel.name;
+            kpiBestScore.innerText = `${activeMetric}: ${formatValue(bestModel.value, activeMetric)}`;
+
+            const avgValue = dataValues.reduce((sum, val) => sum + val, 0) / dataValues.length;
+            kpiAverageVal.innerText = formatValue(avgValue, activeMetric);
+
+            // Stability KPI: Show ARIMA Murni R² Score specifically
+            const arimaR2 = modelData["SARIMA Murni"][selectedCommodity]["R2"];
+            kpiStabilityModel.innerText = arimaR2.toFixed(4);
+            if (arimaR2 > 0.9) {
+                kpiStabilityModel.style.color = "var(--color-success)";
+                kpiStabilityLabel.innerText = "Kesesuaian Sangat Tinggi";
+            } else if (arimaR2 > 0.5) {
+                kpiStabilityModel.style.color = "var(--color-warning)";
+                kpiStabilityLabel.innerText = "Kesesuaian Moderat";
+            } else {
+                kpiStabilityModel.style.color = "var(--color-danger)";
+                kpiStabilityLabel.innerText = "Kesesuaian Buruk";
+            }
+
+            // 2. Re-render Leaderboard
+            leaderboardContainer.innerHTML = "";
+            rankedModels.forEach((model, idx) => {
+                const rankClass = idx === 0 ? "rank-1" : (idx === rankedModels.length - 1 ? "rank-5" : "");
+                const item = document.createElement("div");
+                item.className = `leaderboard-item ${rankClass}`;
+                item.innerHTML = `
+                    <div class="model-identity">
+                        <span class="rank-number">${idx + 1}</span>
+                        <span class="model-name-text">${model.name}</span>
+                    </div>
+                    <div class="metric-score">${formatValue(model.value, activeMetric)}</div>
+                `;
+                leaderboardContainer.appendChild(item);
+            });
+
+            // 3. Re-render Dynamic Data Table
+            tableBody.innerHTML = "";
+
+            // Re-sort models specifically for table: alphabetically or by R2
+            const tableSortedModels = [...models].sort((a, b) => {
+                return modelData[b][selectedCommodity]["R2"] - modelData[a][selectedCommodity]["R2"];
+            });
+
+            // Find best values for table highlighting
+            const bestValues = {
+                R2: Math.max(...models.map(m => modelData[m][selectedCommodity]["R2"])),
+                MAPE: Math.min(...models.map(m => modelData[m][selectedCommodity]["MAPE"])),
+                MAE: Math.min(...models.map(m => modelData[m][selectedCommodity]["MAE"])),
+                RMSE: Math.min(...models.map(m => modelData[m][selectedCommodity]["RMSE"]))
+            };
+
+            tableSortedModels.forEach(model => {
+                const mData = modelData[model][selectedCommodity];
+                const tr = document.createElement("tr");
+
+                const isBestR2 = mData.R2 === bestValues.R2;
+                const isBestMAPE = mData.MAPE === bestValues.MAPE;
+                const isBestMAE = mData.MAE === bestValues.MAE;
+                const isBestRMSE = mData.RMSE === bestValues.RMSE;
+
+                tr.innerHTML = `
+                    <td class="highlight-cell">${model}</td>
+                    <td class="${isBestR2 ? 'best-score-cell' : ''}">${mData.R2.toFixed(4)}</td>
+                    <td class="${isBestMAPE ? 'best-score-cell' : ''}">${mData.MAPE.toFixed(2)}%</td>
+                    <td class="${isBestMAE ? 'best-score-cell' : ''}">${Math.round(mData.MAE).toLocaleString('id-ID')}</td>
+                    <td class="${isBestRMSE ? 'best-score-cell' : ''}">${Math.round(mData.RMSE).toLocaleString('id-ID')}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // 4. Re-render Chart.js
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+
+            // Build custom gradient colors for bars
+            const bgGradients = models.map((model, i) => {
+                const grad = ctx.createLinearGradient(0, 0, 0, 300);
+                if (model === bestModel.name) {
+                    grad.addColorStop(0, 'rgba(16, 185, 129, 0.85)'); // Green for best
+                    grad.addColorStop(1, 'rgba(16, 185, 129, 0.35)');
+                } else if (model === rankedModels[rankedModels.length - 1].name) {
+                    grad.addColorStop(0, 'rgba(244, 63, 94, 0.85)'); // Red for worst
+                    grad.addColorStop(1, 'rgba(244, 63, 94, 0.35)');
+                } else {
+                    grad.addColorStop(0, 'rgba(99, 102, 241, 0.85)'); // Indigo for standard
+                    grad.addColorStop(1, 'rgba(6, 182, 212, 0.35)');
+                }
+                return grad;
+            });
+
+            const borderColors = models.map((model) => {
+                if (model === bestModel.name) return '#10b981';
+                if (model === rankedModels[rankedModels.length - 1].name) return '#f43f5e';
+                return '#6366f1';
+            });
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: models,
+                    datasets: [{
+                        data: dataValues,
+                        backgroundColor: bgGradients,
+                        borderColor: borderColors,
+                        borderWidth: 1.5,
+                        borderRadius: 8,
+                        barPercentage: 0.55
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleFont: { family: 'Space Grotesk', size: 14, weight: 'bold' },
+                            bodyFont: { family: 'Plus Jakarta Sans', size: 13 },
+                            borderColor: 'rgba(255,255,255,0.08)',
+                            borderWidth: 1,
+                            padding: 12,
+                            callbacks: {
+                                label: function (context) {
+                                    return ` ${activeMetric}: ${formatValue(context.raw, activeMetric)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.04)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { family: 'Plus Jakarta Sans', size: 11 }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { family: 'Space Grotesk', size: 12, weight: '500' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Attach event listeners
+        commoditySelect.addEventListener("change", updateDashboard);
+
+        // Initial render
+        updateDashboard();
+    </script>
+</body>
+
+</html>
