@@ -16,8 +16,12 @@ class Settings(BaseSettings):
     DATABASE_PASSWORD: str = "password"
     DATABASE_NAME: str = "arjuna_pijak"
     
+    DATABASE_URL_ENV: Optional[str] = None
+    
     @property
     def DATABASE_URL(self) -> str:
+        if self.DATABASE_URL_ENV:
+            return self.DATABASE_URL_ENV
         return f"postgresql://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
     
     # Security & CORS
