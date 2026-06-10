@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Arjuna AI | Commodity Price Intelligence</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main-content" id="mainContent">
+        <header class="topbar" id="topbar"></header>
+        <div id="pageContent" class="page-content">
+            <div class="loading-skeleton">
+                <div class="skeleton" style="height: 200px; margin-bottom: 20px;"></div>
+                <div class="skeleton" style="height: 400px;"></div>
+            </div>
+        </div>
+    </main>
+    <div class="mobile-bottom-nav" id="mobileBottomNav"></div>
+</div>
+
+<!-- Semua script dalam urutan yang benar -->
+<script src="js/utils/mockData.js"></script>
+<script src="js/utils/helper.js"></script>
+<script src="js/utils/charts.js"></script>
+<script src="js/pages/dashboards.js"></script>
+<script src="js/pages/commodities.js"></script>
+<script src="js/pages/forecast.js"></script>
+<script src="js/pages/insights.js"></script>
+<script src="js/pages/map.js"></script>
+<script src="js/pages/alerts.js"></script>
+<script src="js/pages/reports.js"></script>
+<script src="js/pages/assistant.js"></script>
+<script src="js/pages/settings.js"></script>
+<script src="js/components/sidebar.js"></script>
+<script src="js/components/mobileNav.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
