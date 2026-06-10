@@ -1,2 +1,11 @@
 dataset.json
 .venv
+build.md
+node_modules
+.env
+stitch.md
+__pycache__
+merge_datasets.py
+update2021.json
+update2022.json
+update2023.json
