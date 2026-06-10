@@ -34,6 +34,30 @@ MODEL_CONFIG = {
     "Telur Ayam Ras Segar": {"sarima": {"order": [1, 1, 1], "seasonal_order": [0, 0, 0, 7]}, "sarimax": {"order": [1, 1, 1], "seasonal_order": [0, 0, 0, 7]}},
 }
 
+PARENT_CHILD_MAP = {
+    "Beras": [
+        "Beras Kualitas Bawah I",
+        "Beras Kualitas Bawah II",
+        "Beras Kualitas Medium I",
+        "Beras Kualitas Medium II",
+        "Beras Kualitas Super I",
+        "Beras Kualitas Super II"
+    ],
+    "Daging Ayam": ["Daging Ayam Ras Segar"],
+    "Daging Sapi": ["Daging Sapi Kualitas 1", "Daging Sapi Kualitas 2"],
+    "Telur Ayam": ["Telur Ayam Ras Segar"],
+    "Bawang Merah": ["Bawang Merah Ukuran Sedang"],
+    "Bawang Putih": ["Bawang Putih Ukuran Sedang"],
+    "Cabai Merah": ["Cabai Merah Besar", "Cabai Merah Keriting "],
+    "Cabai Rawit": ["Cabai Rawit Hijau", "Cabai Rawit Merah"],
+    "Minyak Goreng": [
+        "Minyak Goreng Curah",
+        "Minyak Goreng Kemasan Bermerk 1",
+        "Minyak Goreng Kemasan Bermerk 2"
+    ],
+    "Gula Pasir": ["Gula Pasir Kualitas Premium", "Gula Pasir Lokal"]
+}
+
 class ForecastCache:
     def __init__(self, ttl_seconds=43200):  # Default TTL: 12 Jam
         self._cache = {}
@@ -157,6 +181,60 @@ def get_in_sample_fit(db: Session, subcategory: str, days: int = 30) -> list:
 
 
 def generate_forecast(db: Session, subcategory: str, model_type: str, steps: int):
+    # If it is a parent category, average the forecasts of its children
+    if subcategory in PARENT_CHILD_MAP:
+        children = PARENT_CHILD_MAP[subcategory]
+        forecasts_by_date = {}
+        last_prices = []
+        last_dates = []
+        
+        for child in children:
+            try:
+                # Call generate_forecast recursively for child
+                fc = generate_forecast(db, child, model_type, steps)
+                last_prices.append(fc["last_historical_price"])
+                last_dates.append(fc["last_historical_date"])
+                for pred in fc["predictions"]:
+                    d_str = pred["date"]
+                    if d_str not in forecasts_by_date:
+                        forecasts_by_date[d_str] = []
+                    forecasts_by_date[d_str].append(pred["predicted_price"])
+            except Exception as e:
+                logger.error(f"Gagal melakukan forecast untuk {child}: {str(e)}")
+                
+        if not forecasts_by_date:
+            raise ValueError(f"Gagal melakukan peramalan untuk semua sub-komoditas dari '{subcategory}'.")
+            
+        parent_predictions = []
+        sorted_dates = sorted(forecasts_by_date.keys())
+        from datetime import datetime
+        for d_str in sorted_dates:
+            avg_price = sum(forecasts_by_date[d_str]) / len(forecasts_by_date[d_str])
+            # Parse day name from date string
+            d_obj = datetime.strptime(d_str, "%Y-%m-%d")
+            parent_predictions.append({
+                "date": d_str,
+                "day_name": d_obj.strftime("%A"),
+                "predicted_price": round(avg_price, 2)
+            })
+            
+        last_price = sum(last_prices) / len(last_prices) if last_prices else 0.0
+        last_date_str = max(last_dates) if last_dates else datetime.now().strftime("%Y-%m-%d")
+        
+        last_pred_price = parent_predictions[-1]["predicted_price"] if parent_predictions else last_price
+        trend = round(((last_pred_price - last_price) / last_price) * 100, 2) if last_price > 0 else 0.0
+        
+        return {
+            "subcategory": subcategory,
+            "model_used": "AGGREGATE_" + model_type.upper(),
+            "last_historical_price": round(last_price, 2),
+            "last_historical_date": last_date_str,
+            "predictions": parent_predictions,
+            "trend": trend,
+            "horizon": steps,
+            "predicted_price": last_pred_price
+        }
+
     if subcategory not in MODEL_CONFIG:
         raise ValueError(f"Subkategori '{subcategory}' tidak didukung oleh model.")
 
@@ -224,12 +302,18 @@ def generate_forecast(db: Session, subcategory: str, model_type: str, steps: int
                 "predicted_price": price
             })
             
+        last_pred_price = predictions[-1]["predicted_price"] if predictions else last_price
+        trend = round(((last_pred_price - last_price) / last_price) * 100, 2) if last_price > 0 else 0.0
+
         result = {
             "subcategory": subcategory,
             "model_used": model_type.upper(),
             "last_historical_price": last_price,
             "last_historical_date": last_date.strftime("%Y-%m-%d"),
-            "predictions": predictions
+            "predictions": predictions,
+            "trend": trend,
+            "horizon": steps,
+            "predicted_price": last_pred_price
         }
         _forecast_cache.set(subcategory, model_type, steps, result)
         return result
@@ -250,12 +334,19 @@ def generate_forecast(db: Session, subcategory: str, model_type: str, steps: int
                     "day_name": d.strftime("%A"),
                     "predicted_price": price
                 })
+            
+            last_pred_price = predictions[-1]["predicted_price"] if predictions else last_price
+            trend = round(((last_pred_price - last_price) / last_price) * 100, 2) if last_price > 0 else 0.0
+
             result = {
                 "subcategory": subcategory,
                 "model_used": "FALLBACK_ARIMA(1,1,0)",
                 "last_historical_price": last_price,
                 "last_historical_date": last_date.strftime("%Y-%m-%d"),
-                "predictions": predictions
+                "predictions": predictions,
+                "trend": trend,
+                "horizon": steps,
+                "predicted_price": last_pred_price
             }
             _forecast_cache.set(subcategory, model_type, steps, result)
             return result
@@ -283,40 +374,100 @@ def extract_text_from_response(data: dict) -> str:
         raise ValueError("Gagal mengekstrak teks respons.")
     return content_text.strip()
 
-def get_ai_insight(subcategory: str, trend: float, horizon: int, current_price: float, predicted_price: float) -> str:
+def get_ai_insight(subcategory: str, trend: float, horizon: int, current_price: float, predicted_price: float, db: Session = None) -> dict:
     """
     Menghasilkan analisis bisnis taktis menggunakan Google Gemma 4 (31B) dengan caching.
     Menerapkan fallback ke model gemini-1.5-flash jika limit gemma terlampaui (RPD=2).
+    Jika API key tidak valid atau terjadi error, kembalikan rule-based fallback secara anggun.
     """
     cache_key_str = f"{subcategory}_{trend}_{horizon}_{current_price}_{predicted_price}"
-    # Gunakan hash value sebagai parameter steps (integer) untuk ForecastCache
     steps_hash = abs(hash(cache_key_str)) % (10**8)
     cached = _insight_cache.get(subcategory, "insight", steps_hash)
     if cached is not None:
         return cached
 
-    from app.core.config import settings
-    import urllib.request
-    import urllib.error
-    import json
+    # Calculate historical change pct
+    history_change_pct = 0.0
+    if db is not None:
+        try:
+            # 1. Cari subcategory/commodity berdasarkan nama
+            comm = db.query(Commodity).filter(Commodity.name == subcategory).first()
+            if comm:
+                # Ambil 2 harga terbaru
+                recent_prices = db.query(CommodityPrice).filter(
+                    CommodityPrice.commodity_id == comm.id
+                ).order_by(CommodityPrice.date.desc()).limit(2).all()
+                if len(recent_prices) >= 2:
+                    latest_price = recent_prices[0].price
+                    prev_price = recent_prices[1].price
+                    if prev_price > 0:
+                        history_change_pct = round(((latest_price - prev_price) / prev_price) * 100, 2)
+            else:
+                # 2. Coba cari jika ini adalah parent category
+                if subcategory in PARENT_CHILD_MAP:
+                    children_names = PARENT_CHILD_MAP[subcategory]
+                    children = db.query(Commodity).filter(Commodity.name.in_(children_names)).all()
+                    if children:
+                        child_ids = [c.id for c in children]
+                        from sqlalchemy import desc
+                        latest_dates = db.query(CommodityPrice.date).filter(
+                            CommodityPrice.commodity_id.in_(child_ids)
+                        ).distinct().order_by(desc(CommodityPrice.date)).limit(2).all()
+                        if len(latest_dates) >= 2:
+                            d_latest = latest_dates[0][0]
+                            d_prev = latest_dates[1][0]
+                            
+                            p_latest_list = db.query(CommodityPrice.price).filter(
+                                CommodityPrice.commodity_id.in_(child_ids),
+                                CommodityPrice.date == d_latest
+                            ).all()
+                            p_prev_list = db.query(CommodityPrice.price).filter(
+                                CommodityPrice.commodity_id.in_(child_ids),
+                                CommodityPrice.date == d_prev
+                            ).all()
+                            
+                            if p_latest_list and p_prev_list:
+                                avg_latest = sum(p[0] for p in p_latest_list) / len(p_latest_list)
+                                avg_prev = sum(p[0] for p in p_prev_list) / len(p_prev_list)
+                                if avg_prev > 0:
+                                    history_change_pct = round(((avg_latest - avg_prev) / avg_prev) * 100, 2)
+        except Exception as e:
+            logger.warning(f"Gagal menghitung history_change_pct untuk {subcategory}: {e}")
 
-    if not settings.GEMMA_API_KEY:
-        raise ValueError("Gemma API Key tidak dikonfigurasi.")
-
-    trend_type = "kenaikan" if trend > 0 else ("penurunan" if trend < 0 else "kestabilan")
+    if abs(trend) < 0.1:
+        trend_type = "kestabilan"
+    else:
+        trend_type = "kenaikan" if trend > 0 else "penurunan"
     trend_abs = abs(trend)
     
+    # Check if API Key is placeholder or empty
+    from app.core.config import settings
+    if not settings.GEMMA_API_KEY or "your_gemma_api_key" in settings.GEMMA_API_KEY:
+        # Fallback langsung ke rule-based jika key belum dikonfigurasi
+        logger.info(f"API Key belum dikonfigurasi. Menggunakan fallback rule-based untuk {subcategory}.")
+        from app.services.market_summary import generate_rule_based_insight
+        fallback_res = generate_rule_based_insight(
+            subcategory, 
+            "naik" if trend >= 0.1 else ("turun" if trend <= -0.1 else "stabil"), 
+            trend,
+            history_change_pct
+        )
+        _insight_cache.set(subcategory, "insight", steps_hash, fallback_res)
+        return fallback_res
+
     prompt = (
-        "Anda adalah seorang pakar analis bisnis komoditas pangan yang cerdas, praktis, dan profesional. "
+        "Anda adalah seorang pakar analis bisnis komoditas pangan yang cerdas, praktis, dan profesional.\n"
         "Tugas Anda adalah memberikan rekomendasi bisnis taktis yang singkat, solutif, dan langsung dapat dieksekusi "
-        "oleh pelaku UMKM kuliner/warung makan maupun masyarakat umum di Indonesia berdasarkan data prediksi pasar berikut:\n\n"
+        "dalam bentuk JSON terstruktur untuk dua sudut pandang (Masyarakat dan Pedagang):\n\n"
         f"- Komoditas: {subcategory}\n"
         f"- Harga Saat Ini: Rp {current_price:,.0f}/kg\n"
         f"- Harga Prediksi ({horizon} hari ke depan): Rp {predicted_price:,.0f}/kg\n"
         f"- Proyeksi Tren: {trend_type} sebesar {trend_abs:.1f}%\n\n"
-        "Berikan rekomendasi taktis dalam 2 sampai 3 kalimat pendek berbahasa Indonesia (maksimal 70 kata) "
-        "yang fokus pada tindakan nyata (misalnya: kapan harus menyetok bahan, bagaimana menyiasati harga jual, atau substitusi menu). "
-        "Langsung berikan jawaban rekomendasi tanpa kata pengantar basa-basi seperti 'Berikut rekomendasi saya:'."
+        "Format respon wajib berupa raw JSON valid dengan struktur berikut tanpa markdown codeblock (no backticks):\n"
+        "{\n"
+        '  "masyarakat": "Rekomendasi singkat untuk pembeli/konsumen umum (max 40 kata)",\n'
+        '  "pedagang": "Rekomendasi taktis untuk pelaku usaha/UMKM kuliner (max 40 kata)"\n'
+        "}"
     )
 
     headers = {"Content-Type": "application/json"}
@@ -328,7 +479,11 @@ def get_ai_insight(subcategory: str, trend: float, horizon: int, current_price: 
         }]
     }
 
-    # Skenario 1: Coba gemma-4-31b-it terlebih dahulu
+    import urllib.request
+    import urllib.error
+    import json
+
+    # Skenario 1: Coba gemma-4-31b-it
     try:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent?key={settings.GEMMA_API_KEY}"
         req = urllib.request.Request(
@@ -337,18 +492,20 @@ def get_ai_insight(subcategory: str, trend: float, horizon: int, current_price: 
             headers=headers,
             method="POST"
         )
-        with urllib.request.urlopen(req, timeout=30) as response:
+        with urllib.request.urlopen(req, timeout=20) as response:
             res_body = response.read().decode("utf-8")
             data = json.loads(res_body)
             result_text = extract_text_from_response(data)
-            _insight_cache.set(subcategory, "insight", steps_hash, result_text)
-            logger.info("AI Insight berhasil dibuat menggunakan model gemma-4-31b-it.")
-            return result_text
+            parsed_json = json.loads(result_text)
+            parsed_json["disclaimer"] = "Analisis taktis bertenaga Google Gemma 4 (31B)."
+            _insight_cache.set(subcategory, "insight", steps_hash, parsed_json)
+            logger.info("AI Insight (JSON) berhasil dibuat menggunakan model gemma-4-31b-it.")
+            return parsed_json
             
     except Exception as e:
-        logger.warning(f"Percobaan gemma-4-31b-it gagal (limit terlampaui/RPM/RPD/error): {str(e)}. Melakukan fallback ke gemini-2.5-flash...")
+        logger.warning(f"Percobaan gemma-4-31b-it gagal: {str(e)}. Melakukan fallback ke gemini-2.5-flash...")
         
-        # Skenario 2: Fallback ke gemini-2.5-flash jika gemma gagal/terkena rate limit
+        # Skenario 2: Fallback ke gemini-2.5-flash
         try:
             fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={settings.GEMMA_API_KEY}"
             fallback_req = urllib.request.Request(
@@ -357,12 +514,24 @@ def get_ai_insight(subcategory: str, trend: float, horizon: int, current_price: 
                 headers=headers,
                 method="POST"
             )
-            with urllib.request.urlopen(fallback_req, timeout=30) as response:
+            with urllib.request.urlopen(fallback_req, timeout=15) as response:
                 res_body = response.read().decode("utf-8")
                 data = json.loads(res_body)
                 result_text = extract_text_from_response(data)
-                _insight_cache.set(subcategory, "insight", steps_hash, result_text)
-                logger.info("AI Insight berhasil dibuat menggunakan fallback model gemini-2.5-flash.")
-                return result_text
+                parsed_json = json.loads(result_text)
+                parsed_json["disclaimer"] = "Analisis taktis bertenaga Google Gemini 2.5 Flash."
+                _insight_cache.set(subcategory, "insight", steps_hash, parsed_json)
+                logger.info("AI Insight (JSON) berhasil dibuat menggunakan fallback model gemini-2.5-flash.")
+                return parsed_json
         except Exception as fallback_err:
-            raise RuntimeError(f"Gagal mengambil AI Insight dari gemma-4-31b-it maupun model fallback Gemini: {str(fallback_err)}")
+            logger.error(f"Gagal mengambil AI Insight dari Gemma maupun Gemini: {str(fallback_err)}. Mengaktifkan rule-based fallback.")
+            # Fallback akhir yang 100% aman (Rule-based)
+            from app.services.market_summary import generate_rule_based_insight
+            fallback_res = generate_rule_based_insight(
+                subcategory, 
+                "naik" if trend >= 0.1 else ("turun" if trend <= -0.1 else "stabil"), 
+                trend,
+                history_change_pct
+            )
+            _insight_cache.set(subcategory, "insight", steps_hash, fallback_res)
+            return fallback_res

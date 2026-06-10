@@ -12,3 +12,6 @@ class ForecastResponse(BaseModel):
     last_historical_price: float
     last_historical_date: str
     predictions: List[DailyPrediction]
+    trend: float
+    horizon: int
+    predicted_price: float

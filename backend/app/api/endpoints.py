@@ -4,6 +4,7 @@ from sqlalchemy import extract, func
 from app.db.database import get_db
 from app.schemas.prediction import ForecastResponse
 from app.services.forecast import generate_forecast, MODEL_CONFIG, get_in_sample_fit, get_ai_insight
+from app.services.market_summary import get_consolidated_market_summary
 from datetime import datetime, timedelta
 from app.db import models
 from app.core.config import settings
@@ -165,7 +166,8 @@ def get_model_insight(
     trend: float = Query(..., description="Persentase tren harga"),
     horizon: int = Query(..., description="Horizon peramalan (hari)"),
     current_price: float = Query(..., description="Harga historis terakhir"),
-    predicted_price: float = Query(..., description="Harga prediksi terakhir")
+    predicted_price: float = Query(..., description="Harga prediksi terakhir"),
+    db: Session = Depends(get_db)
 ):
     """
     Menghasilkan rekomendasi bisnis taktis untuk pelaku UMKM dan masyarakat
@@ -177,7 +179,8 @@ def get_model_insight(
             trend=trend,
             horizon=horizon,
             current_price=current_price,
-            predicted_price=predicted_price
+            predicted_price=predicted_price,
+            db=db
         )
         return {"insight": insight}
     except ValueError as e:
@@ -186,3 +189,13 @@ def get_model_insight(
         raise HTTPException(status_code=502, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal mengambil AI Insight: {str(e)}")
+
+@router.get("/api/market-summary", tags=["Mobile"])
+def get_market_summary(db: Session = Depends(get_db)):
+    """Mengembalikan ringkasan pasar lengkap teragregasi untuk kebutuhan aplikasi mobile."""
+    try:
+        data = get_consolidated_market_summary(db)
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Gagal mengambil ringkasan pasar: {str(e)}")
+

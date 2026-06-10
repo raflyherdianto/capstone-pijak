@@ -54,18 +54,46 @@
               <span class="material-symbols-outlined text-cyan text-[20px]">auto_awesome</span>
               AI Insight
             </h3>
-            <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed min-h-[60px]">
-              <span v-if="isLoading || isAiLoading" class="flex items-center gap-sm">
+            <div class="min-h-[60px]">
+              <span v-if="isLoading || isAiLoading" class="flex items-center gap-sm font-body-sm text-body-sm text-on-surface-variant">
                 <span class="w-4 h-4 border-2 border-cyan border-t-transparent rounded-full animate-spin"></span>
                 Generating business analysis insight...
               </span>
-              <span v-else-if="error || aiInsightError" class="text-error">
+              <span v-else-if="error || aiInsightError" class="text-error font-body-sm text-body-sm">
                 {{ error || aiInsightError }}
               </span>
-              <span v-else class="text-on-surface leading-relaxed">
-                {{ aiInsight }}
-              </span>
-            </p>
+              <div v-else-if="aiInsight" class="flex flex-col gap-md">
+                <!-- Perspektif Masyarakat -->
+                <div class="flex flex-col gap-xs">
+                  <div class="flex items-center gap-xs text-[11px] font-bold text-cyan uppercase tracking-wider">
+                    <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
+                    Masyarakat / Konsumen
+                  </div>
+                  <p class="text-on-surface leading-relaxed font-body-sm text-body-sm">
+                    {{ aiInsight.masyarakat }}
+                  </p>
+                </div>
+                
+                <!-- Divider -->
+                <div class="h-px bg-white/5"></div>
+                
+                <!-- Perspektif Pedagang -->
+                <div class="flex flex-col gap-xs">
+                  <div class="flex items-center gap-xs text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
+                    <span class="material-symbols-outlined text-[16px]">storefront</span>
+                    Pelaku Usaha / Pedagang
+                  </div>
+                  <p class="text-on-surface leading-relaxed font-body-sm text-body-sm">
+                    {{ aiInsight.pedagang }}
+                  </p>
+                </div>
+                
+                <!-- Disclaimer -->
+                <div v-if="aiInsight.disclaimer" class="text-[10px] text-on-surface-variant font-light italic mt-xs">
+                  {{ aiInsight.disclaimer }}
+                </div>
+              </div>
+            </div>
           </div>
           
           <div class="mt-auto pt-md border-t border-white/10 flex items-center justify-between">
@@ -197,7 +225,7 @@ const historicalData = ref([])
 const isLoading = ref(true)
 const error = ref(null)
 
-const aiInsight = ref('')
+const aiInsight = ref(null)
 const isAiLoading = ref(false)
 const aiInsightError = ref(null)
 
@@ -336,7 +364,7 @@ const fetchAiInsight = async () => {
 const fetchData = async () => {
     isLoading.value = true
     error.value = null
-    aiInsight.value = ''
+    aiInsight.value = null
     aiInsightError.value = null
     try {
         const [predictRes, histRes] = await Promise.all([
