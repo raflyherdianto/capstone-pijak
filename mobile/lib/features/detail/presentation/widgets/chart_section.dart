@@ -25,13 +25,8 @@ class ChartSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final String trendLower = trend.toLowerCase();
-    final isStabil = trendLower == 'stabil';
     final isNaik = trendLower == 'naik';
     final isTurun = trendLower == 'turun';
-
-    final Color badgeColor = isStabil
-        ? (isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB)) // Blue for stable (light/dark responsive)
-        : themeColor;
 
     final IconData trendIcon = isNaik
         ? Icons.trending_up
@@ -85,10 +80,10 @@ class ChartSection extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: badgeColor.withValues(alpha: 0.1),
+                          color: themeColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: badgeColor.withValues(alpha: 0.2),
+                            color: themeColor.withValues(alpha: 0.2),
                             width: 1,
                           ),
                         ),
@@ -98,13 +93,13 @@ class ChartSection extends StatelessWidget {
                             Icon(
                               trendIcon,
                               size: 12,
-                              color: badgeColor,
+                              color: themeColor,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               capitalizedTrend,
                               style: TextStyle(
-                                color: badgeColor,
+                                color: themeColor,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),

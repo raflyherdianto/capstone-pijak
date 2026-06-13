@@ -144,19 +144,34 @@ class CommodityCard extends ConsumerWidget {
 
                       const Spacer(),
 
-                      // Badges
+                      // Badges & Trend Text
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           _TrendBadge(
                             change: dayChange,
                             color: trendColor,
                           ),
-                          const SizedBox(width: 8),
-                          _TrendTextBadge(
-                            trend: commodity.trend,
-                            trendColor: trendColor,
-                            isDark: isDark,
-                          ),
+                          if (commodity.trend.isNotEmpty) ...[
+                            const SizedBox(width: 6),
+                            Text(
+                              '•',
+                              style: TextStyle(
+                                color: isDark ? Colors.white30 : Colors.black26,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Tren: ${commodity.trend[0].toUpperCase()}${commodity.trend.substring(1)}',
+                              style: TextStyle(
+                                color: trendColor,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ],
@@ -219,47 +234,4 @@ class _TrendBadge extends StatelessWidget {
   }
 }
 
-class _TrendTextBadge extends StatelessWidget {
-  final String trend;
-  final Color trendColor;
-  final bool isDark;
 
-  const _TrendTextBadge({
-    required this.trend,
-    required this.trendColor,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final capitalizedTrend = trend.isNotEmpty
-        ? 'Tren: ${trend[0].toUpperCase()}${trend.substring(1)}'
-        : '';
-    final String trendLower = trend.toLowerCase();
-
-    // Use responsive blue for stable, otherwise fallback to trendColor
-    final Color badgeColor = trendLower == 'stabil'
-        ? (isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB))
-        : trendColor;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: badgeColor.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: badgeColor.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: Text(
-        capitalizedTrend,
-        style: TextStyle(
-          color: badgeColor,
-          fontWeight: FontWeight.w700,
-          fontSize: 12,
-        ),
-      ),
-    );
-  }
-}
