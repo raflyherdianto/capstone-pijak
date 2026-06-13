@@ -13,68 +13,68 @@ class AppBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Stack(
       children: [
-        // Base Gradient
+        // Base gradient — slightly more contrast between top and bottom
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
               colors: isDark
                   ? [
                       const Color(0xFF0F0F0F),
-                      const Color(0xFF1A1A1A),
+                      const Color(0xFF161616),
                       const Color(0xFF0F0F0F),
                     ]
                   : [
-                      const Color(0xFFF8F9FA),
-                      const Color(0xFFE9ECEF),
-                      const Color(0xFFF8F9FA),
+                      const Color(0xFFF4F6F8),
+                      const Color(0xFFECEFF3),
+                      const Color(0xFFF4F6F8),
                     ],
             ),
           ),
         ),
-        
+
         if (showBlurShapes) ...[
-          // Top Right Shape
+          // Top-right emerald accent — more visible
           Positioned(
-            top: -100,
-            right: -50,
+            top: -80,
+            right: -60,
             child: _BlurredShape(
-              color: isDark 
-                  ? Colors.green.withValues(alpha: 0.04)
-                  : Colors.green.withValues(alpha: 0.06),
+              color: isDark
+                  ? Colors.green.withValues(alpha: 0.08)
+                  : const Color(0xFF10B981).withValues(alpha: 0.1),
+              size: 280,
+            ),
+          ),
+
+          // Middle-left blue accent
+          Positioned(
+            top: MediaQuery.of(context).size.height * 0.38,
+            left: -90,
+            child: _BlurredShape(
+              color: isDark
+                  ? Colors.teal.withValues(alpha: 0.05)
+                  : Colors.blue.withValues(alpha: 0.06),
+              size: 360,
+            ),
+          ),
+
+          // Bottom-right warm accent
+          Positioned(
+            bottom: -40,
+            right: -80,
+            child: _BlurredShape(
+              color: isDark
+                  ? Colors.amber.withValues(alpha: 0.04)
+                  : Colors.orange.withValues(alpha: 0.06),
               size: 300,
             ),
           ),
-          
-          // Middle Left Shape
-          Positioned(
-            top: MediaQuery.of(context).size.height * 0.4,
-            left: -100,
-            child: _BlurredShape(
-              color: isDark 
-                  ? Colors.blue.withValues(alpha: 0.03)
-                  : Colors.blue.withValues(alpha: 0.04),
-              size: 400,
-            ),
-          ),
-          
-          // Bottom Right Shape
-          Positioned(
-            bottom: -50,
-            right: -100,
-            child: _BlurredShape(
-              color: isDark 
-                  ? Colors.orange.withValues(alpha: 0.03)
-                  : Colors.orange.withValues(alpha: 0.05),
-              size: 350,
-            ),
-          ),
         ],
-        
+
         // Content
         child,
       ],
@@ -98,11 +98,10 @@ class _BlurredShape extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        // Using BoxShadow instead of BackdropFilter is MUCH more performant
         boxShadow: [
           BoxShadow(
             color: color,
-            blurRadius: size * 0.6,
+            blurRadius: size * 0.55,
             spreadRadius: size * 0.1,
           ),
         ],

@@ -23,18 +23,27 @@ class CommodityCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(settingsProvider);
-    final trendColor = ref.read(settingsProvider.notifier).getTrendColor(commodity.priceChanges['day_1'] ?? 0);
+    final trendColor = ref.read(settingsProvider.notifier).getTrendColor(
+      commodity.priceChanges['day_1'] ?? 0,
+    );
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dayChange = commodity.priceChanges['day_1'] ?? 0;
+    final isUp = dayChange > 0;
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.02),
-            blurRadius: 16,
+            color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.07),
+            blurRadius: 20,
             offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.03),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -43,122 +52,216 @@ class CommodityCard extends ConsumerWidget {
         clipBehavior: Clip.antiAlias,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           side: BorderSide(
-            color: trendColor.withValues(alpha: isDark ? 0.25 : 0.12),
-            width: 1.5,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.09)
+                : Colors.black.withValues(alpha: 0.07),
+            width: 1,
           ),
         ),
         child: InkWell(
           onTap: onTap,
           child: SizedBox(
-            height: 160,
+            height: 152,
             child: Stack(
               children: [
-                // Large Image on the right (faded background)
+                // Left trend accent strip — 5px solid
                 Positioned(
-                  right: -30,
-                  top: -10,
-                  bottom: -10,
-                  child: Opacity(
-                    opacity: isDark ? 0.12 : 0.18,
-                    child: Hero(
-                      tag: 'commodity-${commodity.name}',
-                      child: Image.asset(
-                        commodity.imageAsset,
-                        width: 180,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => Icon(
-                          Icons.shopping_basket_outlined,
-                          size: 80,
-                          color: trendColor.withValues(alpha: 0.05),
-                        ),
+                  top: 0,
+                  left: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 5,
+                    decoration: BoxDecoration(
+                      color: trendColor,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        bottomLeft: Radius.circular(20),
                       ),
                     ),
                   ),
                 ),
-                // Content Layer
-                Positioned.fill(
-                  child: Padding(
-                    padding: const EdgeInsets.all(22.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          commodity.name,
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${_currencyFormat.format(commodity.currentPrice)} / ${commodity.unit}',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
-                          ),
-                        ),
-                        const Spacer(),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: trendColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: trendColor.withValues(alpha: 0.2),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    (commodity.priceChanges['day_1'] ?? 0) > 0 ? Icons.trending_up : Icons.trending_down,
-                                    size: 16,
-                                    color: trendColor,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '${commodity.priceChanges['day_1']?.abs().toStringAsFixed(2)}%',
-                                    style: TextStyle(
-                                      color: trendColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: (commodity.forecastPct > 0 ? Colors.blue : Colors.orange).withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                'Prediksi: ${commodity.forecastPct > 0 ? "+" : ""}${commodity.forecastPct}%',
-                                style: TextStyle(
-                                  color: commodity.forecastPct > 0 ? Colors.blue : Colors.orange,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+
+                // Background image — higher opacity
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 140,
+                  child: Opacity(
+                    opacity: isDark ? 0.14 : 0.22,
+                    child: Hero(
+                      tag: 'commodity-${commodity.name}',
+                      child: Image.asset(
+                        commodity.imageAsset,
+                        fit: BoxFit.contain,
+                        alignment: Alignment.centerRight,
+                        errorBuilder: (ctx, err, st) => const SizedBox.shrink(),
+                      ),
                     ),
+                  ),
+                ),
+
+                // Content
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 18, 18, 18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Commodity name
+                      Text(
+                        commodity.name,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                          height: 1.1,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+
+                      // Price — large + bold
+                      Text(
+                        _currencyFormat.format(commodity.currentPrice),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 26,
+                          letterSpacing: -0.8,
+                          color: isDark ? Colors.white : const Color(0xFF0F0F0F),
+                          height: 1.0,
+                        ),
+                      ),
+                      // Unit — separated below price
+                      Text(
+                        'per ${commodity.unit}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isDark ? Colors.white38 : Colors.black38,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.1,
+                        ),
+                      ),
+
+                      const Spacer(),
+
+                      // Badges
+                      Row(
+                        children: [
+                          _TrendBadge(
+                            change: dayChange,
+                            color: trendColor,
+                            isUp: isUp,
+                          ),
+                          const SizedBox(width: 8),
+                          _ForecastBadge(
+                            forecastPct: commodity.forecastPct,
+                            isDark: isDark,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _TrendBadge extends StatelessWidget {
+  final double change;
+  final Color color;
+  final bool isUp;
+
+  const _TrendBadge({
+    required this.change,
+    required this.color,
+    required this.isUp,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: color.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isUp ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+            size: 12,
+            color: color,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            '${change.abs().toStringAsFixed(2)}%',
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.w700,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ForecastBadge extends StatelessWidget {
+  final double forecastPct;
+  final bool isDark;
+
+  const _ForecastBadge({
+    required this.forecastPct,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isUp = forecastPct > 0;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.06)
+            : Colors.black.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.black.withValues(alpha: 0.08),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.bar_chart_rounded,
+            size: 12,
+            color: isDark ? Colors.white.withValues(alpha: 0.4) : Colors.black38,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            '${isUp ? "+" : ""}${forecastPct.toStringAsFixed(1)}%',
+            style: TextStyle(
+              color: isDark ? Colors.white54 : Colors.black45,
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }
