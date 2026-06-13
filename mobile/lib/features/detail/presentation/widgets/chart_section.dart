@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/domain/models.dart';
+import '../../../../core/providers.dart';
 import 'price_chart.dart';
 import 'range_selector.dart';
 
-class ChartSection extends StatelessWidget {
+class ChartSection extends ConsumerWidget {
   final ChartData filteredData;
   final Color themeColor;
   final String reliability;
@@ -22,11 +24,15 @@ class ChartSection extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final String trendLower = trend.toLowerCase();
     final isNaik = trendLower == 'naik';
     final isTurun = trendLower == 'turun';
+
+    // Calculate trend badge color purely based on the overall trend value
+    final double changeValue = isNaik ? 1.0 : (isTurun ? -1.0 : 0.0);
+    final badgeColor = ref.watch(settingsProvider.notifier).getTrendColor(changeValue);
 
     final IconData trendIcon = isNaik
         ? Icons.trending_up
@@ -80,10 +86,10 @@ class ChartSection extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: themeColor.withValues(alpha: 0.1),
+                          color: badgeColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: themeColor.withValues(alpha: 0.2),
+                            color: badgeColor.withValues(alpha: 0.2),
                             width: 1,
                           ),
                         ),
@@ -93,13 +99,13 @@ class ChartSection extends StatelessWidget {
                             Icon(
                               trendIcon,
                               size: 12,
-                              color: themeColor,
+                              color: badgeColor,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               capitalizedTrend,
                               style: TextStyle(
-                                color: themeColor,
+                                color: badgeColor,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),

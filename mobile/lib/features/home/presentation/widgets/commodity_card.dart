@@ -29,6 +29,9 @@ class CommodityCard extends ConsumerWidget {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final dayChange = commodity.priceChanges['day_1'] ?? 0;
+    final String trendLower = commodity.trend.toLowerCase();
+    final double trendChangeValue = trendLower == 'naik' ? 1.0 : (trendLower == 'turun' ? -1.0 : 0.0);
+    final commodityTrendColor = ref.read(settingsProvider.notifier).getTrendColor(trendChangeValue);
 
     return Container(
       decoration: BoxDecoration(
@@ -166,7 +169,7 @@ class CommodityCard extends ConsumerWidget {
                             Text(
                               'Tren: ${commodity.trend[0].toUpperCase()}${commodity.trend.substring(1)}',
                               style: TextStyle(
-                                color: trendColor,
+                                color: commodityTrendColor,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 11,
                               ),
