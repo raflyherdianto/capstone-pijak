@@ -4,9 +4,17 @@ venv/
 env/
 ENV/
 bin/
-lib/
+/lib/
 share/
 include/
+
+# Flutter mobile/lib exception (do NOT ignore)
+!mobile/lib/
+!mobile/lib/**
+!mobile/test/
+!mobile/test/**
+!mobile/pubspec.yaml
+!mobile/pubspec.lock
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
