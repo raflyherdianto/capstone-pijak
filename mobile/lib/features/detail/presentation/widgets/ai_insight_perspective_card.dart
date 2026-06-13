@@ -160,8 +160,7 @@ class _AIInsightPerspectiveCardState extends State<AIInsightPerspectiveCard> {
 
     return GestureDetector(
       onTap: () => setState(() => _selectedPerspective = index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         alignment: Alignment.center,
         decoration: BoxDecoration(
