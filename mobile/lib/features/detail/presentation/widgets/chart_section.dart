@@ -37,7 +37,7 @@ class ChartSection extends StatelessWidget {
         ? Icons.trending_up
         : (isTurun ? Icons.trending_down : Icons.trending_flat);
     final String capitalizedTrend = trend.isNotEmpty
-        ? '${trend[0].toUpperCase()}${trend.substring(1)}'
+        ? 'Tren: ${trend[0].toUpperCase()}${trend.substring(1)}'
         : '';
 
     return Container(
