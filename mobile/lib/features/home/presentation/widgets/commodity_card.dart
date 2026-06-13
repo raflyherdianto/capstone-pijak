@@ -233,7 +233,7 @@ class _TrendTextBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final capitalizedTrend = trend.isNotEmpty
-        ? '${trend[0].toUpperCase()}${trend.substring(1)}'
+        ? 'Tren: ${trend[0].toUpperCase()}${trend.substring(1)}'
         : '';
     final String trendLower = trend.toLowerCase();
 
