@@ -92,7 +92,9 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(
-                                    currentChange > 0 ? Icons.trending_up : Icons.trending_down,
+                                    currentChange > 0
+                                        ? Icons.trending_up
+                                        : (currentChange < 0 ? Icons.trending_down : Icons.trending_flat),
                                     color: trendColor,
                                     size: 14,
                                   ),
@@ -179,7 +181,9 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              currentChange > 0 ? Icons.trending_up : Icons.trending_down,
+                              currentChange > 0
+                                  ? Icons.trending_up
+                                  : (currentChange < 0 ? Icons.trending_down : Icons.trending_flat),
                               color: trendColor,
                               size: 12,
                             ),

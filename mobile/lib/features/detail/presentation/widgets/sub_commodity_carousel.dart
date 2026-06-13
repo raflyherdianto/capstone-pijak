@@ -138,7 +138,9 @@ class SubCommodityCarousel extends ConsumerWidget {
                 ),
                 const SizedBox(width: 2),
                 Icon(
-                  sub.changePct > 0 ? Icons.arrow_upward : Icons.arrow_downward,
+                  sub.changePct > 0
+                      ? Icons.arrow_upward
+                      : (sub.changePct < 0 ? Icons.arrow_downward : Icons.trending_flat),
                   size: 10,
                   color: trendColor,
                 ),

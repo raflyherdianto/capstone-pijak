@@ -29,7 +29,6 @@ class CommodityCard extends ConsumerWidget {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final dayChange = commodity.priceChanges['day_1'] ?? 0;
-    final isUp = dayChange > 0;
 
     return Container(
       decoration: BoxDecoration(
@@ -151,7 +150,6 @@ class CommodityCard extends ConsumerWidget {
                           _TrendBadge(
                             change: dayChange,
                             color: trendColor,
-                            isUp: isUp,
                           ),
                           const SizedBox(width: 8),
                           _ForecastBadge(
@@ -175,16 +173,18 @@ class CommodityCard extends ConsumerWidget {
 class _TrendBadge extends StatelessWidget {
   final double change;
   final Color color;
-  final bool isUp;
 
   const _TrendBadge({
     required this.change,
     required this.color,
-    required this.isUp,
   });
 
   @override
   Widget build(BuildContext context) {
+    final IconData icon = change > 0
+        ? Icons.arrow_upward_rounded
+        : (change < 0 ? Icons.arrow_downward_rounded : Icons.trending_flat_rounded);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
@@ -199,7 +199,7 @@ class _TrendBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            isUp ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+            icon,
             size: 12,
             color: color,
           ),
