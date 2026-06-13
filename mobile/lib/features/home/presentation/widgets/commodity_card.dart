@@ -152,8 +152,9 @@ class CommodityCard extends ConsumerWidget {
                             color: trendColor,
                           ),
                           const SizedBox(width: 8),
-                          _ForecastBadge(
-                            forecastPct: commodity.forecastPct,
+                          _TrendTextBadge(
+                            trend: commodity.trend,
+                            trendColor: trendColor,
                             isDark: isDark,
                           ),
                         ],
@@ -218,50 +219,46 @@ class _TrendBadge extends StatelessWidget {
   }
 }
 
-class _ForecastBadge extends StatelessWidget {
-  final double forecastPct;
+class _TrendTextBadge extends StatelessWidget {
+  final String trend;
+  final Color trendColor;
   final bool isDark;
 
-  const _ForecastBadge({
-    required this.forecastPct,
+  const _TrendTextBadge({
+    required this.trend,
+    required this.trendColor,
     required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isUp = forecastPct > 0;
+    final capitalizedTrend = trend.isNotEmpty
+        ? '${trend[0].toUpperCase()}${trend.substring(1)}'
+        : '';
+    final String trendLower = trend.toLowerCase();
+
+    // Use responsive blue for stable, otherwise fallback to trendColor
+    final Color badgeColor = trendLower == 'stabil'
+        ? (isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB))
+        : trendColor;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.06)
-            : Colors.black.withValues(alpha: 0.04),
+        color: badgeColor.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.1)
-              : Colors.black.withValues(alpha: 0.08),
+          color: badgeColor.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.bar_chart_rounded,
-            size: 12,
-            color: isDark ? Colors.white.withValues(alpha: 0.4) : Colors.black38,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            '${isUp ? "+" : ""}${forecastPct.toStringAsFixed(1)}%',
-            style: TextStyle(
-              color: isDark ? Colors.white54 : Colors.black45,
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-            ),
-          ),
-        ],
+      child: Text(
+        capitalizedTrend,
+        style: TextStyle(
+          color: badgeColor,
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
+        ),
       ),
     );
   }
