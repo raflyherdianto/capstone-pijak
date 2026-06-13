@@ -6,6 +6,11 @@ class CommodityOverviewGrid extends StatelessWidget {
 
   const CommodityOverviewGrid({super.key, required this.commodity});
 
+  String _capitalize(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GridView.count(
@@ -20,14 +25,14 @@ class CommodityOverviewGrid extends StatelessWidget {
         _buildOverviewItem(
           context,
           'Tren Pasar',
-          commodity.trend,
+          _capitalize(commodity.trend),
           Icons.show_chart,
           Colors.orange,
         ),
         _buildOverviewItem(
           context,
           'Keandalan AI',
-          commodity.reliability,
+          _capitalize(commodity.reliability),
           Icons.verified_user_outlined,
           Colors.orange,
         ),
