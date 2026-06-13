@@ -33,7 +33,9 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
     return Container(
       height: currentHeight,
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: progress > 0.5 ? 1.0 : 0.0),
+        color: shrinkOffset > 0
+            ? (isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF4F6F8))
+            : Colors.transparent,
         border: progress > 0.5
             ? Border(
                 bottom: BorderSide(

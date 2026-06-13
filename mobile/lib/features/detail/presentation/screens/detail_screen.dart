@@ -45,6 +45,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     ref.watch(settingsProvider);
     final repository = ref.read(commodityRepositoryProvider);
 
@@ -140,7 +141,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                       ),
                       pinned: true,
                       centerTitle: true,
-                      backgroundColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
+                      backgroundColor: isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF4F6F8),
                       surfaceTintColor: Colors.transparent,
                     ),
                     SliverPersistentHeader(
@@ -164,27 +165,29 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                             onRangeSelected: (range) =>
                                 setState(() => _selectedRange = range),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
                           CommodityOverviewGrid(commodity: widget.commodity),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 16),
                           AIInsightPerspectiveCard(
                             insight: state.liveInsight,
                             isLoading: state.isInsightLoading,
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 20),
                           if (widget.commodity.subCommodities.isNotEmpty) ...[
                             Text(
                               'Sub-Komoditas',
-                              style: Theme.of(context).textTheme.titleLarge,
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 12),
                             SubCommodityCarousel(
                               subCommodities: widget.commodity.subCommodities,
                               currencyFormat: currencyFormat,
                               parentUnit: widget.commodity.unit,
                             ),
                           ],
-                          const SizedBox(height: 40),
+                          const SizedBox(height: 24),
                         ]),
                       ),
                     ),
