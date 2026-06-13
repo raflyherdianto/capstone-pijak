@@ -9,6 +9,7 @@ class ChartSection extends StatelessWidget {
   final String reliability;
   final int selectedRange;
   final Function(int) onRangeSelected;
+  final String trend;
 
   const ChartSection({
     super.key,
@@ -17,11 +18,27 @@ class ChartSection extends StatelessWidget {
     required this.reliability,
     required this.selectedRange,
     required this.onRangeSelected,
+    required this.trend,
   });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final String trendLower = trend.toLowerCase();
+    final isStabil = trendLower == 'stabil';
+    final isNaik = trendLower == 'naik';
+    final isTurun = trendLower == 'turun';
+
+    final Color badgeColor = isStabil
+        ? (isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB)) // Blue for stable (light/dark responsive)
+        : themeColor;
+
+    final IconData trendIcon = isNaik
+        ? Icons.trending_up
+        : (isTurun ? Icons.trending_down : Icons.trending_flat);
+    final String capitalizedTrend = trend.isNotEmpty
+        ? '${trend[0].toUpperCase()}${trend.substring(1)}'
+        : '';
 
     return Container(
       decoration: BoxDecoration(
@@ -54,12 +71,49 @@ class ChartSection extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Grafik Harga',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.2,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'Grafik Harga',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    if (trend.isNotEmpty) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: badgeColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: badgeColor.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              trendIcon,
+                              size: 12,
+                              color: badgeColor,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              capitalizedTrend,
+                              style: TextStyle(
+                                color: badgeColor,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 RangeSelector(
                   selectedRange: selectedRange,

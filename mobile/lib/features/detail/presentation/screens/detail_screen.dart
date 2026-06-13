@@ -8,7 +8,6 @@ import '../../../../core/providers.dart';
 import '../../../../shared/widgets/app_background.dart';
 import '../widgets/sticky_price_header.dart';
 import '../widgets/chart_section.dart';
-import '../widgets/overview_grid.dart';
 import '../widgets/ai_insight_perspective_card.dart';
 import '../widgets/sub_commodity_carousel.dart';
 import '../cubit/detail_cubit.dart';
@@ -164,9 +163,8 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                             selectedRange: _selectedRange,
                             onRangeSelected: (range) =>
                                 setState(() => _selectedRange = range),
+                            trend: widget.commodity.trend,
                           ),
-                          const SizedBox(height: 12),
-                          CommodityOverviewGrid(commodity: widget.commodity),
                           const SizedBox(height: 16),
                           AIInsightPerspectiveCard(
                             insight: state.liveInsight,
