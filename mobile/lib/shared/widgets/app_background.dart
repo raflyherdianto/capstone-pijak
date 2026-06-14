@@ -9,7 +9,7 @@ class AppBackground extends StatelessWidget {
     super.key,
     required this.child,
     this.showBlurShapes = true,
-    this.showBatikPattern = false,
+    this.showBatikPattern = true,
   });
 
   @override
@@ -18,7 +18,7 @@ class AppBackground extends StatelessWidget {
 
     return Stack(
       children: [
-        // Base gradient — slightly more contrast between top and bottom
+        // Base gradient with Arjuna navy, teal, and warm ivory tones.
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -26,14 +26,14 @@ class AppBackground extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: isDark
                   ? [
-                      const Color(0xFF0F0F0F),
-                      const Color(0xFF161616),
-                      const Color(0xFF0F0F0F),
+                      const Color(0xFF031827),
+                      const Color(0xFF062C44),
+                      const Color(0xFF07151D),
                     ]
                   : [
-                      const Color(0xFFF4F6F8),
-                      const Color(0xFFECEFF3),
-                      const Color(0xFFF4F6F8),
+                      const Color(0xFFEAF8F4),
+                      const Color(0xFFF9F4E8),
+                      const Color(0xFFF5FAF8),
                     ],
             ),
           ),
@@ -45,45 +45,45 @@ class AppBackground extends StatelessWidget {
             child: CustomPaint(
               painter: BatikKawungPainter(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.03)
-                    : Colors.black.withValues(alpha: 0.045),
+                    ? const Color(0xFFE8C766).withValues(alpha: 0.035)
+                    : const Color(0xFF07345A).withValues(alpha: 0.035),
               ),
             ),
           ),
 
         if (showBlurShapes) ...[
-          // Top-right emerald accent — more visible
+          // Top-right teal field.
           Positioned(
             top: -80,
             right: -60,
             child: _BlurredShape(
               color: isDark
-                  ? Colors.green.withValues(alpha: 0.08)
-                  : const Color(0xFF10B981).withValues(alpha: 0.1),
+                  ? const Color(0xFF16C7B7).withValues(alpha: 0.12)
+                  : const Color(0xFF16C7B7).withValues(alpha: 0.13),
               size: 280,
             ),
           ),
 
-          // Middle-left blue accent
+          // Middle-left navy field.
           Positioned(
             top: MediaQuery.of(context).size.height * 0.38,
             left: -90,
             child: _BlurredShape(
               color: isDark
-                  ? Colors.teal.withValues(alpha: 0.05)
-                  : Colors.blue.withValues(alpha: 0.06),
+                  ? const Color(0xFF0A4C78).withValues(alpha: 0.14)
+                  : const Color(0xFF07345A).withValues(alpha: 0.08),
               size: 360,
             ),
           ),
 
-          // Bottom-right warm accent
+          // Bottom-right gold field.
           Positioned(
             bottom: -40,
             right: -80,
             child: _BlurredShape(
               color: isDark
-                  ? Colors.amber.withValues(alpha: 0.04)
-                  : Colors.orange.withValues(alpha: 0.06),
+                  ? const Color(0xFFE8C766).withValues(alpha: 0.08)
+                  : const Color(0xFFE8C766).withValues(alpha: 0.14),
               size: 300,
             ),
           ),
@@ -182,10 +182,7 @@ class _BlurredShape extends StatelessWidget {
   final Color color;
   final double size;
 
-  const _BlurredShape({
-    required this.color,
-    required this.size,
-  });
+  const _BlurredShape({required this.color, required this.size});
 
   @override
   Widget build(BuildContext context) {

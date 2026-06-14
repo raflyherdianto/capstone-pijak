@@ -72,7 +72,9 @@ class AppTheme {
             ),
           ),
       cardTheme: CardThemeData(
-        color: isDark ? card.withValues(alpha: 0.7) : card.withValues(alpha: 0.8),
+        color: isDark
+            ? card.withValues(alpha: 0.7)
+            : card.withValues(alpha: 0.8),
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
@@ -85,18 +87,27 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isDark ? card.withValues(alpha: 0.5) : card.withValues(alpha: 0.5),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        fillColor: isDark
+            ? card.withValues(alpha: 0.5)
+            : card.withValues(alpha: 0.5),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.06),
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.06),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.06),
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -127,14 +138,14 @@ class AppTheme {
         backgroundColor: Colors.transparent,
         elevation: 0,
         indicatorColor: isDark
-            ? const Color(0xFF34D399).withValues(alpha: 0.15)
-            : const Color(0xFF10B981).withValues(alpha: 0.1),
+            ? const Color(0xFFE8C766).withValues(alpha: 0.18)
+            : const Color(0xFF16C7B7).withValues(alpha: 0.14),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return GoogleFonts.outfit(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: isDark ? const Color(0xFF34D399) : const Color(0xFF10B981),
+              color: isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91),
             );
           }
           return GoogleFonts.outfit(
@@ -146,12 +157,10 @@ class AppTheme {
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return IconThemeData(
-              color: isDark ? const Color(0xFF34D399) : const Color(0xFF10B981),
+              color: isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91),
             );
           }
-          return IconThemeData(
-            color: isDark ? Colors.white60 : Colors.black54,
-          );
+          return IconThemeData(color: isDark ? Colors.white60 : Colors.black54);
         }),
       ),
     );

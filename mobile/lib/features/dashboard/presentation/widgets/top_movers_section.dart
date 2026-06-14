@@ -22,11 +22,20 @@ class TopMoversSection extends ConsumerWidget {
 
     // Sort by day_1 change descending for top movers
     final sorted = [...commodities]
-      ..sort((a, b) =>
-          (b.priceChanges['day_1'] ?? 0).compareTo(a.priceChanges['day_1'] ?? 0));
+      ..sort(
+        (a, b) => (b.priceChanges['day_1'] ?? 0).compareTo(
+          a.priceChanges['day_1'] ?? 0,
+        ),
+      );
 
-    final topGainers = sorted.where((c) => (c.priceChanges['day_1'] ?? 0) > 0).take(4).toList();
-    final topLosers = sorted.reversed.where((c) => (c.priceChanges['day_1'] ?? 0) < 0).take(4).toList();
+    final topGainers = sorted
+        .where((c) => (c.priceChanges['day_1'] ?? 0) > 0)
+        .take(4)
+        .toList();
+    final topLosers = sorted.reversed
+        .where((c) => (c.priceChanges['day_1'] ?? 0) < 0)
+        .take(4)
+        .toList();
 
     if (topGainers.isEmpty && topLosers.isEmpty) return const SizedBox.shrink();
 
@@ -43,7 +52,12 @@ class TopMoversSection extends ConsumerWidget {
 
         // Gainers
         if (topGainers.isNotEmpty) ...[
-          _SubLabel(label: '🔺 Kenaikan Terbesar', isDark: isDark),
+          _SubLabel(
+            icon: Icons.arrow_upward_rounded,
+            label: 'Kenaikan Terbesar',
+            color: const Color(0xFF17B884),
+            isDark: isDark,
+          ),
           const SizedBox(height: 8),
           SizedBox(
             height: 108,
@@ -69,7 +83,12 @@ class TopMoversSection extends ConsumerWidget {
         // Losers
         if (topLosers.isNotEmpty) ...[
           const SizedBox(height: 14),
-          _SubLabel(label: '🔻 Penurunan Terbesar', isDark: isDark),
+          _SubLabel(
+            icon: Icons.arrow_downward_rounded,
+            label: 'Penurunan Terbesar',
+            color: const Color(0xFFE94D5F),
+            isDark: isDark,
+          ),
           const SizedBox(height: 8),
           SizedBox(
             height: 108,
@@ -91,7 +110,6 @@ class TopMoversSection extends ConsumerWidget {
             ),
           ),
         ],
-
       ],
     );
   }
@@ -115,16 +133,17 @@ class _SectionTitle extends StatelessWidget {
         Icon(
           icon,
           size: 18,
-          color: isDark ? Colors.white70 : Colors.black54,
+          color: isDark ? const Color(0xFFE8C766) : const Color(0xFF07345A),
         ),
         const SizedBox(width: 8),
         Text(
           label,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
-                letterSpacing: -0.2,
-              ),
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+            letterSpacing: -0.2,
+            color: isDark ? Colors.white : const Color(0xFF07345A),
+          ),
         ),
       ],
     );
@@ -132,20 +151,40 @@ class _SectionTitle extends StatelessWidget {
 }
 
 class _SubLabel extends StatelessWidget {
+  final IconData icon;
   final String label;
+  final Color color;
   final bool isDark;
 
-  const _SubLabel({required this.label, required this.isDark});
+  const _SubLabel({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-        color: isDark ? Colors.white54 : Colors.black45,
-      ),
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Icon(icon, size: 12, color: color),
+        ),
+        const SizedBox(width: 7),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: isDark ? Colors.white60 : const Color(0xFF6A7D85),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -166,27 +205,35 @@ class _MoverCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final dayChange = commodity.priceChanges['day_1'] ?? 0;
-    final trendColor =
-        ref.read(settingsProvider.notifier).getTrendColor(dayChange);
+    final trendColor = ref
+        .read(settingsProvider.notifier)
+        .getTrendColor(dayChange);
     final isPositive = dayChange > 0;
+    final imageAsset = _premiumAssetFor(commodity);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 130,
         decoration: BoxDecoration(
-          color: isDark
-              ? trendColor.withValues(alpha: 0.08)
-              : trendColor.withValues(alpha: 0.05),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [const Color(0xFF0A2638), trendColor.withValues(alpha: 0.12)]
+                : [Colors.white, trendColor.withValues(alpha: 0.07)],
+          ),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: trendColor.withValues(alpha: isDark ? 0.2 : 0.15),
+            color: trendColor.withValues(alpha: isDark ? 0.24 : 0.16),
           ),
           boxShadow: [
             BoxShadow(
-              color: trendColor.withValues(alpha: 0.06),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: const Color(
+                0xFF07345A,
+              ).withValues(alpha: isDark ? 0.22 : 0.08),
+              blurRadius: 14,
+              offset: const Offset(0, 7),
             ),
           ],
         ),
@@ -199,18 +246,18 @@ class _MoverCard extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Image.asset(
-                  commodity.imageAsset,
+                  imageAsset,
                   width: 34,
                   height: 34,
                   fit: BoxFit.contain,
-                  errorBuilder: (_, e, st) => Icon(
-                    Icons.eco_rounded,
-                    color: trendColor,
-                    size: 28,
-                  ),
+                  errorBuilder: (_, e, st) =>
+                      Icon(Icons.eco_rounded, color: trendColor, size: 28),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: trendColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
@@ -272,4 +319,25 @@ class _MoverCard extends ConsumerWidget {
       ),
     );
   }
+}
+
+String _premiumAssetFor(Commodity commodity) {
+  final name = commodity.name.toLowerCase();
+
+  if (name.contains('beras')) {
+    return 'assets/images/arjuna_3d_beras.png';
+  }
+  if (name.contains('daging ayam') ||
+      name == 'ayam' ||
+      name.contains(' ayam')) {
+    return 'assets/images/arjuna_3d_daging_ayam.png';
+  }
+  if (name.contains('daging sapi') || name.contains('sapi')) {
+    return 'assets/images/arjuna_3d_daging_sapi.png';
+  }
+  if (name.contains('telur')) {
+    return 'assets/images/arjuna_3d_telur_ayam.png';
+  }
+
+  return commodity.imageAsset;
 }

@@ -8,13 +8,10 @@ import '../widgets/dashboard_header.dart';
 import '../widgets/market_pulse_card.dart';
 import '../widgets/top_movers_section.dart';
 import '../widgets/quick_access_grid.dart';
-import '../widgets/ai_teaser_card.dart';
+import '../widgets/news_section.dart';
 
 class DashboardScreen extends ConsumerWidget {
-  /// Callback to switch the main NavigationBar to the Insight tab (index 2)
-  final VoidCallback? onNavigateToInsight;
-
-  const DashboardScreen({super.key, this.onNavigateToInsight});
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,21 +26,20 @@ class DashboardScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.asset(
-              'assets/images/logo.png',
-              width: 26,
-              height: 26,
+              'assets/images/app_logo.png',
+              width: 30,
+              height: 30,
               fit: BoxFit.contain,
               errorBuilder: (_, e, st) => Icon(
                 Icons.eco_rounded,
                 size: 22,
-                color: isDark ? const Color(0xFF34D399) : const Color(0xFF10B981),
+                color: isDark
+                    ? const Color(0xFFE8C766)
+                    : const Color(0xFF0B9F91),
               ),
             ),
             const SizedBox(width: 8),
-            const Text(
-              'Arjuna',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            const Text('Arjuna', style: TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
         centerTitle: true,
@@ -52,8 +48,8 @@ class DashboardScreen extends ConsumerWidget {
         flexibleSpace: Container(
           decoration: BoxDecoration(
             color: isDark
-                ? const Color(0xFF0F0F0F).withValues(alpha: 0.95)
-                : const Color(0xFFF4F6F8).withValues(alpha: 0.95),
+                ? const Color(0xFF031827).withValues(alpha: 0.95)
+                : const Color(0xFFEAF8F4).withValues(alpha: 0.92),
             border: Border(
               bottom: BorderSide(
                 color: isDark
@@ -66,8 +62,8 @@ class DashboardScreen extends ConsumerWidget {
             child: CustomPaint(
               painter: BatikKawungPainter(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.015)
-                    : Colors.black.withValues(alpha: 0.025),
+                    ? const Color(0xFFE8C766).withValues(alpha: 0.025)
+                    : const Color(0xFF07345A).withValues(alpha: 0.03),
               ),
             ),
           ),
@@ -79,17 +75,19 @@ class DashboardScreen extends ConsumerWidget {
             onRefresh: () async {
               ref.refresh(commoditiesProvider);
               ref.refresh(metadataProvider);
+              ref.refresh(newsProvider);
             },
             color: Theme.of(context).colorScheme.primary,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 116),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 1. Greeting header
                   metadataAsync.when(
-                    data: (meta) => DashboardHeader(lastUpdatedAt: meta.updatedAt),
+                    data: (meta) =>
+                        DashboardHeader(lastUpdatedAt: meta.updatedAt),
                     loading: () => const DashboardHeader(),
                     error: (e, st) => const DashboardHeader(),
                   ),
@@ -113,17 +111,8 @@ class DashboardScreen extends ConsumerWidget {
                     const SizedBox(height: 28),
                   ],
 
-                  // 5. AI Global Insight teaser
-                  metadataAsync.when(
-                    data: (meta) => meta.globalAnalysis.isNotEmpty
-                        ? AiTeaserCard(
-                            analysis: meta.globalAnalysis,
-                            onSeeMore: onNavigateToInsight ?? () {},
-                          )
-                        : const SizedBox.shrink(),
-                    loading: () => const _AiTeaserSkeleton(),
-                    error: (e, st) => const SizedBox.shrink(),
-                  ),
+                  // 5. Berita Pangan (GNews.io)
+                  const NewsSection(),
                 ],
               ),
             ),
@@ -157,12 +146,4 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-/// Skeleton placeholder for the AI teaser while metadata loads
-class _AiTeaserSkeleton extends StatelessWidget {
-  const _AiTeaserSkeleton();
 
-  @override
-  Widget build(BuildContext context) {
-    return const ShimmerCardPlaceholder(height: 110);
-  }
-}

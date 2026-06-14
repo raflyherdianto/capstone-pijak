@@ -16,9 +16,7 @@ void main() async {
 
   runApp(
     ProviderScope(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ],
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
       child: const KomoditasAIApp(),
     ),
   );
@@ -52,17 +50,14 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
-  void _navigateToTab(int index) {
-    setState(() => _selectedIndex = index);
-  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final List<Widget> screens = [
-      // Tab 0: Dashboard — passes callback to jump to Insight (tab 2)
-      DashboardScreen(onNavigateToInsight: () => _navigateToTab(2)),
+      // Tab 0: Dashboard
+      const DashboardScreen(),
       // Tab 1: Komoditas list
       const HomeScreen(),
       // Tab 2: Insight
@@ -74,51 +69,63 @@ class _MainNavigationState extends State<MainNavigation> {
     return AppBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: IndexedStack(
-          index: _selectedIndex,
-          children: screens,
-        ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(
+        body: IndexedStack(index: _selectedIndex, children: screens),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDark
+                  ? const Color(0xFF061D2D).withValues(alpha: 0.94)
+                  : const Color(0xFFFFFBF0).withValues(alpha: 0.94),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.black.withValues(alpha: 0.06),
+                    ? const Color(0xFFE8C766).withValues(alpha: 0.14)
+                    : const Color(0xFF07345A).withValues(alpha: 0.08),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.12),
+                  blurRadius: 28,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: NavigationBar(
+                selectedIndex: _selectedIndex,
+                height: 74,
+                onDestinationSelected: (index) {
+                  setState(() => _selectedIndex = index);
+                },
+                destinations: const [
+                  NavigationDestination(
+                    icon: Icon(Icons.dashboard_outlined),
+                    selectedIcon: Icon(Icons.dashboard_rounded),
+                    label: 'Beranda',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(Icons.storefront_outlined),
+                    selectedIcon: Icon(Icons.storefront_rounded),
+                    label: 'Komoditas',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(Icons.auto_awesome_mosaic_outlined),
+                    selectedIcon: Icon(Icons.auto_awesome_mosaic),
+                    label: 'Insight',
+                  ),
+                  NavigationDestination(
+                    icon: Icon(Icons.settings_outlined),
+                    selectedIcon: Icon(Icons.settings_rounded),
+                    label: 'Pengaturan',
+                  ),
+                ],
               ),
             ),
-          ),
-          child: NavigationBar(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (index) {
-              setState(() => _selectedIndex = index);
-            },
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.dashboard_outlined),
-                selectedIcon: Icon(Icons.dashboard_rounded),
-                label: 'Beranda',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.storefront_outlined),
-                selectedIcon: Icon(Icons.storefront_rounded),
-                label: 'Komoditas',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.auto_awesome_mosaic_outlined),
-                selectedIcon: Icon(Icons.auto_awesome_mosaic),
-                label: 'Insight',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.settings_outlined),
-                selectedIcon: Icon(Icons.settings_rounded),
-                label: 'Pengaturan',
-              ),
-            ],
           ),
         ),
       ),
     );
   }
 }
-

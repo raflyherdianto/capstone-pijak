@@ -15,7 +15,9 @@ class MarketPulseCard extends ConsumerWidget {
     final downRatio = downCount / total;
     if (upRatio >= 0.6) return 'Pasar Cenderung Naik';
     if (downRatio >= 0.6) return 'Pasar Cenderung Turun';
-    if (stableCount >= upCount && stableCount >= downCount) return 'Pasar Stabil';
+    if (stableCount >= upCount && stableCount >= downCount) {
+      return 'Pasar Stabil';
+    }
     return 'Pasar Bergerak Campuran';
   }
 
@@ -28,11 +30,8 @@ class MarketPulseCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor =
-        isDark ? const Color(0xFF34D399) : const Color(0xFF10B981);
     final upColor = ref.read(settingsProvider.notifier).getTrendColor(1.0);
     final downColor = ref.read(settingsProvider.notifier).getTrendColor(-1.0);
-    final stableColor = ref.read(settingsProvider.notifier).getTrendColor(0.0);
 
     final upCount = commodities
         .where((c) => (c.priceChanges['day_1'] ?? 0) > 0)
@@ -46,16 +45,6 @@ class MarketPulseCard extends ConsumerWidget {
     final marketLabel = _getMarketLabel(upCount, downCount, stableCount);
     final marketIcon = _getMarketIcon(upCount, downCount);
 
-    // Dominant color for the card accent
-    Color dominantColor;
-    if (upCount > downCount && upCount > stableCount) {
-      dominantColor = upColor;
-    } else if (downCount > upCount && downCount > stableCount) {
-      dominantColor = downColor;
-    } else {
-      dominantColor = accentColor;
-    }
-
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -63,136 +52,266 @@ class MarketPulseCard extends ConsumerWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [
-                  dominantColor.withValues(alpha: 0.12),
-                  dominantColor.withValues(alpha: 0.04),
-                ]
-              : [
-                  dominantColor.withValues(alpha: 0.08),
-                  dominantColor.withValues(alpha: 0.02),
-                ],
+              ? const [Color(0xFF07345A), Color(0xFF05243F), Color(0xFF041A2A)]
+              : const [Color(0xFF07345A), Color(0xFF0C5B75), Color(0xFF0B9F91)],
         ),
         border: Border.all(
-          color: dominantColor.withValues(alpha: isDark ? 0.2 : 0.15),
+          color: const Color(0xFFE8C766).withValues(alpha: isDark ? 0.2 : 0.3),
         ),
         boxShadow: [
           BoxShadow(
-            color: dominantColor.withValues(alpha: isDark ? 0.1 : 0.06),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
+            color: const Color(
+              0xFF07345A,
+            ).withValues(alpha: isDark ? 0.32 : 0.18),
+            blurRadius: 30,
+            offset: const Offset(0, 14),
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
           children: [
-            // Header row
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: dominantColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    marketIcon,
-                    color: dominantColor,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Kondisi Pasar',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: isDark ? Colors.white54 : Colors.black45,
-                      ),
-                    ),
-                    Text(
-                      marketLabel,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: dominantColor,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                Text(
-                  '$total\nKomoditas',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white38 : Colors.black38,
-                    height: 1.3,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Stacked progress bar
-            if (total > 0) ...[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: Row(
-                  children: [
-                    if (upCount > 0)
-                      Flexible(
-                        flex: upCount,
-                        child: Container(
-                          height: 8,
-                          color: upColor,
-                        ),
-                      ),
-                    if (stableCount > 0)
-                      Flexible(
-                        flex: stableCount,
-                        child: Container(
-                          height: 8,
-                          color: stableColor.withValues(alpha: 0.6),
-                        ),
-                      ),
-                    if (downCount > 0)
-                      Flexible(
-                        flex: downCount,
-                        child: Container(
-                          height: 8,
-                          color: downColor,
-                        ),
-                      ),
-                  ],
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _SignalLinesPainter(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  gold: const Color(0xFFE8C766).withValues(alpha: 0.18),
                 ),
               ),
-              const SizedBox(height: 14),
-            ],
+            ),
+            Positioned(right: -42, top: -10, child: const _FoodSignalCluster()),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(9),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.16),
+                          ),
+                        ),
+                        child: Icon(
+                          marketIcon,
+                          color: const Color(0xFFE8C766),
+                          size: 21,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Kondisi Pasar Nasional',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white.withValues(alpha: 0.68),
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              marketLabel,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                letterSpacing: -0.2,
+                                height: 1.05,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Container(
+                      //   padding: const EdgeInsets.symmetric(
+                      //     horizontal: 10,
+                      //     vertical: 7,
+                      //   ),
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.white.withValues(alpha: 0.12),
+                      //     borderRadius: BorderRadius.circular(14),
+                      //     border: Border.all(
+                      //       color: const Color(
+                      //         0xFFE8C766,
+                      //       ).withValues(alpha: 0.22),
+                      //     ),
+                      //   ),
+                      //   child: Text(
+                      //     '$total\nKomoditas',
+                      //     textAlign: TextAlign.right,
+                      //     style: TextStyle(
+                      //       fontSize: 11,
+                      //       fontWeight: FontWeight.w800,
+                      //       color: Colors.white.withValues(alpha: 0.82),
+                      //       height: 1.18,
+                      //     ),
+                      //   ),
+                      // ),
+                    ],
+                  ),
 
-            // Legend row
-            Row(
-              children: [
-                _LegendDot(color: upColor, label: 'Naik', value: upCount),
-                const SizedBox(width: 16),
-                _LegendDot(color: stableColor, label: 'Stabil', value: stableCount),
-                const SizedBox(width: 16),
-                _LegendDot(color: downColor, label: 'Turun', value: downCount),
-              ],
+                  const SizedBox(height: 24),
+
+                  if (total > 0) ...[
+                    Container(
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Row(
+                        children: [
+                          if (upCount > 0)
+                            Flexible(
+                              flex: upCount,
+                              child: Container(color: upColor),
+                            ),
+                          if (stableCount > 0)
+                            Flexible(
+                              flex: stableCount,
+                              child: Container(
+                                color: const Color(
+                                  0xFFA9B4C0,
+                                ).withValues(alpha: 0.9),
+                              ),
+                            ),
+                          if (downCount > 0)
+                            Flexible(
+                              flex: downCount,
+                              child: Container(color: downColor),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                  ],
+
+                  Wrap(
+                    spacing: 14,
+                    runSpacing: 8,
+                    children: [
+                      _LegendDot(color: upColor, label: 'Naik', value: upCount),
+                      _LegendDot(
+                        color: const Color(0xFFA9B4C0),
+                        label: 'Stabil',
+                        value: stableCount,
+                      ),
+                      _LegendDot(
+                        color: downColor,
+                        label: 'Turun',
+                        value: downCount,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
   }
+}
+
+class _FoodSignalCluster extends StatelessWidget {
+  const _FoodSignalCluster();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 188,
+      height: 132,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: 116,
+            height: 116,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.08),
+              border: Border.all(
+                color: const Color(0xFFE8C766).withValues(alpha: 0.16),
+              ),
+            ),
+          ),
+          Image.asset(
+            'assets/images/arjuna_hero_3d.png',
+            width: 176,
+            height: 118,
+            fit: BoxFit.contain,
+            errorBuilder: (_, e, st) => Icon(
+              Icons.arrow_outward_rounded,
+              size: 54,
+              color: const Color(0xFFE8C766).withValues(alpha: 0.82),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SignalLinesPainter extends CustomPainter {
+  final Color color;
+  final Color gold;
+
+  const _SignalLinesPainter({required this.color, required this.gold});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final linePaint = Paint()
+      ..color = color
+      ..strokeWidth = 1.1
+      ..style = PaintingStyle.stroke;
+    final goldPaint = Paint()
+      ..color = gold
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    final dotPaint = Paint()..color = color;
+
+    final path = Path()
+      ..moveTo(size.width * 0.08, size.height * 0.72)
+      ..lineTo(size.width * 0.28, size.height * 0.56)
+      ..lineTo(size.width * 0.48, size.height * 0.62)
+      ..lineTo(size.width * 0.66, size.height * 0.38)
+      ..lineTo(size.width * 0.88, size.height * 0.48);
+    canvas.drawPath(path, linePaint);
+
+    final arrow = Path()
+      ..moveTo(size.width * 0.08, size.height * 0.22)
+      ..quadraticBezierTo(
+        size.width * 0.46,
+        size.height * 0.02,
+        size.width * 0.92,
+        size.height * 0.18,
+      );
+    canvas.drawPath(arrow, goldPaint);
+
+    for (final point in [
+      Offset(size.width * 0.08, size.height * 0.72),
+      Offset(size.width * 0.28, size.height * 0.56),
+      Offset(size.width * 0.48, size.height * 0.62),
+      Offset(size.width * 0.66, size.height * 0.38),
+      Offset(size.width * 0.88, size.height * 0.48),
+    ]) {
+      canvas.drawCircle(point, 3, dotPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _LegendDot extends StatelessWidget {
@@ -208,25 +327,21 @@ class _LegendDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 5),
         Text(
           '$value $label',
           style: TextStyle(
             fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: isDark ? Colors.white60 : Colors.black54,
+            fontWeight: FontWeight.w700,
+            color: Colors.white.withValues(alpha: 0.78),
           ),
         ),
       ],
