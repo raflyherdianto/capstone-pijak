@@ -151,7 +151,7 @@ class _QuickCard extends ConsumerWidget {
                 child: Container(
                   width: 4,
                   decoration: BoxDecoration(
-                    color: trendColor,
+                    color: isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(22),
                       bottomLeft: Radius.circular(22),
@@ -168,7 +168,7 @@ class _QuickCard extends ConsumerWidget {
                   height: 86,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: trendColor.withValues(alpha: isDark ? 0.08 : 0.06),
+                    color: (isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91)).withValues(alpha: 0.05),
                   ),
                 ),
               ),
@@ -182,7 +182,7 @@ class _QuickCard extends ConsumerWidget {
                   height: 80,
                   fit: BoxFit.contain,
                   errorBuilder: (_, e, st) =>
-                      Icon(Icons.eco_rounded, color: trendColor, size: 34),
+                      Icon(Icons.eco_rounded, color: isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91), size: 34),
                 ),
               ),
 
@@ -219,7 +219,7 @@ class _QuickCard extends ConsumerWidget {
                         CustomPaint(
                           size: const Size(68, 16),
                           painter: _MiniSparklinePainter(
-                            color: trendColor,
+                            color: isDark ? const Color(0xFFE8C766).withValues(alpha: 0.7) : const Color(0xFF0B9F91).withValues(alpha: 0.7),
                             history: commodity.chart.history,
                           ),
                         ),

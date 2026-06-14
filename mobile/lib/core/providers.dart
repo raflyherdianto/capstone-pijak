@@ -19,9 +19,9 @@ class AppSettings {
   AppSettings({
     required this.mode,
     this.isDarkMode = false,
-    this.upColor = const Color(0xFFF43F5E), // Premium Crimson Rose
-    this.downColor = const Color(0xFF10B981), // Premium Emerald Green
-    this.stableColor = const Color(0xFF64748B), // Premium Slate Grey
+    this.upColor = const Color(0xFFE05263), // Soft Terracotta Red
+    this.downColor = const Color(0xFF2A9D8F), // Soft Sage Teal/Green
+    this.stableColor = const Color(0xFF6B7A82), // Soft Slate Blue-Grey
   });
 
   AppSettings copyWith({
@@ -81,7 +81,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   }
 
   Color getTrendColor(double change) {
-    if (change == 0) return state.stableColor;
+    if (change.abs() < 0.25) return state.stableColor;
 
     if (state.mode == UserMode.buyer) {
       return change > 0 ? state.upColor : state.downColor;
