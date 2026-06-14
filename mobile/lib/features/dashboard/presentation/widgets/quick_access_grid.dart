@@ -202,7 +202,7 @@ class _QuickCard extends ConsumerWidget {
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.w700,
                                   height: 1.1,
                                   color: navy,
                                 ),
@@ -228,8 +228,8 @@ class _QuickCard extends ConsumerWidget {
                         Text(
                           currencyFormat.format(commodity.currentPrice),
                           style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
                             color: navy,
                           ),
                           maxLines: 1,
@@ -263,8 +263,8 @@ class _QuickCard extends ConsumerWidget {
                               Text(
                                 '${dayChange.abs().toStringAsFixed(2)}%',
                                 style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
                                   color: trendColor,
                                 ),
                               ),
