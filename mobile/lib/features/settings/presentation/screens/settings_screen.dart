@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../shared/widgets/app_background.dart';
+import '../../../../shared/widgets/arjuna_brand.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/shimmer_placeholder.dart';
 import '../../../../core/providers.dart';
@@ -15,8 +15,6 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final metadataAsync = ref.watch(metadataProvider);
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
@@ -27,29 +25,7 @@ class SettingsScreen extends ConsumerWidget {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            color: isDark
-                ? const Color(0xFF0F0F0F).withValues(alpha: 0.95)
-                : const Color(0xFFF4F6F8).withValues(alpha: 0.95),
-            border: Border(
-              bottom: BorderSide(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.black.withValues(alpha: 0.05),
-              ),
-            ),
-          ),
-          child: ClipRect(
-            child: CustomPaint(
-              painter: BatikKawungPainter(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.015)
-                    : Colors.black.withValues(alpha: 0.025),
-              ),
-            ),
-          ),
-        ),
+        flexibleSpace: const ArjunaAppBarBackground(),
       ),
       body: metadataAsync.when(
         data: (metadata) {

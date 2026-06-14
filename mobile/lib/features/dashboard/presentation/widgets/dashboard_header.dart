@@ -37,71 +37,45 @@ class DashboardHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 42,
-              height: 42,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFFE8C766).withValues(alpha: 0.12)
-                    : const Color(0xFFFFFFFF).withValues(alpha: 0.78),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: accentColor.withValues(alpha: isDark ? 0.24 : 0.18),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(
-                      0xFF07345A,
-                    ).withValues(alpha: isDark ? 0.24 : 0.08),
-                    blurRadius: 18,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
+                    ? const Color(0xFFE8C766).withValues(alpha: 0.09)
+                    : const Color(0xFF07345A).withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(999),
               ),
-              child: Icon(
-                Icons.architecture_rounded,
-                color: accentColor,
-                size: 22,
+              child: Text(
+                _getGreeting(),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontSize: 11,
+                  color: isDark ? Colors.white70 : const Color(0xFF59707B),
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${_getGreeting()} • Nusantara Market Signal',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontSize: 12,
-                      color: isDark ? Colors.white60 : const Color(0xFF59707B),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Pantau Harga Pangan',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.3,
-                      color: navy,
-                      height: 1.05,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    'Analisis harga & tinjauan pangan nasional',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontSize: 12,
-                      color: isDark ? Colors.white54 : const Color(0xFF6A7D85),
-                      fontWeight: FontWeight.w500,
-                      height: 1.2,
-                    ),
-                  ),
-                ],
+            const SizedBox(height: 9),
+            Text(
+              'Pantau Harga Pangan',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontSize: 25,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.3,
+                color: navy,
+                height: 1.04,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'Analisis harga & tinjauan pangan nasional',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontSize: 12,
+                color: isDark ? Colors.white54 : const Color(0xFF6A7D85),
+                fontWeight: FontWeight.w500,
+                height: 1.2,
               ),
             ),
           ],

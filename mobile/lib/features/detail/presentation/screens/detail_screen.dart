@@ -6,6 +6,7 @@ import '../../../../shared/widgets/shimmer_placeholder.dart';
 import '../../../../shared/domain/models.dart';
 import '../../../../core/providers.dart';
 import '../../../../shared/widgets/app_background.dart';
+import '../../../../shared/widgets/arjuna_brand.dart';
 import '../widgets/sticky_price_header.dart';
 import '../widgets/chart_section.dart';
 import '../widgets/ai_insight_perspective_card.dart';
@@ -25,7 +26,10 @@ class DetailScreen extends ConsumerStatefulWidget {
 class _DetailScreenState extends ConsumerState<DetailScreen> {
   int _selectedRange = 1; // 1, 7, 30
 
-  ChartData _getFilteredData(List<PricePoint> history, List<PricePoint> forecast) {
+  ChartData _getFilteredData(
+    List<PricePoint> history,
+    List<PricePoint> forecast,
+  ) {
     List<PricePoint> filteredHistory;
     if (_selectedRange == 1) {
       filteredHistory = history.length >= 2
@@ -64,7 +68,8 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
     );
 
     return BlocProvider(
-      create: (context) => DetailCubit(repository)..fetchDetailData(widget.commodity.name),
+      create: (context) =>
+          DetailCubit(repository)..fetchDetailData(widget.commodity.name),
       child: BlocBuilder<DetailCubit, DetailState>(
         builder: (context, state) {
           if (state is DetailLoading || state is DetailInitial) {
@@ -77,8 +82,9 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   centerTitle: true,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
+                  backgroundColor: ArjunaColors.appBarSurface(isDark),
                   surfaceTintColor: Colors.transparent,
+                  flexibleSpace: const ArjunaAppBarBackground(),
                 ),
                 body: const DetailShimmerPlaceholder(),
               ),
@@ -93,8 +99,9 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   centerTitle: true,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
+                  backgroundColor: ArjunaColors.appBarSurface(isDark),
                   surfaceTintColor: Colors.transparent,
+                  flexibleSpace: const ArjunaAppBarBackground(),
                 ),
                 body: Center(
                   child: Padding(
@@ -102,7 +109,11 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                        const Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Colors.red,
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           state.message,
@@ -114,12 +125,13 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                           builder: (context) {
                             return ElevatedButton(
                               onPressed: () {
-                                BlocProvider.of<DetailCubit>(context)
-                                    .fetchDetailData(widget.commodity.name);
+                                BlocProvider.of<DetailCubit>(
+                                  context,
+                                ).fetchDetailData(widget.commodity.name);
                               },
                               child: const Text('Coba Lagi'),
                             );
-                          }
+                          },
                         ),
                       ],
                     ),
@@ -134,35 +146,15 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                 body: CustomScrollView(
                   slivers: [
                     SliverAppBar(
-                      title: const Text(
-                        'Details',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      title: Text(
+                        widget.commodity.name,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       pinned: true,
                       centerTitle: true,
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: ArjunaColors.appBarSurface(isDark),
                       surfaceTintColor: Colors.transparent,
-                      flexibleSpace: Container(
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF4F6F8),
-                          border: Border(
-                            bottom: BorderSide(
-                              color: isDark
-                                  ? Colors.white10
-                                  : Colors.black.withValues(alpha: 0.05),
-                            ),
-                          ),
-                        ),
-                        child: ClipRect(
-                          child: CustomPaint(
-                            painter: BatikKawungPainter(
-                              color: isDark
-                                  ? Colors.white.withValues(alpha: 0.015)
-                                  : Colors.black.withValues(alpha: 0.025),
-                            ),
-                          ),
-                        ),
-                      ),
+                      flexibleSpace: const ArjunaAppBarBackground(),
                     ),
                     SliverPersistentHeader(
                       pinned: true,
@@ -174,11 +166,17 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                       ),
                     ),
                     SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
                       sliver: SliverList(
                         delegate: SliverChildListDelegate([
                           ChartSection(
-                            filteredData: _getFilteredData(state.history, state.forecast),
+                            filteredData: _getFilteredData(
+                              state.history,
+                              state.forecast,
+                            ),
                             themeColor: trendColor,
                             reliability: widget.commodity.reliability,
                             selectedRange: _selectedRange,
@@ -195,9 +193,8 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                           if (widget.commodity.subCommodities.isNotEmpty) ...[
                             Text(
                               'Sub-Komoditas',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 12),
                             SubCommodityCarousel(

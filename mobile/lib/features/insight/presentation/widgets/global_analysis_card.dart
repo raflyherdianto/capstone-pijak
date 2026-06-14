@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/arjuna_brand.dart';
 
 class GlobalAnalysisCard extends StatelessWidget {
   final String analysis;
@@ -13,13 +14,17 @@ class GlobalAnalysisCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = isDark
-        ? const Color(0xFF34D399)
-        : const Color(0xFF10B981);
+    final accentColor = ArjunaColors.accent(isDark);
 
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? const [Color(0xFF0A2638), Color(0xFF061D2D)]
+              : [Colors.white, ArjunaColors.softIvory],
+        ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: accentColor.withValues(alpha: isDark ? 0.18 : 0.12),
@@ -27,7 +32,7 @@ class GlobalAnalysisCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: accentColor.withValues(alpha: isDark ? 0.08 : 0.06),
+            color: ArjunaColors.navy.withValues(alpha: isDark ? 0.24 : 0.09),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -48,10 +53,12 @@ class GlobalAnalysisCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
               decoration: BoxDecoration(
-                color: accentColor.withValues(alpha: isDark ? 0.08 : 0.05),
+                color: isDark
+                    ? ArjunaColors.gold.withValues(alpha: 0.08)
+                    : ArjunaColors.navy.withValues(alpha: 0.04),
                 border: Border(
                   bottom: BorderSide(
-                    color: accentColor.withValues(alpha: isDark ? 0.1 : 0.08),
+                    color: accentColor.withValues(alpha: isDark ? 0.12 : 0.1),
                     width: 1,
                   ),
                 ),
@@ -61,18 +68,18 @@ class GlobalAnalysisCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(7),
                     decoration: BoxDecoration(
-                      color: accentColor.withValues(alpha: 0.12),
+                      color: accentColor.withValues(alpha: 0.13),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
-                      Icons.auto_awesome,
+                      Icons.travel_explore_rounded,
                       color: accentColor,
                       size: 18,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Analisis Global AI',
+                    'Sinyal Pasar Nusantara',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.2,

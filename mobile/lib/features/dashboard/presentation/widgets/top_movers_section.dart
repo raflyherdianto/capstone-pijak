@@ -19,6 +19,11 @@ class TopMoversSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Watch settings to rebuild on mode change
+    ref.watch(settingsProvider);
+    final gainerColor = ref.read(settingsProvider.notifier).getTrendColor(1.0);
+    final loserColor = ref.read(settingsProvider.notifier).getTrendColor(-1.0);
 
     // Sort by day_1 change descending for top movers
     final sorted = [...commodities]
@@ -55,7 +60,7 @@ class TopMoversSection extends ConsumerWidget {
           _SubLabel(
             icon: Icons.arrow_upward_rounded,
             label: 'Kenaikan Terbesar',
-            color: const Color(0xFF17B884),
+            color: gainerColor,
             isDark: isDark,
           ),
           const SizedBox(height: 8),
@@ -86,7 +91,7 @@ class TopMoversSection extends ConsumerWidget {
           _SubLabel(
             icon: Icons.arrow_downward_rounded,
             label: 'Penurunan Terbesar',
-            color: const Color(0xFFE94D5F),
+            color: loserColor,
             isDark: isDark,
           ),
           const SizedBox(height: 8),
@@ -209,7 +214,6 @@ class _MoverCard extends ConsumerWidget {
         .read(settingsProvider.notifier)
         .getTrendColor(dayChange);
     final isPositive = dayChange > 0;
-    final imageAsset = _premiumAssetFor(commodity);
 
     return GestureDetector(
       onTap: onTap,
@@ -246,7 +250,7 @@ class _MoverCard extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Image.asset(
-                  imageAsset,
+                  commodity.imageAsset,
                   width: 34,
                   height: 34,
                   fit: BoxFit.contain,
@@ -319,25 +323,4 @@ class _MoverCard extends ConsumerWidget {
       ),
     );
   }
-}
-
-String _premiumAssetFor(Commodity commodity) {
-  final name = commodity.name.toLowerCase();
-
-  if (name.contains('beras')) {
-    return 'assets/images/arjuna_3d_beras.png';
-  }
-  if (name.contains('daging ayam') ||
-      name == 'ayam' ||
-      name.contains(' ayam')) {
-    return 'assets/images/arjuna_3d_daging_ayam.png';
-  }
-  if (name.contains('daging sapi') || name.contains('sapi')) {
-    return 'assets/images/arjuna_3d_daging_sapi.png';
-  }
-  if (name.contains('telur')) {
-    return 'assets/images/arjuna_3d_telur_ayam.png';
-  }
-
-  return commodity.imageAsset;
 }

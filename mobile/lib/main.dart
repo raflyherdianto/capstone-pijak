@@ -50,10 +50,13 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final navBottomInset = bottomPadding > 0
+        ? (bottomPadding - 18).clamp(8.0, 18.0)
+        : 10.0;
 
     final List<Widget> screens = [
       // Tab 0: Dashboard
@@ -69,60 +72,141 @@ class _MainNavigationState extends State<MainNavigation> {
     return AppBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
+        extendBody: true,
         body: IndexedStack(index: _selectedIndex, children: screens),
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
-          child: Container(
-            decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF061D2D).withValues(alpha: 0.94)
-                  : const Color(0xFFFFFBF0).withValues(alpha: 0.94),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(
+        bottomNavigationBar: MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            padding: MediaQuery.of(context).padding.copyWith(bottom: 0),
+            viewPadding: MediaQuery.of(context).viewPadding.copyWith(bottom: 0),
+          ),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(14, 0, 14, navBottomInset),
+            child: Container(
+              height: 68,
+              decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFFE8C766).withValues(alpha: 0.14)
-                    : const Color(0xFF07345A).withValues(alpha: 0.08),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.12),
-                  blurRadius: 28,
-                  offset: const Offset(0, 10),
+                    ? const Color(0xFF061D2D).withValues(alpha: 0.94)
+                    : const Color(0xFFFFFBF0).withValues(alpha: 0.94),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                  color: isDark
+                      ? const Color(0xFFE8C766).withValues(alpha: 0.14)
+                      : const Color(0xFF07345A).withValues(alpha: 0.08),
                 ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(28),
-              child: NavigationBar(
-                selectedIndex: _selectedIndex,
-                height: 74,
-                onDestinationSelected: (index) {
-                  setState(() => _selectedIndex = index);
-                },
-                destinations: const [
-                  NavigationDestination(
-                    icon: Icon(Icons.dashboard_outlined),
-                    selectedIcon: Icon(Icons.dashboard_rounded),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.12),
+                    blurRadius: 28,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  _NavItem(
                     label: 'Beranda',
+                    icon: Icons.dashboard_outlined,
+                    selectedIcon: Icons.dashboard_rounded,
+                    selected: _selectedIndex == 0,
+                    isDark: isDark,
+                    onTap: () => setState(() => _selectedIndex = 0),
                   ),
-                  NavigationDestination(
-                    icon: Icon(Icons.storefront_outlined),
-                    selectedIcon: Icon(Icons.storefront_rounded),
+                  _NavItem(
                     label: 'Komoditas',
+                    icon: Icons.storefront_outlined,
+                    selectedIcon: Icons.storefront_rounded,
+                    selected: _selectedIndex == 1,
+                    isDark: isDark,
+                    onTap: () => setState(() => _selectedIndex = 1),
                   ),
-                  NavigationDestination(
-                    icon: Icon(Icons.auto_awesome_mosaic_outlined),
-                    selectedIcon: Icon(Icons.auto_awesome_mosaic),
+                  _NavItem(
                     label: 'Insight',
+                    icon: Icons.auto_awesome_mosaic_outlined,
+                    selectedIcon: Icons.auto_awesome_mosaic,
+                    selected: _selectedIndex == 2,
+                    isDark: isDark,
+                    onTap: () => setState(() => _selectedIndex = 2),
                   ),
-                  NavigationDestination(
-                    icon: Icon(Icons.settings_outlined),
-                    selectedIcon: Icon(Icons.settings_rounded),
+                  _NavItem(
                     label: 'Pengaturan',
+                    icon: Icons.settings_outlined,
+                    selectedIcon: Icons.settings_rounded,
+                    selected: _selectedIndex == 3,
+                    isDark: isDark,
+                    onTap: () => setState(() => _selectedIndex = 3),
                   ),
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final IconData selectedIcon;
+  final bool selected;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _NavItem({
+    required this.label,
+    required this.icon,
+    required this.selectedIcon,
+    required this.selected,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final activeColor = isDark
+        ? const Color(0xFFE8C766)
+        : const Color(0xFF0B9F91);
+    final inactiveColor = isDark ? Colors.white54 : const Color(0xFF66747C);
+
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(24),
+        child: SizedBox(
+          height: 68,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOutCubic,
+                width: selected ? 52 : 40,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: selected
+                      ? activeColor.withValues(alpha: isDark ? 0.16 : 0.14)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Icon(
+                  selected ? selectedIcon : icon,
+                  size: 23,
+                  color: selected ? activeColor : inactiveColor,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                  color: selected ? activeColor : inactiveColor,
+                ),
+              ),
+            ],
           ),
         ),
       ),

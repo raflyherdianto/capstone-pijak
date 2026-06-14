@@ -48,12 +48,13 @@ class QuickAccessGrid extends ConsumerWidget {
         const SizedBox(height: 12),
         GridView.builder(
           shrinkWrap: true,
+          padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 1.34,
+            childAspectRatio: 1.52,
           ),
           itemCount: items.length,
           itemBuilder: (context, index) {
@@ -98,7 +99,6 @@ class _QuickCard extends ConsumerWidget {
     final isPositive = dayChange > 0;
     final isFlat = dayChange == 0;
     final navy = isDark ? const Color(0xFFEAF8F4) : const Color(0xFF07345A);
-    final imageAsset = _premiumAssetFor(commodity);
 
     return Container(
       decoration: BoxDecoration(
@@ -175,11 +175,11 @@ class _QuickCard extends ConsumerWidget {
 
               Positioned(
                 right: 10,
-                top: 38,
+                top: 30,
                 child: Image.asset(
-                  imageAsset,
-                  width: 58,
-                  height: 58,
+                  commodity.imageAsset,
+                  width: 50,
+                  height: 50,
                   fit: BoxFit.contain,
                   errorBuilder: (_, e, st) =>
                       Icon(Icons.eco_rounded, color: trendColor, size: 34),
@@ -188,7 +188,7 @@ class _QuickCard extends ConsumerWidget {
 
               // Content
               Padding(
-                padding: const EdgeInsets.fromLTRB(14, 13, 12, 12),
+                padding: const EdgeInsets.fromLTRB(14, 12, 12, 11),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -217,24 +217,24 @@ class _QuickCard extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CustomPaint(
-                          size: const Size(70, 20),
+                          size: const Size(68, 16),
                           painter: _MiniSparklinePainter(
                             color: trendColor,
-                            isPositive: isPositive,
+                            history: commodity.chart.history,
                           ),
                         ),
-                        const SizedBox(height: 3),
+                        const SizedBox(height: 2),
                         Text(
                           currencyFormat.format(commodity.currentPrice),
                           style: TextStyle(
                             fontWeight: FontWeight.w800,
-                            fontSize: 15,
+                            fontSize: 14,
                             color: navy,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 4),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 7,
@@ -285,9 +285,9 @@ class _QuickCard extends ConsumerWidget {
 
 class _MiniSparklinePainter extends CustomPainter {
   final Color color;
-  final bool isPositive;
+  final List<PricePoint> history;
 
-  const _MiniSparklinePainter({required this.color, required this.isPositive});
+  const _MiniSparklinePainter({required this.color, required this.history});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -300,26 +300,33 @@ class _MiniSparklinePainter extends CustomPainter {
       guide,
     );
 
-    final path = Path();
-    final points = isPositive
-        ? [
-            Offset(0, size.height * 0.74),
-            Offset(size.width * 0.22, size.height * 0.58),
-            Offset(size.width * 0.46, size.height * 0.64),
-            Offset(size.width * 0.7, size.height * 0.36),
-            Offset(size.width, size.height * 0.28),
-          ]
-        : [
-            Offset(0, size.height * 0.32),
-            Offset(size.width * 0.24, size.height * 0.42),
-            Offset(size.width * 0.5, size.height * 0.38),
-            Offset(size.width * 0.74, size.height * 0.68),
-            Offset(size.width, size.height * 0.76),
-          ];
+    if (history.length < 2) return;
 
-    path.moveTo(points.first.dx, points.first.dy);
-    for (final point in points.skip(1)) {
-      path.lineTo(point.dx, point.dy);
+    final path = Path();
+    final prices = history.map((p) => p.price).toList();
+
+    double minPrice = prices.reduce((a, b) => a < b ? a : b);
+    double maxPrice = prices.reduce((a, b) => a > b ? a : b);
+
+    // Add small padding to min and max to keep sparkline clean
+    final priceRange = maxPrice - minPrice;
+    final padding = priceRange == 0 ? 1.0 : priceRange * 0.15;
+    minPrice -= padding;
+    maxPrice += padding;
+
+    final range = maxPrice - minPrice;
+
+    for (int i = 0; i < prices.length; i++) {
+      final double x = (i / (prices.length - 1)) * size.width;
+      final double ratio = (prices[i] - minPrice) / range;
+      // Invert Y coordinate because 0 is at the top in Flutter
+      final double y = size.height - (ratio * size.height);
+
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
     }
 
     final paint = Paint()
@@ -332,26 +339,7 @@ class _MiniSparklinePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-String _premiumAssetFor(Commodity commodity) {
-  final name = commodity.name.toLowerCase();
-
-  if (name.contains('beras')) {
-    return 'assets/images/arjuna_3d_beras.png';
+  bool shouldRepaint(covariant _MiniSparklinePainter oldDelegate) {
+    return oldDelegate.color != color || oldDelegate.history != history;
   }
-  if (name.contains('telur')) {
-    return 'assets/images/arjuna_3d_telur_ayam.png';
-  }
-  if (name.contains('daging ayam') ||
-      name == 'ayam' ||
-      name.contains(' ayam')) {
-    return 'assets/images/arjuna_3d_daging_ayam.png';
-  }
-  if (name.contains('daging sapi') || name.contains('sapi')) {
-    return 'assets/images/arjuna_3d_daging_sapi.png';
-  }
-
-  return commodity.imageAsset;
 }

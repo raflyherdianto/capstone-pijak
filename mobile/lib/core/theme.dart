@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
@@ -127,6 +128,11 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark, // Android
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light, // iOS
+        ),
         iconTheme: IconThemeData(color: isDark ? Colors.white : primary),
         titleTextStyle: GoogleFonts.outfit(
           fontSize: 20,

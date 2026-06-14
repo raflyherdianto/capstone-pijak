@@ -270,7 +270,10 @@ class _NewsShimmer extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: 3,
         separatorBuilder: (_, i) => const SizedBox(width: 12),
-        itemBuilder: (_, i) => const ShimmerCardPlaceholder(height: 190),
+        itemBuilder: (_, i) => const SizedBox(
+          width: 220,
+          child: ShimmerCardPlaceholder(height: 190),
+        ),
       ),
     );
   }

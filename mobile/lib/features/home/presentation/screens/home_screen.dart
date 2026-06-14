@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers.dart';
-import '../../../../shared/widgets/app_background.dart';
+import '../../../../shared/widgets/arjuna_brand.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/shimmer_placeholder.dart';
 import '../../../detail/presentation/screens/detail_screen.dart';
@@ -30,8 +30,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final commoditiesAsync = ref.watch(commoditiesProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor =
-        isDark ? const Color(0xFF34D399) : const Color(0xFF10B981);
+    final accentColor = ArjunaColors.accent(isDark);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -39,29 +38,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            color: isDark
-                ? const Color(0xFF0F0F0F).withValues(alpha: 0.95)
-                : const Color(0xFFF4F6F8).withValues(alpha: 0.95),
-            border: Border(
-              bottom: BorderSide(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.black.withValues(alpha: 0.05),
-              ),
-            ),
-          ),
-          child: ClipRect(
-            child: CustomPaint(
-              painter: BatikKawungPainter(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.015)
-                    : Colors.black.withValues(alpha: 0.025),
-              ),
-            ),
-          ),
-        ),
+        flexibleSpace: const ArjunaAppBarBackground(),
         // Integrated search in the title area
         title: _SearchField(
           controller: _searchController,
@@ -82,8 +59,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: commoditiesAsync.when(
         data: (commodities) {
           final filtered = commodities
-              .where((c) =>
-                  c.name.toLowerCase().contains(_searchQuery.toLowerCase()))
+              .where(
+                (c) =>
+                    c.name.toLowerCase().contains(_searchQuery.toLowerCase()),
+              )
               .toList();
 
           return RefreshIndicator(
@@ -95,7 +74,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // Result count header
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
                     child: _ResultHeader(
                       filteredCount: filtered.length,
                       totalCount: commodities.length,
@@ -118,7 +97,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
                     sliver: SliverList.separated(
                       itemCount: filtered.length,
-              separatorBuilder: (_, i) => const SizedBox(height: 14),
+                      separatorBuilder: (_, i) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
                         final commodity = filtered[index];
                         return CommodityCard(
@@ -146,9 +125,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Column(
                   children: [
                     const SizedBox(height: 4),
-                    ShimmerCardPlaceholder(
-                      height: 28,
-                    ),
+                    ShimmerCardPlaceholder(height: 28),
                     const SizedBox(height: 16),
                   ],
                 ),
@@ -158,8 +135,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               sliver: SliverList.separated(
                 itemCount: 5,
-                separatorBuilder: (_, i) => const SizedBox(height: 14),
-                itemBuilder: (_, i) => const ShimmerCardPlaceholder(height: 152),
+                separatorBuilder: (_, i) => const SizedBox(height: 10),
+                itemBuilder: (_, i) => const ShimmerCardPlaceholder(height: 92),
               ),
             ),
           ],
@@ -199,13 +176,13 @@ class _SearchField extends StatelessWidget {
       height: 44,
       decoration: BoxDecoration(
         color: isDark
-            ? Colors.white.withValues(alpha: 0.07)
-            : Colors.black.withValues(alpha: 0.05),
+            ? Colors.white.withValues(alpha: 0.08)
+            : Colors.white.withValues(alpha: 0.78),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.1)
-              : Colors.black.withValues(alpha: 0.07),
+              ? ArjunaColors.gold.withValues(alpha: 0.14)
+              : ArjunaColors.navy.withValues(alpha: 0.08),
         ),
       ),
       child: TextField(
@@ -215,19 +192,19 @@ class _SearchField extends StatelessWidget {
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
-          color: isDark ? Colors.white : const Color(0xFF0F0F0F),
+          color: isDark ? Colors.white : ArjunaColors.navy,
         ),
         decoration: InputDecoration(
           hintText: 'Cari bahan pangan...',
           hintStyle: TextStyle(
             fontSize: 14,
-            color: isDark ? Colors.white38 : Colors.black38,
+            color: isDark ? Colors.white38 : ArjunaColors.muted,
             fontWeight: FontWeight.w400,
           ),
           prefixIcon: Icon(
             Icons.search_rounded,
             size: 18,
-            color: isDark ? Colors.white38 : Colors.black38,
+            color: isDark ? Colors.white38 : ArjunaColors.muted,
           ),
           suffixIcon: controller.text.isNotEmpty
               ? GestureDetector(
@@ -237,13 +214,13 @@ class _SearchField extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: isDark
                           ? Colors.white.withValues(alpha: 0.12)
-                          : Colors.black.withValues(alpha: 0.07),
+                          : ArjunaColors.navy.withValues(alpha: 0.07),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.close_rounded,
                       size: 14,
-                      color: isDark ? Colors.white60 : Colors.black54,
+                      color: isDark ? Colors.white60 : ArjunaColors.navy,
                     ),
                   ),
                 )
@@ -251,8 +228,10 @@ class _SearchField extends StatelessWidget {
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 0, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 0,
+            vertical: 12,
+          ),
           isDense: true,
         ),
       ),
@@ -289,10 +268,10 @@ class _ResultHeader extends StatelessWidget {
               Text(
                 isFiltering ? 'Hasil Pencarian' : 'Semua Bahan Pangan',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 17,
-                      letterSpacing: -0.3,
-                    ),
+                  fontWeight: FontWeight.w800,
+                  fontSize: 17,
+                  letterSpacing: -0.3,
+                ),
               ),
               Text(
                 isFiltering
@@ -300,7 +279,9 @@ class _ResultHeader extends StatelessWidget {
                     : '$totalCount komoditas tersedia',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? Colors.white.withValues(alpha: 0.45) : Colors.black.withValues(alpha: 0.38),
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.45)
+                      : Colors.black.withValues(alpha: 0.38),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -315,9 +296,7 @@ class _ResultHeader extends StatelessWidget {
             decoration: BoxDecoration(
               color: accentColor.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: accentColor.withValues(alpha: 0.15),
-              ),
+              border: Border.all(color: accentColor.withValues(alpha: 0.15)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -342,9 +321,7 @@ class _ResultHeader extends StatelessWidget {
             decoration: BoxDecoration(
               color: accentColor.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: accentColor.withValues(alpha: 0.15),
-              ),
+              border: Border.all(color: accentColor.withValues(alpha: 0.15)),
             ),
             child: Text(
               '$filteredCount ditemukan',
@@ -395,9 +372,9 @@ class _EmptyState extends StatelessWidget {
             Text(
               'Tidak Ditemukan',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 18,
-                  ),
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -405,7 +382,9 @@ class _EmptyState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? Colors.white.withValues(alpha: 0.45) : Colors.black.withValues(alpha: 0.38),
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.45)
+                    : Colors.black.withValues(alpha: 0.38),
                 height: 1.5,
               ),
             ),

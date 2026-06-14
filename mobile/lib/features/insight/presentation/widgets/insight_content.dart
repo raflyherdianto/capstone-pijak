@@ -25,7 +25,7 @@ class InsightContent extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 4),
             GlobalAnalysisCard(
               analysis: metadata.globalAnalysis,
               disclaimer: metadata.disclaimer,

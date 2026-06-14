@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers.dart';
-import '../../../../shared/widgets/app_background.dart';
+import '../../../../shared/widgets/arjuna_brand.dart';
 import '../../../../shared/widgets/shimmer_placeholder.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../widgets/dashboard_header.dart';
@@ -17,7 +17,6 @@ class DashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final commoditiesAsync = ref.watch(commoditiesProvider);
     final metadataAsync = ref.watch(metadataProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -25,19 +24,7 @@ class DashboardScreen extends ConsumerWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(
-              'assets/images/app_logo.png',
-              width: 30,
-              height: 30,
-              fit: BoxFit.contain,
-              errorBuilder: (_, e, st) => Icon(
-                Icons.eco_rounded,
-                size: 22,
-                color: isDark
-                    ? const Color(0xFFE8C766)
-                    : const Color(0xFF0B9F91),
-              ),
-            ),
+            const ArjunaLogoMark(size: 30, padding: 2, radius: 10),
             const SizedBox(width: 8),
             const Text('Arjuna', style: TextStyle(fontWeight: FontWeight.bold)),
           ],
@@ -45,29 +32,7 @@ class DashboardScreen extends ConsumerWidget {
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            color: isDark
-                ? const Color(0xFF031827).withValues(alpha: 0.95)
-                : const Color(0xFFEAF8F4).withValues(alpha: 0.92),
-            border: Border(
-              bottom: BorderSide(
-                color: isDark
-                    ? Colors.white10
-                    : Colors.black.withValues(alpha: 0.05),
-              ),
-            ),
-          ),
-          child: ClipRect(
-            child: CustomPaint(
-              painter: BatikKawungPainter(
-                color: isDark
-                    ? const Color(0xFFE8C766).withValues(alpha: 0.025)
-                    : const Color(0xFF07345A).withValues(alpha: 0.03),
-              ),
-            ),
-          ),
-        ),
+        flexibleSpace: const ArjunaAppBarBackground(),
       ),
       body: commoditiesAsync.when(
         data: (commodities) {
@@ -102,7 +67,7 @@ class DashboardScreen extends ConsumerWidget {
                   // 3. Quick Access Grid (top 4)
                   if (commodities.isNotEmpty) ...[
                     QuickAccessGrid(commodities: commodities),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 16),
                   ],
 
                   // 4. Top Movers section
@@ -118,21 +83,7 @@ class DashboardScreen extends ConsumerWidget {
             ),
           );
         },
-        loading: () => SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const DashboardHeader(),
-              const SizedBox(height: 20),
-              const ShimmerCardPlaceholder(height: 140),
-              const SizedBox(height: 20),
-              const ShimmerCardPlaceholder(height: 180),
-              const SizedBox(height: 20),
-              const ShimmerListPlaceholder(itemCount: 3),
-            ],
-          ),
-        ),
+        loading: () => const DashboardShimmer(),
         error: (error, _) => AppErrorWidget(
           title: 'Gagal Memuat Dashboard',
           message: error.toString(),
@@ -145,5 +96,3 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 }
-
-

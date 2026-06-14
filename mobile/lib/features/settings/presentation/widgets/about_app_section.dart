@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/domain/models.dart';
+import '../../../../shared/widgets/arjuna_brand.dart';
 import 'setting_card_wrapper.dart';
 
 class AboutAppSection extends StatelessWidget {
@@ -10,6 +11,7 @@ class AboutAppSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final about = metadata.aboutUs;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SettingCardWrapper(
       child: Padding(
@@ -19,11 +21,7 @@ class AboutAppSection extends StatelessWidget {
           children: [
             Row(
               children: [
-                SizedBox(
-                  width: 54,
-                  height: 54,
-                  child: Image.asset('assets/images/app_logo.png'),
-                ),
+                const ArjunaLogoMark(size: 58, padding: 3, radius: 18),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -31,17 +29,15 @@ class AboutAppSection extends StatelessWidget {
                     children: [
                       Text(
                         about['app_name'] ?? 'Arjuna',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w900,
+                          color: ArjunaColors.title(isDark),
                         ),
                       ),
                       Text(
                         'Versi ${about['version'] ?? '1.0.0'}',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 13,
-                        ),
+                        style: TextStyle(color: Colors.grey[600], fontSize: 13),
                       ),
                     ],
                   ),
