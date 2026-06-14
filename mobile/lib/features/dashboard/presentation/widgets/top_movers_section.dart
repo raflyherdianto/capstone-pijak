@@ -209,6 +209,7 @@ class _MoverCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(settingsProvider);
     final dayChange = commodity.priceChanges['day_1'] ?? 0;
     final trendColor = ref
         .read(settingsProvider.notifier)

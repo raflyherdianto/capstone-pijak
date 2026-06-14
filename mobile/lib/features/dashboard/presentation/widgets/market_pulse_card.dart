@@ -29,6 +29,7 @@ class MarketPulseCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(settingsProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final upColor = ref.read(settingsProvider.notifier).getTrendColor(1.0);
     final downColor = ref.read(settingsProvider.notifier).getTrendColor(-1.0);

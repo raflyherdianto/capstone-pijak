@@ -92,6 +92,7 @@ class _QuickCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(settingsProvider);
     final dayChange = commodity.priceChanges['day_1'] ?? 0;
     final trendColor = ref
         .read(settingsProvider.notifier)
@@ -151,7 +152,7 @@ class _QuickCard extends ConsumerWidget {
                 child: Container(
                   width: 4,
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91),
+                    color: trendColor,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(22),
                       bottomLeft: Radius.circular(22),
@@ -168,7 +169,7 @@ class _QuickCard extends ConsumerWidget {
                   height: 86,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: (isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91)).withValues(alpha: 0.05),
+                    color: trendColor.withValues(alpha: 0.05),
                   ),
                 ),
               ),
@@ -182,7 +183,7 @@ class _QuickCard extends ConsumerWidget {
                   height: 80,
                   fit: BoxFit.contain,
                   errorBuilder: (_, e, st) =>
-                      Icon(Icons.eco_rounded, color: isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91), size: 34),
+                      Icon(Icons.eco_rounded, color: trendColor, size: 34),
                 ),
               ),
 
@@ -219,7 +220,7 @@ class _QuickCard extends ConsumerWidget {
                         CustomPaint(
                           size: const Size(68, 16),
                           painter: _MiniSparklinePainter(
-                            color: isDark ? const Color(0xFFE8C766).withValues(alpha: 0.7) : const Color(0xFF0B9F91).withValues(alpha: 0.7),
+                            color: trendColor.withValues(alpha: 0.7),
                             history: commodity.chart.history,
                           ),
                         ),
