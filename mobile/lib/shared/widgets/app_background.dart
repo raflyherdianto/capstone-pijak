@@ -37,6 +37,17 @@ class AppBackground extends StatelessWidget {
           ),
         ),
 
+        // Subtle Batik Kawung pattern background watermark
+        Positioned.fill(
+          child: CustomPaint(
+            painter: BatikKawungPainter(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.03)
+                  : Colors.black.withValues(alpha: 0.045),
+            ),
+          ),
+        ),
+
         if (showBlurShapes) ...[
           // Top-right emerald accent — more visible
           Positioned(
@@ -80,6 +91,88 @@ class AppBackground extends StatelessWidget {
       ],
     );
   }
+}
+
+class BatikKawungPainter extends CustomPainter {
+  final Color color;
+
+  BatikKawungPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+
+    final dotPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    const double cellSize = 72.0;
+    final int cols = (size.width / cellSize).ceil() + 1;
+    final int rows = (size.height / cellSize).ceil() + 1;
+
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        final double x = c * cellSize;
+        final double y = r * cellSize;
+        final double half = cellSize / 2;
+        final double quarter = cellSize / 4;
+
+        final center = Offset(x + half, y + half);
+
+        // Top petal
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(x + half, y + quarter),
+            width: quarter * 1.6,
+            height: half,
+          ),
+          paint,
+        );
+
+        // Bottom petal
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(x + half, y + cellSize - quarter),
+            width: quarter * 1.6,
+            height: half,
+          ),
+          paint,
+        );
+
+        // Left petal
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(x + quarter, y + half),
+            width: half,
+            height: quarter * 1.6,
+          ),
+          paint,
+        );
+
+        // Right petal
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: Offset(x + cellSize - quarter, y + half),
+            width: half,
+            height: quarter * 1.6,
+          ),
+          paint,
+        );
+
+        // Center dot
+        canvas.drawCircle(center, 2.0, dotPaint);
+
+        // Corner dots
+        canvas.drawCircle(Offset(x, y), 1.0, dotPaint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _BlurredShape extends StatelessWidget {
