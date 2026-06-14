@@ -28,7 +28,7 @@ class AboutAppSection extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        about['app_name'] ?? 'Arjuna',
+                        'Arjuna Mobile',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
@@ -39,7 +39,9 @@ class AboutAppSection extends StatelessWidget {
                       Text(
                         'Versi ${about['version'] ?? '1.0.0'}',
                         style: TextStyle(
-                          color: isDark ? Colors.white38 : const Color(0xFF6A7D85),
+                          color: isDark
+                              ? Colors.white38
+                              : const Color(0xFF6A7D85),
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
