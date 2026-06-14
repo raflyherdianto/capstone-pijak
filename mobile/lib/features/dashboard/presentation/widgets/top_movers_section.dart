@@ -19,7 +19,7 @@ class TopMoversSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     // Watch settings to rebuild on mode change
     ref.watch(settingsProvider);
     final gainerColor = ref.read(settingsProvider.notifier).getTrendColor(1.0);
@@ -251,8 +251,8 @@ class _MoverCard extends ConsumerWidget {
               children: [
                 Image.asset(
                   commodity.imageAsset,
-                  width: 34,
-                  height: 34,
+                  width: 42,
+                  height: 42,
                   fit: BoxFit.contain,
                   errorBuilder: (_, e, st) =>
                       Icon(Icons.eco_rounded, color: trendColor, size: 28),

@@ -65,13 +65,14 @@ class CommodityCard extends ConsumerWidget {
                 child: Container(
                   width: 54,
                   height: 54,
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     color: trendColor.withValues(alpha: isDark ? 0.12 : 0.08),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Image.asset(
                     commodity.imageAsset,
+
                     fit: BoxFit.contain,
                     errorBuilder: (_, e, st) =>
                         Icon(Icons.eco_rounded, color: trendColor, size: 26),

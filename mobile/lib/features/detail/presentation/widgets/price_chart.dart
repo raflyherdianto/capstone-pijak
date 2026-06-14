@@ -174,6 +174,11 @@ class PriceChart extends StatelessWidget {
                     reservedSize: 46,
                     interval: yInterval,
                     getTitlesWidget: (value, meta) {
+                      // Skip rendering absolute min and max boundary labels to prevent overlapping
+                      if (value == meta.min || value == meta.max) {
+                        return const SizedBox.shrink();
+                      }
+
                       String text;
                       if (value >= 1000000) {
                         text = '${(value / 1000000).toStringAsFixed(1)}jt';

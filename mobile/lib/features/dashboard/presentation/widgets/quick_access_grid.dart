@@ -178,8 +178,8 @@ class _QuickCard extends ConsumerWidget {
                 top: 30,
                 child: Image.asset(
                   commodity.imageAsset,
-                  width: 50,
-                  height: 50,
+                  width: 80,
+                  height: 80,
                   fit: BoxFit.contain,
                   errorBuilder: (_, e, st) =>
                       Icon(Icons.eco_rounded, color: trendColor, size: 34),
