@@ -10,6 +10,7 @@ class QuickStatsGrid extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(settingsProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final upCount = commodities
@@ -114,7 +115,7 @@ class _StatCard extends StatelessWidget {
               value,
               style: TextStyle(
                 fontSize: 30,
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w800,
                 color: isDark ? Colors.white : const Color(0xFF0F0F0F),
                 letterSpacing: -1,
                 height: 1.0,

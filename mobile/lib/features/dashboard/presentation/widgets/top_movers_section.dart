@@ -282,7 +282,7 @@ class _MoverCard extends ConsumerWidget {
                         '${dayChange.abs().toStringAsFixed(1)}%',
                         style: TextStyle(
                           fontSize: 10,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: trendColor,
                         ),
                       ),

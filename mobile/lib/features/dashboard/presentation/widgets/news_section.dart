@@ -28,10 +28,10 @@ class NewsSection extends ConsumerWidget {
             Text(
               'Berita Pangan',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                    letterSpacing: -0.2,
-                  ),
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+                letterSpacing: -0.2,
+              ),
             ),
             const Spacer(),
             _PoweredByBadge(isDark: isDark),
@@ -52,10 +52,8 @@ class NewsSection extends ConsumerWidget {
                 scrollDirection: Axis.horizontal,
                 itemCount: articles.length,
                 separatorBuilder: (_, i) => const SizedBox(width: 12),
-                itemBuilder: (context, i) => _NewsCard(
-                  article: articles[i],
-                  isDark: isDark,
-                ),
+                itemBuilder: (context, i) =>
+                    _NewsCard(article: articles[i], isDark: isDark),
               ),
             );
           },
@@ -195,7 +193,9 @@ class _NewsCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: isDark ? Colors.white : const Color(0xFF0F0F0F),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF0F0F0F),
                           height: 1.35,
                           letterSpacing: -0.1,
                         ),
@@ -290,8 +290,9 @@ class _NewsError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accentColor =
-        isDark ? const Color(0xFF34D399) : const Color(0xFF10B981);
+    final accentColor = isDark
+        ? const Color(0xFF34D399)
+        : const Color(0xFF10B981);
     return Container(
       height: 80,
       decoration: BoxDecoration(

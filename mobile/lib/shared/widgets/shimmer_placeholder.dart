@@ -459,3 +459,87 @@ class DashboardShimmer extends StatelessWidget {
     );
   }
 }
+
+class AuditShimmerPlaceholder extends StatelessWidget {
+  const AuditShimmerPlaceholder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[300]!;
+    final highlightColor = isDark ? const Color(0xFF2C2C2C) : Colors.grey[100]!;
+
+    return Shimmer.fromColors(
+      baseColor: baseColor,
+      highlightColor: highlightColor,
+      child: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 1. Accuracy Summary Card Shimmer
+            Container(
+              height: 140,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // 2. Evaluation Chart Card Shimmer
+            Container(
+              height: 260,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // 3. Section Title Shimmer
+            Container(
+              width: 130,
+              height: 18,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // 4. Log Audit List / Table Rows Shimmer
+            Column(
+              children: List.generate(
+                4,
+                (index) => Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  height: 64,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // 5. Info Card Shimmer
+            Container(
+              height: 120,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
