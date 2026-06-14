@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers.dart';
+import '../../../../shared/widgets/app_background.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/shimmer_placeholder.dart';
 import '../../../detail/presentation/screens/detail_screen.dart';
@@ -54,6 +55,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final commoditiesAsync = ref.watch(commoditiesProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -61,6 +63,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         title: const Text(
           'Arjuna',
           style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
+            border: Border(
+              bottom: BorderSide(
+                color: isDark
+                    ? Colors.white10
+                    : Colors.black.withValues(alpha: 0.05),
+              ),
+            ),
+          ),
+          child: ClipRect(
+            child: CustomPaint(
+              painter: BatikKawungPainter(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.015)
+                    : Colors.black.withValues(alpha: 0.025),
+              ),
+            ),
+          ),
         ),
       ),
       body: commoditiesAsync.when(

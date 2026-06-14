@@ -140,8 +140,29 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                       ),
                       pinned: true,
                       centerTitle: true,
-                      backgroundColor: isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF4F6F8),
+                      backgroundColor: Colors.transparent,
                       surfaceTintColor: Colors.transparent,
+                      flexibleSpace: Container(
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF4F6F8),
+                          border: Border(
+                            bottom: BorderSide(
+                              color: isDark
+                                  ? Colors.white10
+                                  : Colors.black.withValues(alpha: 0.05),
+                            ),
+                          ),
+                        ),
+                        child: ClipRect(
+                          child: CustomPaint(
+                            painter: BatikKawungPainter(
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.015)
+                                  : Colors.black.withValues(alpha: 0.025),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                     SliverPersistentHeader(
                       pinned: true,

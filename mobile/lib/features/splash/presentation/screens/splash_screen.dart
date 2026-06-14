@@ -62,6 +62,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     return AppBackground(
       showBlurShapes: true,
+      showBatikPattern: true,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(

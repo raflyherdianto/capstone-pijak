@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class AppBackground extends StatelessWidget {
   final Widget child;
   final bool showBlurShapes;
+  final bool showBatikPattern;
 
   const AppBackground({
     super.key,
     required this.child,
     this.showBlurShapes = true,
+    this.showBatikPattern = false,
   });
 
   @override
@@ -37,16 +39,17 @@ class AppBackground extends StatelessWidget {
           ),
         ),
 
-        // Subtle Batik Kawung pattern background watermark
-        Positioned.fill(
-          child: CustomPaint(
-            painter: BatikKawungPainter(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.03)
-                  : Colors.black.withValues(alpha: 0.045),
+        // Subtle Batik Kawung pattern background watermark (optional)
+        if (showBatikPattern)
+          Positioned.fill(
+            child: CustomPaint(
+              painter: BatikKawungPainter(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.03)
+                    : Colors.black.withValues(alpha: 0.045),
+              ),
             ),
           ),
-        ),
 
         if (showBlurShapes) ...[
           // Top-right emerald accent — more visible
