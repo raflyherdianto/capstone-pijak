@@ -115,6 +115,38 @@ def get_in_sample_fit(db: Session, subcategory: str, days: int = 30) -> list:
     Returns:
         List of dicts: [{date, actual_price, fitted_price, residual_pct}]
     """
+    # If it is a parent category, average the fits of its children
+    if subcategory in PARENT_CHILD_MAP:
+        children = PARENT_CHILD_MAP[subcategory]
+        fits_by_date = {}
+        for child in children:
+            try:
+                child_fit = get_in_sample_fit(db, child, days)
+                for pt in child_fit:
+                    d = pt["date"]
+                    if d not in fits_by_date:
+                        fits_by_date[d] = {"actual": [], "fitted": []}
+                    fits_by_date[d]["actual"].append(pt["actual_price"])
+                    fits_by_date[d]["fitted"].append(pt["fitted_price"])
+            except Exception as e:
+                logger.error(f"Gagal mengambil fit untuk anak {child}: {e}")
+                
+        if not fits_by_date:
+            raise ValueError(f"Gagal melakukan audit untuk semua sub-komoditas dari '{subcategory}'.")
+            
+        result = []
+        for d in sorted(fits_by_date.keys()):
+            avg_actual = sum(fits_by_date[d]["actual"]) / len(fits_by_date[d]["actual"])
+            avg_fitted = sum(fits_by_date[d]["fitted"]) / len(fits_by_date[d]["fitted"])
+            residual_pct = round(((avg_actual - avg_fitted) / avg_actual) * 100, 4) if avg_actual > 0 else 0.0
+            result.append({
+                "date": d,
+                "actual_price": round(avg_actual, 2),
+                "fitted_price": round(avg_fitted, 2),
+                "residual_pct": residual_pct
+            })
+        return result
+
     if subcategory not in MODEL_CONFIG:
         raise ValueError(f"Subkategori '{subcategory}' tidak didukung oleh model.")
 

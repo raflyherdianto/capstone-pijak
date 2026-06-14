@@ -78,7 +78,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                 backgroundColor: Colors.transparent,
                 appBar: AppBar(
                   title: Text(
-                    widget.commodity.name,
+                    'Detail',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   centerTitle: true,
@@ -95,7 +95,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                 backgroundColor: Colors.transparent,
                 appBar: AppBar(
                   title: Text(
-                    widget.commodity.name,
+                    'Detail',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   centerTitle: true,
@@ -147,7 +147,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                   slivers: [
                     SliverAppBar(
                       title: Text(
-                        widget.commodity.name,
+                        'Detail',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       pinned: true,
@@ -173,6 +173,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                       sliver: SliverList(
                         delegate: SliverChildListDelegate([
                           ChartSection(
+                            subcategory: widget.commodity.name,
                             filteredData: _getFilteredData(
                               state.history,
                               state.forecast,
@@ -184,7 +185,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                                 setState(() => _selectedRange = range),
                             trend: widget.commodity.trend,
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 32),
                           AIInsightPerspectiveCard(
                             insight: state.liveInsight,
                             isLoading: state.isInsightLoading,

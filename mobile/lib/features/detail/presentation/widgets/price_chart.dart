@@ -221,10 +221,15 @@ class PriceChart extends StatelessWidget {
                       final dateStr = allPoints[index].date;
                       final date = DateTime.parse(dateStr);
 
-                      if (allPoints.length > 10 &&
-                          index % 7 != 0 &&
-                          index != allPoints.length - 1) {
-                        return const SizedBox.shrink();
+                      if (allPoints.length > 10) {
+                        final isMultipleOf7 = index % 7 == 0;
+                        final isLastItem = index == allPoints.length - 1;
+                        final distanceToLastMultipleOf7 = (allPoints.length - 1) % 7;
+                        if (!isMultipleOf7) {
+                          if (!isLastItem || distanceToLastMultipleOf7 < 3) {
+                            return const SizedBox.shrink();
+                          }
+                        }
                       }
 
                       return Padding(

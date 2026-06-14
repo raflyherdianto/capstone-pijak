@@ -4,6 +4,7 @@ class ApiConfig {
   static const String historical = '/historical';
   static const String predict = '/predict';
   static const String insight = '/insight';
+  static const String audit = '/audit';
 
   // Timeouts
   static const Duration connectTimeout = Duration(seconds: 10);

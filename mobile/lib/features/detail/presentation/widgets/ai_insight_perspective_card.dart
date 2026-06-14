@@ -34,6 +34,26 @@ class _AIInsightPerspectiveCardState extends State<AIInsightPerspectiveCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Row(
+          children: [
+            Icon(
+              Icons.psychology_outlined,
+              color: isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91),
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Rekomendasi Analisis AI',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : const Color(0xFF07345A),
+                fontFamily: 'Outfit',
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
@@ -94,6 +114,7 @@ class _AIInsightPerspectiveCardState extends State<AIInsightPerspectiveCard> {
                   Text(
                     isMasyarakat ? 'Tips Belanja Cerdas' : 'Analisis Bisnis',
                     style: TextStyle(
+                      fontFamily: 'Outfit',
                       color: primaryColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -107,6 +128,7 @@ class _AIInsightPerspectiveCardState extends State<AIInsightPerspectiveCard> {
                     ? insight.masyarakat
                     : insight.pedagang,
                 style: TextStyle(
+                  fontFamily: 'Outfit',
                   fontSize: 15,
                   height: 1.6,
                   color: isDark ? Colors.white70 : Colors.black87,
@@ -133,6 +155,7 @@ class _AIInsightPerspectiveCardState extends State<AIInsightPerspectiveCard> {
                       child: Text(
                         insight.disclaimer,
                         style: TextStyle(
+                          fontFamily: 'Outfit',
                           fontSize: 11,
                           fontStyle: FontStyle.italic,
                           color: isDark ? Colors.white38 : Colors.black45,
@@ -192,6 +215,7 @@ class _AIInsightPerspectiveCardState extends State<AIInsightPerspectiveCard> {
             Text(
               label,
               style: TextStyle(
+                fontFamily: 'Outfit',
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
                 color: isSelected

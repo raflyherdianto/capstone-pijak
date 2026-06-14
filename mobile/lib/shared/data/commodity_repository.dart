@@ -14,6 +14,7 @@ abstract class ICommodityRepository {
     double currentPrice,
     double predictedPrice,
   );
+  Future<List<AuditPoint>> getAuditData(String subcategory);
 }
 
 class CommodityRepository implements ICommodityRepository {
@@ -78,5 +79,15 @@ class CommodityRepository implements ICommodityRepository {
       },
     );
     return Insight.fromJson(response.data['insight']);
+  }
+
+  @override
+  Future<List<AuditPoint>> getAuditData(String subcategory) async {
+    final response = await _apiClient.dio.get(
+      ApiConfig.audit,
+      queryParameters: {'subcategory': subcategory, 'days': 30},
+    );
+    final list = response.data as List;
+    return list.map((e) => AuditPoint.fromJson(e)).toList();
   }
 }

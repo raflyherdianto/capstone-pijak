@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/domain/models.dart';
 import '../../../../core/providers.dart';
+import '../screens/model_audit_screen.dart';
 import 'price_chart.dart';
 import 'range_selector.dart';
 
 class ChartSection extends ConsumerWidget {
+  final String subcategory;
   final ChartData filteredData;
   final Color themeColor;
   final String reliability;
@@ -15,6 +17,7 @@ class ChartSection extends ConsumerWidget {
 
   const ChartSection({
     super.key,
+    required this.subcategory,
     required this.filteredData,
     required this.themeColor,
     required this.reliability,
@@ -79,6 +82,7 @@ class ChartSection extends ConsumerWidget {
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.2,
+                        fontFamily: 'Outfit',
                       ),
                     ),
                     if (trend.isNotEmpty) ...[
@@ -108,6 +112,7 @@ class ChartSection extends ConsumerWidget {
                                 color: badgeColor,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: 'Outfit',
                               ),
                             ),
                           ],
@@ -127,6 +132,45 @@ class ChartSection extends ConsumerWidget {
               data: filteredData,
               themeColor: themeColor,
               reliability: reliability,
+            ),
+            const Divider(height: 24, thickness: 0.5),
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ModelAuditScreen(
+                      subcategory: subcategory,
+                      themeColor: themeColor,
+                    ),
+                  ),
+                );
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.verified_user_outlined,
+                    size: 14,
+                    color: isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Lihat Audit Akurasi Prediksi AI',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91),
+                      fontFamily: 'Outfit',
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    size: 14,
+                    color: isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

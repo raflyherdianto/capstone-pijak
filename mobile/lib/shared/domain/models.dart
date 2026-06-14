@@ -160,3 +160,26 @@ class SubCommodity {
     );
   }
 }
+
+class AuditPoint {
+  final String date;
+  final double actualPrice;
+  final double fittedPrice;
+  final double residualPct;
+
+  AuditPoint({
+    required this.date,
+    required this.actualPrice,
+    required this.fittedPrice,
+    required this.residualPct,
+  });
+
+  factory AuditPoint.fromJson(Map<String, dynamic> json) {
+    return AuditPoint(
+      date: json['date'] as String,
+      actualPrice: (json['actual_price'] as num).toDouble(),
+      fittedPrice: (json['fitted_price'] as num).toDouble(),
+      residualPct: (json['residual_pct'] as num).toDouble(),
+    );
+  }
+}
