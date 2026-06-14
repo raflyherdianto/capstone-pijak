@@ -16,6 +16,14 @@ class TopMoversSection extends ConsumerWidget {
 
   const TopMoversSection({super.key, required this.commodities});
 
+  List<Commodity> _sortedByDailyChange() {
+    return [...commodities]..sort(
+      (a, b) => (b.priceChanges['day_1'] ?? 0).compareTo(
+        a.priceChanges['day_1'] ?? 0,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -25,13 +33,7 @@ class TopMoversSection extends ConsumerWidget {
     final gainerColor = ref.read(settingsProvider.notifier).getTrendColor(1.0);
     final loserColor = ref.read(settingsProvider.notifier).getTrendColor(-1.0);
 
-    // Sort by day_1 change descending for top movers
-    final sorted = [...commodities]
-      ..sort(
-        (a, b) => (b.priceChanges['day_1'] ?? 0).compareTo(
-          a.priceChanges['day_1'] ?? 0,
-        ),
-      );
+    final sorted = _sortedByDailyChange();
 
     final topGainers = sorted
         .where((c) => (c.priceChanges['day_1'] ?? 0) > 0)
@@ -146,7 +148,6 @@ class _SectionTitle extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w700,
             fontSize: 16,
-            letterSpacing: -0.2,
             color: isDark ? Colors.white : const Color(0xFF07345A),
           ),
         ),
@@ -216,110 +217,107 @@ class _MoverCard extends ConsumerWidget {
         .getTrendColor(dayChange);
     final isPositive = dayChange > 0;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 130,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDark
-                ? [const Color(0xFF0A2638), trendColor.withValues(alpha: 0.12)]
-                : [Colors.white, trendColor.withValues(alpha: 0.07)],
-          ),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: trendColor.withValues(alpha: isDark ? 0.24 : 0.16),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(
-                0xFF07345A,
-              ).withValues(alpha: isDark ? 0.22 : 0.08),
-              blurRadius: 14,
-              offset: const Offset(0, 7),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          width: 130,
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF0A2638) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: trendColor.withValues(alpha: isDark ? 0.24 : 0.16),
             ),
-          ],
-        ),
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image + change badge row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Image.asset(
-                  commodity.imageAsset,
-                  width: 42,
-                  height: 42,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, e, st) =>
-                      Icon(Icons.eco_rounded, color: trendColor, size: 28),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 3,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(
+                  0xFF07345A,
+                ).withValues(alpha: isDark ? 0.16 : 0.05),
+                blurRadius: 12,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image + change badge row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Image.asset(
+                    commodity.imageAsset,
+                    width: 42,
+                    height: 42,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, e, st) =>
+                        Icon(Icons.eco_rounded, color: trendColor, size: 28),
                   ),
-                  decoration: BoxDecoration(
-                    color: trendColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isPositive
-                            ? Icons.arrow_upward_rounded
-                            : Icons.arrow_downward_rounded,
-                        size: 10,
-                        color: trendColor,
-                      ),
-                      const SizedBox(width: 2),
-                      Text(
-                        '${dayChange.abs().toStringAsFixed(1)}%',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: trendColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isPositive
+                              ? Icons.arrow_upward_rounded
+                              : Icons.arrow_downward_rounded,
+                          size: 10,
                           color: trendColor,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 2),
+                        Text(
+                          '${dayChange.abs().toStringAsFixed(1)}%',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: trendColor,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                ],
+              ),
+
+              const Spacer(),
+
+              // Name
+              Text(
+                commodity.name,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? Colors.white : const Color(0xFF0F0F0F),
                 ),
-              ],
-            ),
-
-            const Spacer(),
-
-            // Name
-            Text(
-              commodity.name,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: isDark ? Colors.white : const Color(0xFF0F0F0F),
-                letterSpacing: -0.2,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 2),
+              const SizedBox(height: 2),
 
-            // Price
-            Text(
-              currencyFormat.format(commodity.currentPrice),
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white54 : Colors.black45,
+              // Price
+              Text(
+                currencyFormat.format(commodity.currentPrice),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white54 : Colors.black45,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

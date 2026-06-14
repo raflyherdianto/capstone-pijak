@@ -61,7 +61,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             children: [
               const ArjunaLogoMark(size: 30, padding: 2, radius: 10),
               const SizedBox(width: 8),
-              const Text('Arjuna', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                'Arjuna',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ],
           ),
         ),
@@ -114,36 +117,38 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 24),
 
                   // Bottom content panel
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF061525).withValues(alpha: 0.96)
+                          ? const Color(0xFF061525).withValues(alpha: 0.98)
                           : Colors.white,
                       borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(32),
-                        topRight: Radius.circular(32),
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
                       ),
                       border: Border(
                         top: BorderSide(
                           color: isDark
                               ? Colors.white.withValues(alpha: 0.05)
                               : Colors.black.withValues(alpha: 0.04),
-                          width: 1.5,
+                          width: 1,
                         ),
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.04),
-                          blurRadius: 24,
-                          offset: const Offset(0, -8),
+                          color: Colors.black.withValues(
+                            alpha: isDark ? 0.18 : 0.035,
+                          ),
+                          blurRadius: 18,
+                          offset: const Offset(0, -5),
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.fromLTRB(20, 28, 20, 120),
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 112),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

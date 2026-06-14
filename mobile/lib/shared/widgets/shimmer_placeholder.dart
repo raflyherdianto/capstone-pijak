@@ -9,8 +9,12 @@ class ShimmerCardPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[300]!;
-    final highlightColor = isDark ? const Color(0xFF2C2C2C) : Colors.grey[100]!;
+    final baseColor = isDark
+        ? const Color(0xFF0B2637)
+        : const Color(0xFFE6EEEB);
+    final highlightColor = isDark
+        ? const Color(0xFF12384C)
+        : const Color(0xFFF7FAF8);
 
     return Shimmer.fromColors(
       baseColor: baseColor,
@@ -20,7 +24,7 @@ class ShimmerCardPlaceholder extends StatelessWidget {
         height: height,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(18),
         ),
       ),
     );
@@ -30,16 +34,17 @@ class ShimmerCardPlaceholder extends StatelessWidget {
 class ShimmerListPlaceholder extends StatelessWidget {
   final int itemCount;
 
-  const ShimmerListPlaceholder({
-    super.key,
-    this.itemCount = 3,
-  });
+  const ShimmerListPlaceholder({super.key, this.itemCount = 3});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[300]!;
-    final highlightColor = isDark ? const Color(0xFF2C2C2C) : Colors.grey[100]!;
+    final baseColor = isDark
+        ? const Color(0xFF0B2637)
+        : const Color(0xFFE6EEEB);
+    final highlightColor = isDark
+        ? const Color(0xFF12384C)
+        : const Color(0xFFF7FAF8);
 
     return Shimmer.fromColors(
       baseColor: baseColor,
@@ -52,7 +57,7 @@ class ShimmerListPlaceholder extends StatelessWidget {
             height: 160,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(18),
             ),
           ),
         ),
@@ -64,16 +69,17 @@ class ShimmerListPlaceholder extends StatelessWidget {
 class ShimmerGridPlaceholder extends StatelessWidget {
   final int itemCount;
 
-  const ShimmerGridPlaceholder({
-    super.key,
-    this.itemCount = 4,
-  });
+  const ShimmerGridPlaceholder({super.key, this.itemCount = 4});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[300]!;
-    final highlightColor = isDark ? const Color(0xFF2C2C2C) : Colors.grey[100]!;
+    final baseColor = isDark
+        ? const Color(0xFF0B2637)
+        : const Color(0xFFE6EEEB);
+    final highlightColor = isDark
+        ? const Color(0xFF12384C)
+        : const Color(0xFFF7FAF8);
 
     return Shimmer.fromColors(
       baseColor: baseColor,
@@ -91,7 +97,7 @@ class ShimmerGridPlaceholder extends StatelessWidget {
         itemBuilder: (context, index) => Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(18),
           ),
         ),
       ),
@@ -105,8 +111,12 @@ class ShimmerInsightPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[300]!;
-    final highlightColor = isDark ? const Color(0xFF2C2C2C) : Colors.grey[100]!;
+    final baseColor = isDark
+        ? const Color(0xFF0B2637)
+        : const Color(0xFFE6EEEB);
+    final highlightColor = isDark
+        ? const Color(0xFF12384C)
+        : const Color(0xFFF7FAF8);
 
     return Shimmer.fromColors(
       baseColor: baseColor,
@@ -115,7 +125,7 @@ class ShimmerInsightPlaceholder extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(18),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,8 +178,12 @@ class DetailShimmerPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[300]!;
-    final highlightColor = isDark ? const Color(0xFF2C2C2C) : Colors.grey[100]!;
+    final baseColor = isDark
+        ? const Color(0xFF0B2637)
+        : const Color(0xFFE6EEEB);
+    final highlightColor = isDark
+        ? const Color(0xFF12384C)
+        : const Color(0xFFF7FAF8);
 
     return Shimmer.fromColors(
       baseColor: baseColor,
@@ -278,8 +292,12 @@ class DashboardShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[300]!;
-    final highlightColor = isDark ? const Color(0xFF2C2C2C) : Colors.grey[100]!;
+    final baseColor = isDark
+        ? const Color(0xFF0B2637)
+        : const Color(0xFFE6EEEB);
+    final highlightColor = isDark
+        ? const Color(0xFF12384C)
+        : const Color(0xFFF7FAF8);
 
     return SingleChildScrollView(
       physics: const NeverScrollableScrollPhysics(),
@@ -382,12 +400,13 @@ class DashboardShimmer extends StatelessWidget {
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 1.34,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 1.34,
+                        ),
                     itemCount: 4,
                     itemBuilder: (context, index) => Container(
                       decoration: BoxDecoration(
@@ -413,7 +432,8 @@ class DashboardShimmer extends StatelessWidget {
                       scrollDirection: Axis.horizontal,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: 3,
-                      separatorBuilder: (context, index) => const SizedBox(width: 10),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 10),
                       itemBuilder: (context, index) => Container(
                         width: 130,
                         decoration: BoxDecoration(
@@ -440,7 +460,8 @@ class DashboardShimmer extends StatelessWidget {
                       scrollDirection: Axis.horizontal,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: 3,
-                      separatorBuilder: (context, index) => const SizedBox(width: 12),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 12),
                       itemBuilder: (context, index) => Container(
                         width: 220,
                         decoration: BoxDecoration(
@@ -466,8 +487,12 @@ class AuditShimmerPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[300]!;
-    final highlightColor = isDark ? const Color(0xFF2C2C2C) : Colors.grey[100]!;
+    final baseColor = isDark
+        ? const Color(0xFF0B2637)
+        : const Color(0xFFE6EEEB);
+    final highlightColor = isDark
+        ? const Color(0xFF12384C)
+        : const Color(0xFFF7FAF8);
 
     return Shimmer.fromColors(
       baseColor: baseColor,

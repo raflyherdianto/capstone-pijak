@@ -34,15 +34,15 @@ class CommodityCard extends ConsumerWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         child: Container(
-          height: 92,
+          constraints: const BoxConstraints(minHeight: 92),
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
           decoration: BoxDecoration(
             color: isDark
-                ? const Color(0xFF071F31).withValues(alpha: 0.78)
-                : Colors.white.withValues(alpha: 0.82),
-            borderRadius: BorderRadius.circular(16),
+                ? const Color(0xFF071F31).withValues(alpha: 0.96)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: isDark
                   ? ArjunaColors.gold.withValues(alpha: 0.1)
@@ -51,10 +51,10 @@ class CommodityCard extends ConsumerWidget {
             boxShadow: [
               BoxShadow(
                 color: ArjunaColors.navy.withValues(
-                  alpha: isDark ? 0.18 : 0.06,
+                  alpha: isDark ? 0.16 : 0.05,
                 ),
-                blurRadius: 14,
-                offset: const Offset(0, 7),
+                blurRadius: 12,
+                offset: const Offset(0, 5),
               ),
             ],
           ),
@@ -91,7 +91,7 @@ class CommodityCard extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontSize: 15,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w800,
                         color: ArjunaColors.title(isDark),
                       ),
                     ),
@@ -131,7 +131,7 @@ class CommodityCard extends ConsumerWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                       fontSize: 15,
                       color: ArjunaColors.title(isDark),
                     ),

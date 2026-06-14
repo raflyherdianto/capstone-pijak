@@ -11,7 +11,9 @@ class PersonalizationSection extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final navy = isDark ? const Color(0xFFEAF8F4) : const Color(0xFF07345A);
-    final brandColor = isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91);
+    final brandColor = isDark
+        ? const Color(0xFFE8C766)
+        : const Color(0xFF0B9F91);
 
     return SettingCardWrapper(
       child: Column(
@@ -42,11 +44,14 @@ class PersonalizationSection extends ConsumerWidget {
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder: (context) {
-                    final dialogDark = Theme.of(context).brightness == Brightness.dark;
+                    final dialogDark =
+                        Theme.of(context).brightness == Brightness.dark;
                     return AlertDialog(
-                      backgroundColor: dialogDark ? const Color(0xFF0A2638) : Colors.white,
+                      backgroundColor: dialogDark
+                          ? const Color(0xFF0A2638)
+                          : Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(18),
                         side: BorderSide(
                           color: dialogDark
                               ? const Color(0xFFE8C766).withValues(alpha: 0.12)
@@ -57,14 +62,18 @@ class PersonalizationSection extends ConsumerWidget {
                         'Ubah Perspektif?',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: dialogDark ? Colors.white : const Color(0xFF07345A),
+                          color: dialogDark
+                              ? Colors.white
+                              : const Color(0xFF07345A),
                         ),
                       ),
                       content: Text(
                         description,
                         style: TextStyle(
                           fontSize: 14,
-                          color: dialogDark ? Colors.white70 : const Color(0xFF6A7D85),
+                          color: dialogDark
+                              ? Colors.white70
+                              : const Color(0xFF6A7D85),
                           height: 1.5,
                         ),
                       ),
@@ -74,7 +83,9 @@ class PersonalizationSection extends ConsumerWidget {
                           child: Text(
                             'Batal',
                             style: TextStyle(
-                              color: dialogDark ? Colors.white38 : Colors.black45,
+                              color: dialogDark
+                                  ? Colors.white38
+                                  : Colors.black45,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -82,8 +93,12 @@ class PersonalizationSection extends ConsumerWidget {
                         ElevatedButton(
                           onPressed: () => Navigator.pop(context, true),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: dialogDark ? const Color(0xFFE8C766) : const Color(0xFF16C7B7),
-                            foregroundColor: dialogDark ? const Color(0xFF031827) : Colors.white,
+                            backgroundColor: dialogDark
+                                ? const Color(0xFFE8C766)
+                                : const Color(0xFF16C7B7),
+                            foregroundColor: dialogDark
+                                ? const Color(0xFF031827)
+                                : Colors.white,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),

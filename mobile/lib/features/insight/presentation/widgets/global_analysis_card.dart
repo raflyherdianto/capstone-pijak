@@ -18,14 +18,8 @@ class GlobalAnalysisCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? const [Color(0xFF0A2638), Color(0xFF061D2D)]
-              : [Colors.white, ArjunaColors.softIvory],
-        ),
-        borderRadius: BorderRadius.circular(24),
+        color: isDark ? const Color(0xFF0A2638) : Colors.white,
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: accentColor.withValues(alpha: isDark ? 0.18 : 0.12),
           width: 1,
@@ -33,18 +27,13 @@ class GlobalAnalysisCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: ArjunaColors.navy.withValues(alpha: isDark ? 0.24 : 0.09),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.18 : 0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -82,7 +71,6 @@ class GlobalAnalysisCard extends StatelessWidget {
                     'Sinyal Pasar Nusantara',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
                     ),
                   ),
                 ],

@@ -25,6 +25,11 @@ class DetailScreen extends ConsumerStatefulWidget {
 
 class _DetailScreenState extends ConsumerState<DetailScreen> {
   int _selectedRange = 1; // 1, 7, 30
+  final NumberFormat _currencyFormat = NumberFormat.currency(
+    locale: 'id_ID',
+    symbol: 'Rp ',
+    decimalDigits: 0,
+  );
 
   ChartData _getFilteredData(
     List<PricePoint> history,
@@ -60,12 +65,6 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
     final trendColor = ref
         .read(settingsProvider.notifier)
         .getTrendColor(currentChange);
-
-    final currencyFormat = NumberFormat.currency(
-      locale: 'id_ID',
-      symbol: 'Rp ',
-      decimalDigits: 0,
-    );
 
     return BlocProvider(
       create: (context) =>
@@ -160,7 +159,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                       pinned: true,
                       delegate: StickyPriceHeader(
                         commodity: widget.commodity,
-                        currencyFormat: currencyFormat,
+                        currencyFormat: _currencyFormat,
                         trendColor: trendColor,
                         currentChange: currentChange,
                       ),
@@ -200,7 +199,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                             const SizedBox(height: 12),
                             SubCommodityCarousel(
                               subCommodities: widget.commodity.subCommodities,
-                              currencyFormat: currencyFormat,
+                              currencyFormat: _currencyFormat,
                               parentUnit: widget.commodity.unit,
                             ),
                           ],
