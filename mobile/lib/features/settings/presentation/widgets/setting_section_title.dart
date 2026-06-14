@@ -7,13 +7,15 @@ class SettingSectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Text(
       title.toUpperCase(),
       style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.bold,
-        color: Colors.grey[600],
-        letterSpacing: 1.2,
+        fontSize: 11,
+        fontWeight: FontWeight.w800,
+        color: isDark ? const Color(0xFF16C7B7) : const Color(0xFF0B9F91),
+        letterSpacing: 1.4,
       ),
     );
   }
