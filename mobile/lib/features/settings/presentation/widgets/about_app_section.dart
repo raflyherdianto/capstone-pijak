@@ -15,7 +15,7 @@ class AboutAppSection extends StatelessWidget {
 
     return SettingCardWrapper(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -35,42 +35,65 @@ class AboutAppSection extends StatelessWidget {
                           color: ArjunaColors.title(isDark),
                         ),
                       ),
+                      const SizedBox(height: 2),
                       Text(
                         'Versi ${about['version'] ?? '1.0.0'}',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                        style: TextStyle(
+                          color: isDark ? Colors.white38 : const Color(0xFF6A7D85),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               about['description'] ?? '',
-              style: const TextStyle(fontSize: 14, height: 1.5),
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.55,
+                color: isDark ? Colors.white70 : const Color(0xFF2C3E50),
+              ),
             ),
-            const SizedBox(height: 16),
-            const Divider(),
-            const SizedBox(height: 8),
-            _buildInfoRow('Developer', about['developer'] ?? ''),
-            _buildInfoRow('Status', 'Stable Release'),
-            _buildInfoRow('Update Terakhir', metadata.updatedAt),
+            const SizedBox(height: 20),
+            const Divider(height: 1),
+            const SizedBox(height: 12),
+            _buildInfoRow(context, 'Developer', about['developer'] ?? ''),
+            _buildInfoRow(context, 'Status', 'Stable Release'),
+            _buildInfoRow(context, 'Update Terakhir', metadata.updatedAt),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(BuildContext context, String label, String value) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final navy = isDark ? const Color(0xFFEAF8F4) : const Color(0xFF07345A);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+          Text(
+            label,
+            style: TextStyle(
+              color: isDark ? Colors.white54 : const Color(0xFF6A7D85),
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           Text(
             value,
-            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+              color: navy,
+            ),
           ),
         ],
       ),

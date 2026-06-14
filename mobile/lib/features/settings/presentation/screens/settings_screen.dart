@@ -13,14 +13,18 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final metadataAsync = ref.watch(metadataProvider);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Pengaturan',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            color: isDark ? Colors.white : ArjunaColors.navy,
+          ),
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -29,38 +33,89 @@ class SettingsScreen extends ConsumerWidget {
       ),
       body: metadataAsync.when(
         data: (metadata) {
-          return ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              const SettingSectionTitle(title: 'Personalisasi'),
-              const SizedBox(height: 12),
-              const PersonalizationSection(),
-              const SizedBox(height: 32),
-              const SettingSectionTitle(title: 'Tentang Aplikasi'),
-              const SizedBox(height: 12),
-              AboutAppSection(metadata: metadata),
-            ],
+          return Container(
+            width: double.infinity,
+            height: double.infinity,
+            margin: const EdgeInsets.only(top: 12),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? const Color(0xFF061525).withValues(alpha: 0.96)
+                  : Colors.white,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(32),
+                topRight: Radius.circular(32),
+              ),
+              border: Border(
+                top: BorderSide(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : Colors.black.withValues(alpha: 0.04),
+                  width: 1.5,
+                ),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.04),
+                  blurRadius: 24,
+                  offset: const Offset(0, -8),
+                ),
+              ],
+            ),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 28, 20, 100),
+              children: [
+                const SettingSectionTitle(title: 'Personalisasi'),
+                const SizedBox(height: 12),
+                const PersonalizationSection(),
+                const SizedBox(height: 32),
+                const SettingSectionTitle(title: 'Tentang Aplikasi'),
+                const SizedBox(height: 12),
+                AboutAppSection(metadata: metadata),
+              ],
+            ),
           );
         },
-        loading: () => const SingleChildScrollView(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SettingSectionTitle(title: 'Personalisasi'),
-              SizedBox(height: 12),
-              PersonalizationSection(),
-              SizedBox(height: 32),
-              SettingSectionTitle(title: 'Tentang Aplikasi'),
-              SizedBox(height: 12),
-              ShimmerInsightPlaceholder(),
-            ],
+        loading: () => Container(
+          width: double.infinity,
+          height: double.infinity,
+          margin: const EdgeInsets.only(top: 12),
+          decoration: BoxDecoration(
+            color: isDark
+                ? const Color(0xFF061525).withValues(alpha: 0.96)
+                : Colors.white,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(32),
+              topRight: Radius.circular(32),
+            ),
+            border: Border(
+              top: BorderSide(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.04),
+                width: 1.5,
+              ),
+            ),
+          ),
+          child: const SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(20, 28, 20, 100),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SettingSectionTitle(title: 'Personalisasi'),
+                SizedBox(height: 12),
+                PersonalizationSection(),
+                SizedBox(height: 32),
+                SettingSectionTitle(title: 'Tentang Aplikasi'),
+                SizedBox(height: 12),
+                ShimmerInsightPlaceholder(),
+              ],
+            ),
           ),
         ),
         error: (error, stack) => AppErrorWidget(
           title: 'Gagal Memuat Data',
           message: error.toString(),
-          onRetry: () => ref.refresh(commoditiesProvider),
+          onRetry: () => ref.refresh(metadataProvider),
         ),
       ),
     );
