@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'api_client.dart';
 import '../shared/data/commodity_repository.dart';
 import '../shared/domain/models.dart';
+import '../features/dashboard/data/news_article.dart';
+import '../features/dashboard/data/news_repository.dart';
 
 enum UserMode { buyer, seller }
 
@@ -17,9 +19,9 @@ class AppSettings {
   AppSettings({
     required this.mode,
     this.isDarkMode = false,
-    this.upColor = const Color(0xFFF43F5E), // Premium Crimson Rose
-    this.downColor = const Color(0xFF10B981), // Premium Emerald Green
-    this.stableColor = const Color(0xFF64748B), // Premium Slate Grey
+    this.upColor = const Color(0xFFE05263), // Soft Terracotta Red
+    this.downColor = const Color(0xFF2A9D8F), // Soft Sage Teal/Green
+    this.stableColor = const Color(0xFF6B7A82), // Soft Slate Blue-Grey
   });
 
   AppSettings copyWith({
@@ -79,7 +81,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   }
 
   Color getTrendColor(double change) {
-    if (change == 0) return state.stableColor;
+    if (change.abs() < 0.25) return state.stableColor;
 
     if (state.mode == UserMode.buyer) {
       return change > 0 ? state.upColor : state.downColor;
@@ -112,4 +114,14 @@ final commoditiesProvider = FutureProvider<List<Commodity>>((ref) async {
 final metadataProvider = FutureProvider<AppMetadata>((ref) async {
   final repository = ref.watch(commodityRepositoryProvider);
   return repository.getMetadata();
+});
+
+/// Provider for GNews.io food/commodity news feed
+final newsRepositoryProvider = Provider<NewsRepository>((ref) {
+  return NewsRepository();
+});
+
+final newsProvider = FutureProvider<List<NewsArticle>>((ref) async {
+  final repository = ref.watch(newsRepositoryProvider);
+  return repository.fetchPanganNews(max: 6);
 });

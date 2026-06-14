@@ -11,64 +11,124 @@ class QuickStatsGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     final upCount = commodities
         .where((c) => (c.priceChanges['day_1'] ?? 0) > 0)
         .length;
-    final downCount = commodities.length - upCount;
+    final downCount = commodities
+        .where((c) => (c.priceChanges['day_1'] ?? 0) < 0)
+        .length;
+    final stableCount = commodities.length - upCount - downCount;
+
+    final upColor = ref.read(settingsProvider.notifier).getTrendColor(1.0);
+    final stableColor = ref.read(settingsProvider.notifier).getTrendColor(0.0);
+    final downColor = ref.read(settingsProvider.notifier).getTrendColor(-1.0);
 
     return Row(
       children: [
-        _buildStatItem(
-          context,
-          'Meningkat',
-          upCount.toString(),
-          Icons.trending_up,
-          ref.read(settingsProvider.notifier).getTrendColor(1.0),
-          isDark,
+        _StatCard(
+          label: 'Meningkat',
+          value: upCount.toString(),
+          icon: Icons.trending_up_rounded,
+          color: upColor,
+          isDark: isDark,
         ),
-        const SizedBox(width: 16),
-        _buildStatItem(
-          context,
-          'Menurun',
-          downCount.toString(),
-          Icons.trending_down,
-          ref.read(settingsProvider.notifier).getTrendColor(-1.0),
-          isDark,
+        const SizedBox(width: 10),
+        _StatCard(
+          label: 'Stabil',
+          value: stableCount.toString(),
+          icon: Icons.trending_flat_rounded,
+          color: stableColor,
+          isDark: isDark,
+        ),
+        const SizedBox(width: 10),
+        _StatCard(
+          label: 'Menurun',
+          value: downCount.toString(),
+          icon: Icons.trending_down_rounded,
+          color: downColor,
+          isDark: isDark,
         ),
       ],
     );
   }
+}
 
-  Widget _buildStatItem(
-    BuildContext context,
-    String label,
-    String value,
-    IconData icon,
-    Color color,
-    bool isDark,
-  ) {
+class _StatCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+  final bool isDark;
+
+  const _StatCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
         decoration: BoxDecoration(
-          color: isDark ? color.withValues(alpha: 0.1) : color.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: color.withValues(alpha: 0.1)),
+          color: isDark
+              ? color.withValues(alpha: 0.1)
+              : color.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: color.withValues(alpha: isDark ? 0.2 : 0.15),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: isDark ? 0.12 : 0.08),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.04),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           children: [
-            Icon(icon, color: color, size: 24),
+            // Icon in a circle container
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: isDark ? 0.15 : 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
             const SizedBox(height: 8),
+            // Big number
             Text(
               value,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.w900,
+                color: isDark ? Colors.white : const Color(0xFF0F0F0F),
+                letterSpacing: -1,
+                height: 1.0,
+              ),
             ),
+            const SizedBox(height: 3),
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 12,
-                color: isDark ? Colors.white54 : Colors.black54,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white54 : Colors.black45,
               ),
             ),
           ],

@@ -9,6 +9,13 @@ class DetailCubit extends Cubit<DetailState> {
 
   DetailCubit(this._repository) : super(DetailInitial());
 
+  @override
+  void emit(DetailState state) {
+    if (!isClosed) {
+      super.emit(state);
+    }
+  }
+
   Future<void> fetchDetailData(String subcategory) async {
     emit(DetailLoading());
     try {

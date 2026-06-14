@@ -33,23 +33,13 @@ class SplashContent extends StatelessWidget {
   }
 
   Widget _buildLogo() {
-    return Container(
-      width: 130,
-      height: 130,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Image.asset('assets/images/app_logo.png'),
+    return SizedBox(
+      width: 150,
+      height: 150,
+      child: Image.asset(
+        'assets/images/arjuna-logo.png',
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
       ),
     );
   }

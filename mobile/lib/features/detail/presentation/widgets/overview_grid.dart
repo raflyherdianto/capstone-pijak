@@ -3,14 +3,31 @@ import '../../../../shared/domain/models.dart';
 
 class CommodityOverviewGrid extends StatelessWidget {
   final Commodity commodity;
+  final Color themeColor;
 
-  const CommodityOverviewGrid({super.key, required this.commodity});
+  const CommodityOverviewGrid({
+    super.key,
+    required this.commodity,
+    required this.themeColor,
+  });
+
+  String _capitalize(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isForecastUp = commodity.forecastPct > 0;
+    final isForecastDown = commodity.forecastPct < 0;
+    final Color forecastColor = isForecastUp
+        ? const Color(0xFF10B981) // emerald
+        : (isForecastDown ? const Color(0xFFEF4444) : Colors.amber);
+
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
+      padding: EdgeInsets.zero,
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: 16,
       crossAxisSpacing: 16,
@@ -19,16 +36,16 @@ class CommodityOverviewGrid extends StatelessWidget {
         _buildOverviewItem(
           context,
           'Tren Pasar',
-          commodity.trend,
+          _capitalize(commodity.trend),
           Icons.show_chart,
-          Colors.orange,
+          themeColor,
         ),
         _buildOverviewItem(
           context,
-          'Keandalan AI',
-          commodity.reliability,
-          Icons.verified_user_outlined,
-          Colors.orange,
+          'Prediksi AI',
+          '${commodity.forecastPct > 0 ? "+" : ""}${commodity.forecastPct.toStringAsFixed(1)}%',
+          Icons.auto_awesome_outlined,
+          forecastColor,
         ),
       ],
     );
@@ -60,15 +77,17 @@ class CommodityOverviewGrid extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.labelSmall?.copyWith(fontSize: 10),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    fontSize: 10,
+                    color: isDark ? Colors.white54 : Colors.black54,
+                  ),
                 ),
+                const SizedBox(height: 2),
                 Text(
                   value,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 13,
+                    fontSize: 14,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

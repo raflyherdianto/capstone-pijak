@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../shared/domain/models.dart';
+import '../../../../shared/widgets/arjuna_brand.dart';
 
 class StickyPriceHeader extends SliverPersistentHeaderDelegate {
   final Commodity commodity;
@@ -23,21 +24,28 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final progress = shrinkOffset / maxExtent;
-    
+
     // Calculate opacity for expanded/collapsed elements
     final expandedOpacity = (1 - progress * 2).clamp(0.0, 1.0);
     final collapsedOpacity = (progress * 2 - 1).clamp(0.0, 1.0);
 
-    final currentHeight = (maxExtent - shrinkOffset).clamp(minExtent, maxExtent);
+    final currentHeight = (maxExtent - shrinkOffset).clamp(
+      minExtent,
+      maxExtent,
+    );
 
     return Container(
       height: currentHeight,
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: progress > 0.5 ? 1.0 : 0.0),
+        color: shrinkOffset > 0
+            ? ArjunaColors.appBarSurface(isDark)
+            : Colors.transparent,
         border: progress > 0.5
             ? Border(
                 bottom: BorderSide(
-                  color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+                  color: isDark
+                      ? ArjunaColors.gold.withValues(alpha: 0.1)
+                      : ArjunaColors.navy.withValues(alpha: 0.05),
                 ),
               )
             : null,
@@ -62,26 +70,38 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
                           children: [
                             Text(
                               commodity.name,
-                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context).textTheme.headlineSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                    color: ArjunaColors.title(isDark),
+                                  ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               currencyFormat.format(commodity.currentPrice),
-                              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w800,
-                                color: isDark ? Colors.white : Colors.black87,
-                              ),
+                              style: Theme.of(context).textTheme.displaySmall
+                                  ?.copyWith(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w800,
+                                    color: ArjunaColors.title(isDark),
+                                  ),
                             ),
                             Text(
                               'Per ${commodity.unit}',
-                              style: const TextStyle(color: Colors.grey, fontSize: 12),
+                              style: TextStyle(
+                                color: isDark
+                                    ? Colors.white54
+                                    : ArjunaColors.muted,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: trendColor.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
@@ -90,7 +110,11 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(
-                                    currentChange > 0 ? Icons.trending_up : Icons.trending_down,
+                                    currentChange > 0
+                                        ? Icons.trending_up
+                                        : (currentChange < 0
+                                              ? Icons.trending_down
+                                              : Icons.trending_flat),
                                     color: trendColor,
                                     size: 14,
                                   ),
@@ -154,7 +178,7 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
                         Text(
                           'Per ${commodity.unit}',
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: isDark ? Colors.white54 : ArjunaColors.muted,
                             fontSize: 11,
                           ),
                         ),
@@ -170,14 +194,18 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
                           style: TextStyle(
                             fontWeight: FontWeight.w800,
                             fontSize: 16,
-                            color: isDark ? Colors.white : Colors.black87,
+                            color: ArjunaColors.title(isDark),
                           ),
                         ),
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              currentChange > 0 ? Icons.trending_up : Icons.trending_down,
+                              currentChange > 0
+                                  ? Icons.trending_up
+                                  : (currentChange < 0
+                                        ? Icons.trending_down
+                                        : Icons.trending_flat),
                               color: trendColor,
                               size: 12,
                             ),

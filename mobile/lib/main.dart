@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:komoditas_ai/core/providers.dart';
 import 'core/theme.dart';
+import 'features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'features/home/presentation/screens/home_screen.dart';
 import 'features/settings/presentation/screens/settings_screen.dart';
 import 'features/insight/presentation/screens/insight_screen.dart';
@@ -11,13 +13,12 @@ import 'shared/widgets/app_background.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID', null);
   final prefs = await SharedPreferences.getInstance();
 
   runApp(
     ProviderScope(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ],
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
       child: const KomoditasAIApp(),
     ),
   );
@@ -53,46 +54,159 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final navBottomInset = bottomPadding > 0
+        ? (bottomPadding - 18).clamp(8.0, 18.0)
+        : 10.0;
+
+    final List<Widget> screens = [
+      // Tab 0: Dashboard
+      const DashboardScreen(),
+      // Tab 1: Komoditas list
+      const HomeScreen(),
+      // Tab 2: Insight
+      const InsightScreen(),
+      // Tab 3: Pengaturan
+      const SettingsScreen(),
+    ];
+
     return AppBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: IndexedStack(
-          index: _selectedIndex,
-          children: const [HomeScreen(), InsightScreen(), SettingsScreen()],
-        ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 20,
-                offset: const Offset(0, -5),
-              ),
-            ],
+        extendBody: true,
+        body: IndexedStack(index: _selectedIndex, children: screens),
+        bottomNavigationBar: MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            padding: MediaQuery.of(context).padding.copyWith(bottom: 0),
+            viewPadding: MediaQuery.of(context).viewPadding.copyWith(bottom: 0),
           ),
-          child: NavigationBar(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            indicatorColor: Colors.transparent,
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home),
-                label: 'Home',
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(14, 0, 14, navBottomInset),
+            child: Container(
+              height: 68,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF061D2D).withValues(alpha: 0.94)
+                    : const Color(0xFFFFFBF0).withValues(alpha: 0.94),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                  color: isDark
+                      ? const Color(0xFFE8C766).withValues(alpha: 0.14)
+                      : const Color(0xFF07345A).withValues(alpha: 0.08),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.12),
+                    blurRadius: 28,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-              NavigationDestination(
-                icon: Icon(Icons.auto_awesome_mosaic_outlined),
-                selectedIcon: Icon(Icons.auto_awesome_mosaic),
-                label: 'Insight',
+              child: Row(
+                children: [
+                  _NavItem(
+                    label: 'Beranda',
+                    icon: Icons.dashboard_outlined,
+                    selectedIcon: Icons.dashboard_rounded,
+                    selected: _selectedIndex == 0,
+                    isDark: isDark,
+                    onTap: () => setState(() => _selectedIndex = 0),
+                  ),
+                  _NavItem(
+                    label: 'Komoditas',
+                    icon: Icons.storefront_outlined,
+                    selectedIcon: Icons.storefront_rounded,
+                    selected: _selectedIndex == 1,
+                    isDark: isDark,
+                    onTap: () => setState(() => _selectedIndex = 1),
+                  ),
+                  _NavItem(
+                    label: 'Insight',
+                    icon: Icons.auto_awesome_mosaic_outlined,
+                    selectedIcon: Icons.auto_awesome_mosaic,
+                    selected: _selectedIndex == 2,
+                    isDark: isDark,
+                    onTap: () => setState(() => _selectedIndex = 2),
+                  ),
+                  _NavItem(
+                    label: 'Pengaturan',
+                    icon: Icons.settings_outlined,
+                    selectedIcon: Icons.settings_rounded,
+                    selected: _selectedIndex == 3,
+                    isDark: isDark,
+                    onTap: () => setState(() => _selectedIndex = 3),
+                  ),
+                ],
               ),
-              NavigationDestination(
-                icon: Icon(Icons.settings_outlined),
-                selectedIcon: Icon(Icons.settings),
-                label: 'Settings',
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final IconData selectedIcon;
+  final bool selected;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _NavItem({
+    required this.label,
+    required this.icon,
+    required this.selectedIcon,
+    required this.selected,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final activeColor = isDark
+        ? const Color(0xFFE8C766)
+        : const Color(0xFF0B9F91);
+    final inactiveColor = isDark ? Colors.white54 : const Color(0xFF66747C);
+
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(24),
+        child: SizedBox(
+          height: 68,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOutCubic,
+                width: selected ? 52 : 40,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: selected
+                      ? activeColor.withValues(alpha: isDark ? 0.16 : 0.14)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Icon(
+                  selected ? selectedIcon : icon,
+                  size: 23,
+                  color: selected ? activeColor : inactiveColor,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                  color: selected ? activeColor : inactiveColor,
+                ),
               ),
             ],
           ),
@@ -101,4 +215,3 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 }
-

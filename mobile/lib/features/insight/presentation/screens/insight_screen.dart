@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../shared/widgets/arjuna_brand.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/shimmer_placeholder.dart';
 import '../../../../core/providers.dart';
@@ -34,6 +35,10 @@ class InsightScreen extends ConsumerWidget {
           'Insight Pasar',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: const ArjunaAppBarBackground(),
       ),
       body: metadataAsync.when(
         data: (metadata) {

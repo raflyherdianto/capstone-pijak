@@ -41,7 +41,27 @@ class PriceChart extends StatelessWidget {
     final maxPrice = allPoints
         .map((e) => e.price)
         .reduce((a, b) => a > b ? a : b);
-    final padding = (maxPrice - minPrice) * 0.15;
+    
+    final priceRange = maxPrice - minPrice;
+    final avgPrice = (minPrice + maxPrice) / 2;
+    // Enforce a minimum vertical range (at least 5% of average price or at least 1000)
+    final minDesiredRange = (avgPrice * 0.05).clamp(1000.0, 5000.0);
+
+    final double padding;
+    final double minY;
+    final double maxY;
+
+    if (priceRange < minDesiredRange) {
+      minY = avgPrice - (minDesiredRange / 2);
+      maxY = avgPrice + (minDesiredRange / 2);
+      padding = 0; // range is already expanded
+    } else {
+      padding = priceRange * 0.15;
+      minY = minPrice - padding;
+      maxY = maxPrice + padding;
+    }
+
+    final yInterval = (maxY - minY) / 4;
 
     double boundMultiplier;
     switch (reliability.toLowerCase()) {
@@ -90,7 +110,7 @@ class PriceChart extends StatelessWidget {
                       if ((barSpot.barIndex == 2 || barSpot.barIndex == 3) &&
                           !shown) {
                         shown = true;
-
+ 
                         final index = barSpot.x.toInt();
                         if (index < 0 || index >= allPoints.length) return null;
 
@@ -151,22 +171,37 @@ class PriceChart extends StatelessWidget {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 40,
+                    reservedSize: 46,
+                    interval: yInterval,
                     getTitlesWidget: (value, meta) {
+                      // Skip rendering absolute min and max boundary labels to prevent overlapping
+                      if (value == meta.min || value == meta.max) {
+                        return const SizedBox.shrink();
+                      }
+
                       String text;
                       if (value >= 1000000) {
                         text = '${(value / 1000000).toStringAsFixed(1)}jt';
                       } else if (value >= 1000) {
-                        text = '${(value / 1000).toStringAsFixed(0)}rb';
+                        final isDecimalNeeded = (yInterval % 1000) != 0;
+                        if (isDecimalNeeded) {
+                          text = NumberFormat('#,###', 'id_ID').format(value);
+                        } else {
+                          text = '${(value / 1000).toStringAsFixed(0)}rb';
+                        }
                       } else {
                         text = value.toStringAsFixed(0);
                       }
-                      return Text(
-                        text,
-                        style: TextStyle(
-                          color: Colors.grey[isDark ? 500 : 400],
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 6),
+                        child: Text(
+                          text,
+                          style: TextStyle(
+                            color: Colors.grey[isDark ? 500 : 400],
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.right,
                         ),
                       );
                     },
@@ -186,10 +221,15 @@ class PriceChart extends StatelessWidget {
                       final dateStr = allPoints[index].date;
                       final date = DateTime.parse(dateStr);
 
-                      if (allPoints.length > 10 &&
-                          index % 7 != 0 &&
-                          index != allPoints.length - 1) {
-                        return const SizedBox.shrink();
+                      if (allPoints.length > 10) {
+                        final isMultipleOf7 = index % 7 == 0;
+                        final isLastItem = index == allPoints.length - 1;
+                        final distanceToLastMultipleOf7 = (allPoints.length - 1) % 7;
+                        if (!isMultipleOf7) {
+                          if (!isLastItem || distanceToLastMultipleOf7 < 3) {
+                            return const SizedBox.shrink();
+                          }
+                        }
                       }
 
                       return Padding(
@@ -210,8 +250,8 @@ class PriceChart extends StatelessWidget {
               borderData: FlBorderData(show: false),
               minX: 0,
               maxX: (allPoints.length - 1).toDouble(),
-              minY: minPrice - padding,
-              maxY: maxPrice + padding,
+              minY: minY,
+              maxY: maxY,
               lineBarsData: [
                 // Forecast Upper Bound (Invisible) - Index 0
                 LineChartBarData(
@@ -260,7 +300,16 @@ class PriceChart extends StatelessWidget {
                   color: themeColor,
                   barWidth: 3,
                   isStrokeCapRound: true,
-                  dotData: const FlDotData(show: false),
+                  dotData: FlDotData(
+                    show: priceRange < minDesiredRange,
+                    getDotPainter: (spot, percent, bar, index) =>
+                        FlDotCirclePainter(
+                      radius: 3,
+                      color: themeColor,
+                      strokeWidth: 1,
+                      strokeColor: Colors.white,
+                    ),
+                  ),
                   belowBarData: BarAreaData(
                     show: true,
                     gradient: LinearGradient(

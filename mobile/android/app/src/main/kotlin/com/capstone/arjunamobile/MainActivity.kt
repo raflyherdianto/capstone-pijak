@@ -1,4 +1,4 @@
-package com.rizkyhamdana.komoditas_ai
+package com.capstone.arjunamobile
 
 import io.flutter.embedding.android.FlutterActivity
 

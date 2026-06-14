@@ -61,3 +61,8 @@ update2023.json
 *.sqlite3
 *.sqlite
 
+# Secrets & Configs
+mobile/secrets.json
+mobile/config.json
+
+
