@@ -123,5 +123,5 @@ final newsRepositoryProvider = Provider<NewsRepository>((ref) {
 
 final newsProvider = FutureProvider<List<NewsArticle>>((ref) async {
   final repository = ref.watch(newsRepositoryProvider);
-  return repository.fetchPanganNews(max: 5);
+  return repository.fetchPanganNews(max: 6);
 });

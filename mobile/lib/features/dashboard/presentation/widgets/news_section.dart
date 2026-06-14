@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/providers.dart';
 import '../../../../shared/widgets/shimmer_placeholder.dart';
 import '../../data/news_article.dart';
+import '../screens/news_detail_screen.dart';
 
 class NewsSection extends ConsumerWidget {
   const NewsSection({super.key});
@@ -112,17 +112,18 @@ class _NewsCard extends StatelessWidget {
 
   const _NewsCard({required this.article, required this.isDark});
 
-  Future<void> _open() async {
-    final uri = Uri.tryParse(article.url);
-    if (uri != null && await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+  void _open(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => NewsDetailScreen(article: article),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: _open,
+      onTap: () => _open(context),
       child: Container(
         width: 220,
         decoration: BoxDecoration(
