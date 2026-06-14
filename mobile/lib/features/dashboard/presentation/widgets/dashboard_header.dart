@@ -8,10 +8,10 @@ class DashboardHeader extends StatelessWidget {
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
-    if (hour >= 5 && hour < 11) return 'Selamat Pagi';
-    if (hour >= 11 && hour < 15) return 'Selamat Siang';
-    if (hour >= 15 && hour < 18) return 'Selamat Sore';
-    return 'Selamat Malam';
+    if (hour >= 5 && hour < 11) return 'Selamat Pagi, Sobat Arjuna';
+    if (hour >= 11 && hour < 15) return 'Selamat Siang, Sobat Arjuna';
+    if (hour >= 15 && hour < 18) return 'Selamat Sore, Sobat Arjuna';
+    return 'Selamat Malam, Sobat Arjuna';
   }
 
   String _formatLastUpdated(String? raw) {

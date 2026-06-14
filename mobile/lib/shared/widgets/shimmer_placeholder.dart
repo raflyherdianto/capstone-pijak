@@ -281,126 +281,180 @@ class DashboardShimmer extends StatelessWidget {
     final baseColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[300]!;
     final highlightColor = isDark ? const Color(0xFF2C2C2C) : Colors.grey[100]!;
 
-    return Shimmer.fromColors(
-      baseColor: baseColor,
-      highlightColor: highlightColor,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 116),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header greeting shimmer
-            Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 140,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
+    return SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top Part (Greeting & Hero Card)
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              MediaQuery.of(context).padding.top + 16,
+              20,
+              0,
+            ),
+            child: Shimmer.fromColors(
+              baseColor: baseColor,
+              highlightColor: highlightColor,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header greeting shimmer
+                  Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 140,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            width: 200,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                          ),
+                        ],
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  // Market Pulse Shimmer
+                  Container(
+                    height: 140,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(22),
                     ),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: 200,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 28),
+
+          // Bottom content panel shimmer
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? const Color(0xFF061525).withValues(alpha: 0.96)
+                  : Colors.white,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(32),
+                topRight: Radius.circular(32),
+              ),
+              border: Border(
+                top: BorderSide(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : Colors.black.withValues(alpha: 0.04),
+                  width: 1.5,
+                ),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.04),
+                  blurRadius: 24,
+                  offset: const Offset(0, -8),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-            // Market Pulse Shimmer
-            Container(
-              height: 140,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-              ),
-            ),
-            const SizedBox(height: 28),
-            // Akses Cepat Shimmer
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.34,
-              ),
-              itemCount: 4,
-              itemBuilder: (context, index) => Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(22),
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-            // Top Movers Shimmer
-            Container(
-              width: 150,
-              height: 20,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 108,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 3,
-                separatorBuilder: (context, index) => const SizedBox(width: 10),
-                itemBuilder: (context, index) => Container(
-                  width: 130,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+            padding: const EdgeInsets.fromLTRB(20, 28, 20, 120),
+            child: Shimmer.fromColors(
+              baseColor: baseColor,
+              highlightColor: highlightColor,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Akses Cepat Shimmer
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 1.34,
+                    ),
+                    itemCount: 4,
+                    itemBuilder: (context, index) => Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-            // News Shimmer
-            Container(
-              width: 120,
-              height: 20,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 190,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 3,
-                separatorBuilder: (context, index) => const SizedBox(width: 12),
-                itemBuilder: (context, index) => Container(
-                  width: 220,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
+                  const SizedBox(height: 28),
+                  // Top Movers Shimmer
+                  Container(
+                    width: 150,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 108,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: 3,
+                      separatorBuilder: (context, index) => const SizedBox(width: 10),
+                      itemBuilder: (context, index) => Container(
+                        width: 130,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  // News Shimmer
+                  Container(
+                    width: 120,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 190,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: 3,
+                      separatorBuilder: (context, index) => const SizedBox(width: 12),
+                      itemBuilder: (context, index) => Container(
+                        width: 220,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
