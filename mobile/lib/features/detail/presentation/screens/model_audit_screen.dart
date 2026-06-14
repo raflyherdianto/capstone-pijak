@@ -9,6 +9,7 @@ import '../../../../shared/domain/models.dart';
 import '../../../../core/providers.dart';
 import '../cubit/audit_cubit.dart';
 import '../cubit/audit_state.dart';
+import '../../../../shared/widgets/shimmer_placeholder.dart';
 
 class ModelAuditScreen extends ConsumerStatefulWidget {
   final String subcategory;
@@ -48,7 +49,7 @@ class _ModelAuditScreenState extends ConsumerState<ModelAuditScreen> {
           child: BlocBuilder<AuditCubit, AuditState>(
             builder: (context, state) {
               if (state is AuditLoading || state is AuditInitial) {
-                return const Center(child: CircularProgressIndicator());
+                return const AuditShimmerPlaceholder();
               } else if (state is AuditError) {
                 return Center(
                   child: Padding(
