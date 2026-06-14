@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:komoditas_ai/core/providers.dart';
 import 'core/theme.dart';
+import 'features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'features/home/presentation/screens/home_screen.dart';
 import 'features/settings/presentation/screens/settings_screen.dart';
 import 'features/insight/presentation/screens/insight_screen.dart';
@@ -51,38 +52,57 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
+  void _navigateToTab(int index) {
+    setState(() => _selectedIndex = index);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final List<Widget> screens = [
+      // Tab 0: Dashboard — passes callback to jump to Insight (tab 2)
+      DashboardScreen(onNavigateToInsight: () => _navigateToTab(2)),
+      // Tab 1: Komoditas list
+      const HomeScreen(),
+      // Tab 2: Insight
+      const InsightScreen(),
+      // Tab 3: Pengaturan
+      const SettingsScreen(),
+    ];
+
     return AppBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: IndexedStack(
           index: _selectedIndex,
-          children: const [HomeScreen(), InsightScreen(), SettingsScreen()],
+          children: screens,
         ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 20,
-                offset: const Offset(0, -5),
+            border: Border(
+              top: BorderSide(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.black.withValues(alpha: 0.06),
               ),
-            ],
+            ),
           ),
           child: NavigationBar(
             selectedIndex: _selectedIndex,
             onDestinationSelected: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
+              setState(() => _selectedIndex = index);
             },
-            indicatorColor: Colors.transparent,
             destinations: const [
               NavigationDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home),
-                label: 'Home',
+                icon: Icon(Icons.dashboard_outlined),
+                selectedIcon: Icon(Icons.dashboard_rounded),
+                label: 'Beranda',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.storefront_outlined),
+                selectedIcon: Icon(Icons.storefront_rounded),
+                label: 'Komoditas',
               ),
               NavigationDestination(
                 icon: Icon(Icons.auto_awesome_mosaic_outlined),
@@ -91,8 +111,8 @@ class _MainNavigationState extends State<MainNavigation> {
               ),
               NavigationDestination(
                 icon: Icon(Icons.settings_outlined),
-                selectedIcon: Icon(Icons.settings),
-                label: 'Settings',
+                selectedIcon: Icon(Icons.settings_rounded),
+                label: 'Pengaturan',
               ),
             ],
           ),

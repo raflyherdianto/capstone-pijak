@@ -6,7 +6,6 @@ import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/shimmer_placeholder.dart';
 import '../../../detail/presentation/screens/detail_screen.dart';
 import '../widgets/commodity_card.dart';
-import '../widgets/home_header.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -107,10 +106,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const HomeHeader(),
                   const SizedBox(height: 16),
                   _buildSearchBox(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   if (filteredCommodities.isEmpty) ...[
                     const SizedBox(height: 40),
                     Center(
@@ -177,10 +175,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const HomeHeader(),
               const SizedBox(height: 16),
               _buildSearchBox(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               const ShimmerListPlaceholder(itemCount: 4),
               const SizedBox(height: 100),
             ],

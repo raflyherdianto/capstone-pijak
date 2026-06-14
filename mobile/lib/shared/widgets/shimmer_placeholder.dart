@@ -1,6 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
+class ShimmerCardPlaceholder extends StatelessWidget {
+  final double height;
+
+  const ShimmerCardPlaceholder({super.key, this.height = 120});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark ? const Color(0xFF1E1E1E) : Colors.grey[300]!;
+    final highlightColor = isDark ? const Color(0xFF2C2C2C) : Colors.grey[100]!;
+
+    return Shimmer.fromColors(
+      baseColor: baseColor,
+      highlightColor: highlightColor,
+      child: Container(
+        width: double.infinity,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+    );
+  }
+}
+
 class ShimmerListPlaceholder extends StatelessWidget {
   final int itemCount;
 
