@@ -24,52 +24,57 @@ class AppErrorWidget extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(28.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: errorColor.withValues(alpha: isDark ? 0.14 : 0.09),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: errorColor.withValues(alpha: isDark ? 0.24 : 0.16),
+        child: Semantics(
+          container: true,
+          label: '$title. $message',
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: errorColor.withValues(alpha: isDark ? 0.14 : 0.09),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: errorColor.withValues(alpha: isDark ? 0.24 : 0.16),
+                  ),
+                ),
+                child: Icon(icon, size: 32, color: errorColor),
+              ),
+              const SizedBox(height: 22),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: titleColor,
+                  height: 1.2,
                 ),
               ),
-              child: Icon(icon, size: 32, color: errorColor),
-            ),
-            const SizedBox(height: 22),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: titleColor,
-                height: 1.2,
+              const SizedBox(height: 8),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isDark ? Colors.white54 : ArjunaColors.muted,
+                  height: 1.5,
+                  fontSize: 14,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: isDark ? Colors.white54 : ArjunaColors.muted,
-                height: 1.5,
-                fontSize: 14,
+              const SizedBox(height: 28),
+              SizedBox(
+                width: 156,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh_rounded, size: 20),
+                  label: const Text('Coba Lagi'),
+                ),
               ),
-            ),
-            const SizedBox(height: 28),
-            SizedBox(
-              width: 156,
-              child: ElevatedButton.icon(
-                onPressed: onRetry,
-                icon: const Icon(Icons.refresh, size: 20),
-                label: const Text('Coba Lagi'),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

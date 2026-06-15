@@ -31,8 +31,13 @@ class DetailCubit extends Cubit<DetailState> {
       // Extract prediction parameters
       final double trend = (predictionData['trend'] as num).toDouble();
       final int horizon = (predictionData['horizon'] as num).toInt();
-      final double lastPrice = (predictionData['last_historical_price'] as num).toDouble();
-      final double predictedPrice = (predictionData['predicted_price'] as num).toDouble();
+      final double lastPrice = (predictionData['last_historical_price'] as num)
+          .toDouble();
+      final double predictedPrice = (predictionData['predicted_price'] as num)
+          .toDouble();
+      final String modelUsed = predictionData['model_used']?.toString() ?? '';
+      final String lastHistoricalDate =
+          predictionData['last_historical_date']?.toString() ?? '';
 
       // Extract forecast price points
       final List<dynamic> predsList = predictionData['predictions'] as List;
@@ -44,14 +49,18 @@ class DetailCubit extends Cubit<DetailState> {
       }).toList();
 
       // Emit loaded state with charts and predictions first
-      emit(DetailLoaded(
-        history: history,
-        forecast: forecast,
-        isInsightLoading: true,
-        trend: trend,
-        horizon: horizon,
-        predictedPrice: predictedPrice,
-      ));
+      emit(
+        DetailLoaded(
+          history: history,
+          forecast: forecast,
+          isInsightLoading: true,
+          trend: trend,
+          horizon: horizon,
+          predictedPrice: predictedPrice,
+          modelUsed: modelUsed,
+          lastHistoricalDate: lastHistoricalDate,
+        ),
+      );
 
       // 2. Fetch live AI insight asynchronously
       try {
@@ -63,23 +72,29 @@ class DetailCubit extends Cubit<DetailState> {
           predictedPrice,
         );
         if (state is DetailLoaded) {
-          emit((state as DetailLoaded).copyWith(
-            liveInsight: liveInsight,
-            isInsightLoading: false,
-          ));
+          emit(
+            (state as DetailLoaded).copyWith(
+              liveInsight: liveInsight,
+              isInsightLoading: false,
+            ),
+          );
         }
       } catch (insightError) {
         // Log the error but keep the charts/forecast displayed
         debugPrint("Failed to fetch live AI insight: $insightError");
         if (state is DetailLoaded) {
-          emit((state as DetailLoaded).copyWith(
-            isInsightLoading: false,
-            liveInsight: Insight(
-              masyarakat: "Gagal memuat rekomendasi otomatis. Silakan coba beberapa saat lagi.",
-              pedagang: "Gagal memuat rekomendasi otomatis. Silakan coba beberapa saat lagi.",
-              disclaimer: "Terjadi gangguan koneksi ke mesin AI.",
+          emit(
+            (state as DetailLoaded).copyWith(
+              isInsightLoading: false,
+              liveInsight: Insight(
+                masyarakat:
+                    "Gagal memuat rekomendasi otomatis. Silakan coba beberapa saat lagi.",
+                pedagang:
+                    "Gagal memuat rekomendasi otomatis. Silakan coba beberapa saat lagi.",
+                disclaimer: "Terjadi gangguan koneksi ke mesin AI.",
+              ),
             ),
-          ));
+          );
         }
       }
     } catch (e) {

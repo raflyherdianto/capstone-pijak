@@ -85,6 +85,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ref.refresh(newsProvider);
             },
             color: Theme.of(context).colorScheme.primary,
+            edgeOffset: MediaQuery.of(context).padding.top,
+            displacement: MediaQuery.of(context).padding.top + 24,
             child: SingleChildScrollView(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),

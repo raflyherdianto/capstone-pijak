@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers.dart';
 import '../../../../shared/domain/models.dart';
 import '../../../../shared/widgets/arjuna_brand.dart';
+import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/shimmer_placeholder.dart';
 import '../../../detail/presentation/screens/detail_screen.dart';
@@ -17,6 +20,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
+  Timer? _searchDebounce;
+  String _searchInput = '';
   String _searchQuery = '';
   String _lastFilterKey = '';
   List<Commodity>? _lastFiltered;
@@ -24,14 +29,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     _searchFocus.dispose();
     super.dispose();
   }
 
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    setState(() => _searchInput = value);
+    _searchDebounce = Timer(const Duration(milliseconds: 280), () {
+      if (!mounted) return;
+      setState(() => _searchQuery = value);
+    });
+  }
+
+  void _clearSearch() {
+    _searchDebounce?.cancel();
+    _searchController.clear();
+    setState(() {
+      _searchInput = '';
+      _searchQuery = '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final commoditiesAsync = ref.watch(commoditiesProvider);
+    final metadataAsync = ref.watch(metadataProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentColor = ArjunaColors.accent(isDark);
 
@@ -48,11 +73,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           focusNode: _searchFocus,
           isDark: isDark,
           accentColor: accentColor,
-          onChanged: (value) => setState(() => _searchQuery = value),
-          onClear: () {
-            _searchController.clear();
-            setState(() => _searchQuery = '');
-          },
+          hasText: _searchInput.isNotEmpty,
+          onChanged: _onSearchChanged,
+          onClear: _clearSearch,
         ),
         titleSpacing: 16,
         toolbarHeight: 64,
@@ -79,6 +102,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           return RefreshIndicator(
             onRefresh: () async => ref.refresh(commoditiesProvider),
             color: accentColor,
+            edgeOffset: 4,
+            displacement: 28,
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
@@ -91,6 +116,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       filteredCount: filtered.length,
                       totalCount: commodities.length,
                       isFiltering: _searchQuery.isNotEmpty,
+                      lastUpdatedAt: metadataAsync.maybeWhen(
+                        data: (metadata) => metadata.updatedAt,
+                        orElse: () => '',
+                      ),
                       isDark: isDark,
                       accentColor: accentColor,
                     ),
@@ -98,10 +127,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
 
                 // Empty state
-                if (filtered.isEmpty)
+                if (commodities.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
-                    child: _EmptyState(query: _searchQuery, isDark: isDark),
+                    child: AppEmptyState(
+                      icon: Icons.inventory_2_outlined,
+                      title: 'Data Komoditas Belum Tersedia',
+                      message:
+                          'Tarik untuk memuat ulang atau coba lagi saat koneksi lebih stabil.',
+                      actionLabel: 'Muat Ulang',
+                      onAction: () => ref.refresh(commoditiesProvider),
+                    ),
+                  )
+                else if (filtered.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: AppEmptyState(
+                      icon: Icons.search_off_rounded,
+                      title: 'Tidak Ada Hasil',
+                      message:
+                          '"$_searchQuery" tidak cocok dengan daftar bahan pangan. Coba kata kunci yang lebih umum.',
+                      actionLabel: 'Bersihkan',
+                      onAction: _clearSearch,
+                    ),
                   )
                 else
                   // Commodity list
@@ -148,7 +196,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               sliver: SliverList.separated(
                 itemCount: 5,
                 separatorBuilder: (_, i) => const SizedBox(height: 10),
-                itemBuilder: (_, i) => const ShimmerCardPlaceholder(height: 92),
+                itemBuilder: (_, i) => const CommodityCardShimmer(),
               ),
             ),
           ],
@@ -170,6 +218,7 @@ class _SearchField extends StatelessWidget {
   final FocusNode focusNode;
   final bool isDark;
   final Color accentColor;
+  final bool hasText;
   final ValueChanged<String> onChanged;
   final VoidCallback onClear;
 
@@ -178,6 +227,7 @@ class _SearchField extends StatelessWidget {
     required this.focusNode,
     required this.isDark,
     required this.accentColor,
+    required this.hasText,
     required this.onChanged,
     required this.onClear,
   });
@@ -197,46 +247,51 @@ class _SearchField extends StatelessWidget {
               : ArjunaColors.navy.withValues(alpha: 0.08),
         ),
       ),
-      child: TextField(
-        controller: controller,
-        focusNode: focusNode,
-        onChanged: onChanged,
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: isDark ? Colors.white : ArjunaColors.navy,
-        ),
-        decoration: InputDecoration(
-          hintText: 'Cari bahan pangan...',
-          hintStyle: TextStyle(
+      child: Semantics(
+        textField: true,
+        label: 'Cari bahan pangan',
+        child: TextField(
+          controller: controller,
+          focusNode: focusNode,
+          onChanged: onChanged,
+          textInputAction: TextInputAction.search,
+          style: TextStyle(
             fontSize: 14,
-            color: isDark ? Colors.white38 : ArjunaColors.muted,
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w500,
+            color: isDark ? Colors.white : ArjunaColors.navy,
           ),
-          prefixIcon: Icon(
-            Icons.search_rounded,
-            size: 18,
-            color: isDark ? Colors.white38 : ArjunaColors.muted,
+          decoration: InputDecoration(
+            hintText: 'Cari bahan pangan...',
+            hintStyle: TextStyle(
+              fontSize: 14,
+              color: isDark ? Colors.white38 : ArjunaColors.muted,
+              fontWeight: FontWeight.w400,
+            ),
+            prefixIcon: Icon(
+              Icons.search_rounded,
+              size: 18,
+              color: isDark ? Colors.white38 : ArjunaColors.muted,
+            ),
+            suffixIcon: hasText
+                ? IconButton(
+                    onPressed: onClear,
+                    icon: Icon(
+                      Icons.close_rounded,
+                      size: 20,
+                      color: isDark ? Colors.white60 : ArjunaColors.navy,
+                    ),
+                    tooltip: 'Bersihkan pencarian',
+                  )
+                : null,
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 0,
+              vertical: 12,
+            ),
+            isDense: true,
           ),
-          suffixIcon: controller.text.isNotEmpty
-              ? IconButton(
-                  onPressed: onClear,
-                  icon: Icon(
-                    Icons.close_rounded,
-                    size: 18,
-                    color: isDark ? Colors.white60 : ArjunaColors.navy,
-                  ),
-                  tooltip: 'Bersihkan pencarian',
-                )
-              : null,
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 0,
-            vertical: 12,
-          ),
-          isDense: true,
         ),
       ),
     );
@@ -249,6 +304,7 @@ class _ResultHeader extends StatelessWidget {
   final int filteredCount;
   final int totalCount;
   final bool isFiltering;
+  final String lastUpdatedAt;
   final bool isDark;
   final Color accentColor;
 
@@ -256,6 +312,7 @@ class _ResultHeader extends StatelessWidget {
     required this.filteredCount,
     required this.totalCount,
     required this.isFiltering,
+    required this.lastUpdatedAt,
     required this.isDark,
     required this.accentColor,
   });
@@ -279,7 +336,7 @@ class _ResultHeader extends StatelessWidget {
               Text(
                 isFiltering
                     ? '$filteredCount dari $totalCount komoditas'
-                    : '$totalCount komoditas tersedia',
+                    : _subtitleText,
                 style: TextStyle(
                   fontSize: 12,
                   color: isDark
@@ -338,62 +395,19 @@ class _ResultHeader extends StatelessWidget {
       ],
     );
   }
-}
 
-// ── Empty State ────────────────────────────────────────────────────────────
+  String get _subtitleText {
+    if (lastUpdatedAt.trim().isEmpty) {
+      return '$totalCount komoditas tersedia';
+    }
 
-class _EmptyState extends StatelessWidget {
-  final String query;
-  final bool isDark;
-
-  const _EmptyState({required this.query, required this.isDark});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : Colors.black.withValues(alpha: 0.04),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.search_off_rounded,
-                size: 36,
-                color: isDark ? Colors.white30 : Colors.black26,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Tidak Ditemukan',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '"$query" tidak ada dalam daftar bahan pangan',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.45)
-                    : Colors.black.withValues(alpha: 0.38),
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    try {
+      final date = DateTime.parse(lastUpdatedAt);
+      final formatted =
+          '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+      return '$totalCount komoditas tersedia - Update $formatted';
+    } catch (_) {
+      return '$totalCount komoditas tersedia - Update $lastUpdatedAt';
+    }
   }
 }

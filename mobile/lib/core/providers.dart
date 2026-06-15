@@ -63,8 +63,9 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   }
 
   void toggleMode() {
-    final newMode =
-        state.mode == UserMode.buyer ? UserMode.seller : UserMode.buyer;
+    final newMode = state.mode == UserMode.buyer
+        ? UserMode.seller
+        : UserMode.buyer;
     state = state.copyWith(mode: newMode);
     _prefs.setInt('user_mode', newMode.index);
   }
@@ -91,8 +92,9 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   }
 }
 
-final settingsProvider =
-    StateNotifierProvider<SettingsNotifier, AppSettings>((ref) {
+final settingsProvider = StateNotifierProvider<SettingsNotifier, AppSettings>((
+  ref,
+) {
   final prefs = ref.watch(sharedPreferencesProvider);
   return SettingsNotifier(prefs);
 });
@@ -103,7 +105,8 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 
 final commodityRepositoryProvider = Provider<ICommodityRepository>((ref) {
   final apiClient = ref.watch(apiClientProvider);
-  return CommodityRepository(apiClient);
+  final prefs = ref.watch(sharedPreferencesProvider);
+  return CommodityRepository(apiClient, prefs);
 });
 
 final commoditiesProvider = FutureProvider<List<Commodity>>((ref) async {

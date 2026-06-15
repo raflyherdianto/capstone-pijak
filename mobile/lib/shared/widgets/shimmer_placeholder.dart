@@ -31,6 +31,74 @@ class ShimmerCardPlaceholder extends StatelessWidget {
   }
 }
 
+class CommodityCardShimmer extends StatelessWidget {
+  const CommodityCardShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark
+        ? const Color(0xFF0B2637)
+        : const Color(0xFFE6EEEB);
+    final highlightColor = isDark
+        ? const Color(0xFF12384C)
+        : const Color(0xFFF7FAF8);
+
+    return Shimmer.fromColors(
+      baseColor: baseColor,
+      highlightColor: highlightColor,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 92),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _ShimmerBlock(width: 132, height: 15, radius: 5),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: const [
+                      _ShimmerBlock(width: 58, height: 22, radius: 999),
+                      SizedBox(width: 8),
+                      Expanded(child: _ShimmerBlock(height: 11, radius: 4)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: const [
+                _ShimmerBlock(width: 88, height: 15, radius: 5),
+                SizedBox(height: 8),
+                _ShimmerBlock(width: 44, height: 11, radius: 4),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class ShimmerListPlaceholder extends StatelessWidget {
   final int itemCount;
 
@@ -172,8 +240,8 @@ class ShimmerInsightPlaceholder extends StatelessWidget {
   }
 }
 
-class DetailShimmerPlaceholder extends StatelessWidget {
-  const DetailShimmerPlaceholder({super.key});
+class InsightContentShimmer extends StatelessWidget {
+  const InsightContentShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -189,66 +257,283 @@ class DetailShimmerPlaceholder extends StatelessWidget {
       baseColor: baseColor,
       highlightColor: highlightColor,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            const SizedBox(height: 4),
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
+                    child: Row(
+                      children: const [
+                        _ShimmerBlock(width: 32, height: 32, radius: 10),
+                        SizedBox(width: 12),
+                        _ShimmerBlock(width: 178, height: 18, radius: 6),
+                      ],
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _ShimmerBlock(
+                          width: double.infinity,
+                          height: 14,
+                          radius: 5,
+                        ),
+                        SizedBox(height: 10),
+                        _ShimmerBlock(
+                          width: double.infinity,
+                          height: 14,
+                          radius: 5,
+                        ),
+                        SizedBox(height: 10),
+                        _ShimmerBlock(width: 250, height: 14, radius: 5),
+                        SizedBox(height: 18),
+                        Divider(height: 1),
+                        SizedBox(height: 12),
+                        _ShimmerBlock(
+                          width: double.infinity,
+                          height: 12,
+                          radius: 4,
+                        ),
+                        SizedBox(height: 8),
+                        _ShimmerBlock(width: 210, height: 12, radius: 4),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 40),
+            Row(
+              children: const [
+                Expanded(child: _StatCardShimmer()),
+                SizedBox(width: 10),
+                Expanded(child: _StatCardShimmer()),
+                SizedBox(width: 10),
+                Expanded(child: _StatCardShimmer()),
+              ],
+            ),
+            const SizedBox(height: 100),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SettingsAboutShimmer extends StatelessWidget {
+  const SettingsAboutShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark
+        ? const Color(0xFF0B2637)
+        : const Color(0xFFE6EEEB);
+    final highlightColor = isDark
+        ? const Color(0xFF12384C)
+        : const Color(0xFFF7FAF8);
+
+    return Shimmer.fromColors(
+      baseColor: baseColor,
+      highlightColor: highlightColor,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 16),
-            // Price Header Shimmer
+            Row(
+              children: const [
+                _ShimmerBlock(width: 58, height: 58, radius: 18),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _ShimmerBlock(width: 150, height: 20, radius: 6),
+                      SizedBox(height: 8),
+                      _ShimmerBlock(width: 82, height: 12, radius: 4),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const _ShimmerBlock(width: double.infinity, height: 14, radius: 5),
+            const SizedBox(height: 8),
+            const _ShimmerBlock(width: 240, height: 14, radius: 5),
+            const SizedBox(height: 20),
+            const Divider(height: 1),
+            const SizedBox(height: 12),
+            const _InfoRowShimmer(),
+            const _InfoRowShimmer(),
+            const _InfoRowShimmer(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class NewsCardShimmer extends StatelessWidget {
+  const NewsCardShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark
+        ? const Color(0xFF0B2637)
+        : const Color(0xFFE6EEEB);
+    final highlightColor = isDark
+        ? const Color(0xFF12384C)
+        : const Color(0xFFF7FAF8);
+
+    return Shimmer.fromColors(
+      baseColor: baseColor,
+      highlightColor: highlightColor,
+      child: Container(
+        width: 220,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            _ShimmerBlock(width: double.infinity, height: 96, radius: 16),
+            Padding(
+              padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(child: _ShimmerBlock(height: 10, radius: 4)),
+                      SizedBox(width: 20),
+                      _ShimmerBlock(width: 34, height: 9, radius: 4),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  _ShimmerBlock(width: double.infinity, height: 12, radius: 5),
+                  SizedBox(height: 7),
+                  _ShimmerBlock(width: double.infinity, height: 12, radius: 5),
+                  SizedBox(height: 7),
+                  _ShimmerBlock(width: 126, height: 12, radius: 5),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DetailShimmerPlaceholder extends StatelessWidget {
+  final bool includePriceHeader;
+  final EdgeInsetsGeometry padding;
+
+  const DetailShimmerPlaceholder({
+    super.key,
+    this.includePriceHeader = true,
+    this.padding = const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark
+        ? const Color(0xFF0B2637)
+        : const Color(0xFFE6EEEB);
+    final highlightColor = isDark
+        ? const Color(0xFF12384C)
+        : const Color(0xFFF7FAF8);
+
+    return Shimmer.fromColors(
+      baseColor: baseColor,
+      highlightColor: highlightColor,
+      child: Padding(
+        padding: padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (includePriceHeader) ...[
+              const SizedBox(height: 16),
+              // Price Header Shimmer
+              const _ShimmerBlock(height: 24, width: 160, radius: 6),
+              const SizedBox(height: 12),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _ShimmerBlock(height: 34, width: 190, radius: 8),
+                        SizedBox(height: 10),
+                        _ShimmerBlock(height: 13, width: 72, radius: 5),
+                        SizedBox(height: 10),
+                        _ShimmerBlock(height: 24, width: 76, radius: 8),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Container(
+                    width: 104,
+                    height: 104,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 28),
+            ],
+            // Chart Section Shimmer
+            const _ChartSectionShimmer(),
+            const SizedBox(height: 28),
+            // Insight Header + Card Shimmer
+            const Row(
+              children: [
+                _ShimmerBlock(width: 20, height: 20, radius: 10),
+                SizedBox(width: 8),
+                _ShimmerBlock(width: 164, height: 18, radius: 6),
+              ],
+            ),
+            const SizedBox(height: 12),
             Container(
-              height: 20,
-              width: 120,
+              height: 44,
+              width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(14),
               ),
             ),
             const SizedBox(height: 12),
             Container(
-              height: 36,
-              width: 180,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(6),
-              ),
-            ),
-            const SizedBox(height: 28),
-            // Chart Section Shimmer
-            Container(
-              height: 260,
+              height: 178,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            const SizedBox(height: 24),
-            // Overview Grid Shimmer (Grid of cards)
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 2.2,
-              ),
-              itemCount: 4,
-              itemBuilder: (context, index) => Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-            // Insight Card Shimmer
-            Container(
-              height: 150,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(18),
               ),
             ),
             const SizedBox(height: 28),
@@ -282,6 +567,177 @@ class DetailShimmerPlaceholder extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ChartSectionShimmer extends StatelessWidget {
+  const _ChartSectionShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: const [
+              _ShimmerBlock(width: 116, height: 20, radius: 6),
+              Spacer(),
+              _ShimmerBlock(width: 132, height: 46, radius: 12),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Row(
+                  children: [
+                    _ShimmerBlock(width: 112, height: 32, radius: 10),
+                    SizedBox(width: 8),
+                    _ShimmerBlock(width: 96, height: 32, radius: 10),
+                  ],
+                ),
+                SizedBox(height: 10),
+                _ShimmerBlock(width: double.infinity, height: 12, radius: 4),
+                SizedBox(height: 8),
+                _ShimmerBlock(width: 220, height: 12, radius: 4),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            height: 210,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Center(child: _ShimmerBlock(width: 210, height: 14, radius: 6)),
+          const SizedBox(height: 12),
+          Container(
+            height: 44,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ShimmerBlock extends StatelessWidget {
+  final double? width;
+  final double height;
+  final double radius;
+
+  const _ShimmerBlock({this.width, required this.height, required this.radius});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    );
+  }
+}
+
+class _StatCardShimmer extends StatelessWidget {
+  const _StatCardShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: const Column(
+        children: [
+          _ShimmerBlock(width: 38, height: 38, radius: 19),
+          SizedBox(height: 8),
+          _ShimmerBlock(width: 34, height: 30, radius: 8),
+          SizedBox(height: 6),
+          _ShimmerBlock(width: 64, height: 12, radius: 4),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoRowShimmer extends StatelessWidget {
+  const _InfoRowShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _ShimmerBlock(width: 92, height: 13, radius: 4),
+          _ShimmerBlock(width: 128, height: 13, radius: 4),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionHeaderShimmer extends StatelessWidget {
+  final double width;
+
+  const _SectionHeaderShimmer({required this.width});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const _ShimmerBlock(width: 18, height: 18, radius: 6),
+        const SizedBox(width: 8),
+        _ShimmerBlock(width: width, height: 18, radius: 5),
+      ],
+    );
+  }
+}
+
+class _SubHeaderShimmer extends StatelessWidget {
+  final double width;
+
+  const _SubHeaderShimmer({required this.width});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const _ShimmerBlock(width: 18, height: 18, radius: 6),
+        const SizedBox(width: 7),
+        _ShimmerBlock(width: width, height: 12, radius: 4),
+      ],
     );
   }
 }
@@ -397,6 +853,8 @@ class DashboardShimmer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Akses Cepat Shimmer
+                  const _SectionHeaderShimmer(width: 112),
+                  const SizedBox(height: 12),
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -417,15 +875,10 @@ class DashboardShimmer extends StatelessWidget {
                   ),
                   const SizedBox(height: 28),
                   // Top Movers Shimmer
-                  Container(
-                    width: 150,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
+                  const _SectionHeaderShimmer(width: 164),
                   const SizedBox(height: 12),
+                  const _SubHeaderShimmer(width: 132),
+                  const SizedBox(height: 8),
                   SizedBox(
                     height: 108,
                     child: ListView.separated(
@@ -445,13 +898,12 @@ class DashboardShimmer extends StatelessWidget {
                   ),
                   const SizedBox(height: 28),
                   // News Shimmer
-                  Container(
-                    width: 120,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
+                  Row(
+                    children: const [
+                      _SectionHeaderShimmer(width: 126),
+                      Spacer(),
+                      _ShimmerBlock(width: 54, height: 22, radius: 6),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   SizedBox(
@@ -462,13 +914,7 @@ class DashboardShimmer extends StatelessWidget {
                       itemCount: 3,
                       separatorBuilder: (context, index) =>
                           const SizedBox(width: 12),
-                      itemBuilder: (context, index) => Container(
-                        width: 220,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                      ),
+                      itemBuilder: (context, index) => const NewsCardShimmer(),
                     ),
                   ),
                 ],
@@ -525,9 +971,20 @@ class AuditShimmerPlaceholder extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // 3. Section Title Shimmer
+            // 3. Model Explanation Card Shimmer
             Container(
-              width: 130,
+              height: 142,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // 4. Section Title Shimmer
+            Container(
+              width: 220,
               height: 18,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -536,7 +993,7 @@ class AuditShimmerPlaceholder extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // 4. Log Audit List / Table Rows Shimmer
+            // 5. Log Audit List / Table Rows Shimmer
             Column(
               children: List.generate(
                 4,
@@ -549,17 +1006,6 @@ class AuditShimmerPlaceholder extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // 5. Info Card Shimmer
-            Container(
-              height: 120,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
               ),
             ),
           ],

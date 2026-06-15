@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../data/news_article.dart';
 import '../../../../shared/widgets/app_background.dart';
@@ -63,14 +64,7 @@ class NewsDetailScreen extends StatelessWidget {
                             _buildImagePlaceholder(isDark),
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
-                          return Container(
-                            color: isDark
-                                ? const Color(0xFF1E1E1E)
-                                : Colors.grey[200],
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
+                          return _buildImageLoadingPlaceholder(isDark);
                         },
                       )
                     : _buildImagePlaceholder(isDark),
@@ -233,6 +227,20 @@ class NewsDetailScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildImageLoadingPlaceholder(bool isDark) {
+    return Shimmer.fromColors(
+      baseColor: isDark ? const Color(0xFF0B2637) : const Color(0xFFE6EEEB),
+      highlightColor: isDark
+          ? const Color(0xFF12384C)
+          : const Color(0xFFF7FAF8),
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.white,
       ),
     );
   }

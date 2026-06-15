@@ -20,6 +20,8 @@ class InsightContent extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: onRefresh,
       color: Theme.of(context).colorScheme.primary,
+      edgeOffset: 4,
+      displacement: 28,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(20),
