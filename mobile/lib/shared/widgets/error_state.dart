@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'arjuna_brand.dart';
 
 class AppErrorWidget extends StatelessWidget {
   final String title;
@@ -16,45 +17,56 @@ class AppErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final errorColor = Theme.of(context).colorScheme.error;
+    final titleColor = ArjunaColors.title(isDark);
+
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(28.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
+              width: 72,
+              height: 72,
               decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.1),
+                color: errorColor.withValues(alpha: isDark ? 0.14 : 0.09),
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: errorColor.withValues(alpha: isDark ? 0.24 : 0.16),
+                ),
               ),
-              child: Icon(icon, size: 48, color: Colors.red),
+              child: Icon(icon, size: 32, color: errorColor),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 22),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: titleColor,
+                height: 1.2,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[600], height: 1.5),
+              style: TextStyle(
+                color: isDark ? Colors.white54 : ArjunaColors.muted,
+                height: 1.5,
+                fontSize: 14,
+              ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 28),
             SizedBox(
-              width: 160,
+              width: 156,
               child: ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh, size: 20),
                 label: const Text('Coba Lagi'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
               ),
             ),
           ],

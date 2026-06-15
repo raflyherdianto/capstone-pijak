@@ -48,13 +48,13 @@ class MarketPulseCard extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF07345A), Color(0xFF05243F), Color(0xFF041A2A)]
-              : const [Color(0xFF07345A), Color(0xFF0C5B75), Color(0xFF0B9F91)],
+              ? const [Color(0xFF07345A), Color(0xFF05243F)]
+              : const [Color(0xFF07345A), Color(0xFF0B756E)],
         ),
         border: Border.all(
           color: const Color(0xFFE8C766).withValues(alpha: isDark ? 0.2 : 0.3),
@@ -63,14 +63,14 @@ class MarketPulseCard extends ConsumerWidget {
           BoxShadow(
             color: const Color(
               0xFF07345A,
-            ).withValues(alpha: isDark ? 0.32 : 0.18),
-            blurRadius: 30,
-            offset: const Offset(0, 14),
+            ).withValues(alpha: isDark ? 0.28 : 0.14),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
             Positioned.fill(
@@ -81,9 +81,9 @@ class MarketPulseCard extends ConsumerWidget {
                 ),
               ),
             ),
-            Positioned(right: -42, top: -10, child: const _FoodSignalCluster()),
+            Positioned(right: -48, top: -8, child: const _FoodSignalCluster()),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -94,7 +94,7 @@ class MarketPulseCard extends ConsumerWidget {
                         padding: const EdgeInsets.all(9),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.16),
                           ),
@@ -125,7 +125,6 @@ class MarketPulseCard extends ConsumerWidget {
                                 fontSize: 18,
                                 fontWeight: FontWeight.w900,
                                 color: Colors.white,
-                                letterSpacing: -0.2,
                                 height: 1.05,
                               ),
                             ),

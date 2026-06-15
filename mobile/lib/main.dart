@@ -82,14 +82,14 @@ class _MainNavigationState extends State<MainNavigation> {
             viewPadding: MediaQuery.of(context).viewPadding.copyWith(bottom: 0),
           ),
           child: Padding(
-            padding: EdgeInsets.fromLTRB(14, 0, 14, navBottomInset),
+            padding: EdgeInsets.fromLTRB(16, 0, 16, navBottomInset),
             child: Container(
-              height: 68,
+              height: 66,
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF061D2D).withValues(alpha: 0.94)
-                    : const Color(0xFFFFFBF0).withValues(alpha: 0.94),
-                borderRadius: BorderRadius.circular(28),
+                    ? const Color(0xFF061D2D).withValues(alpha: 0.96)
+                    : Colors.white.withValues(alpha: 0.96),
+                borderRadius: BorderRadius.circular(22),
                 border: Border.all(
                   color: isDark
                       ? const Color(0xFFE8C766).withValues(alpha: 0.14)
@@ -97,9 +97,9 @@ class _MainNavigationState extends State<MainNavigation> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.12),
-                    blurRadius: 28,
-                    offset: const Offset(0, 10),
+                    color: Colors.black.withValues(alpha: isDark ? 0.24 : 0.10),
+                    blurRadius: 22,
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
@@ -174,22 +174,22 @@ class _NavItem extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(18),
         child: SizedBox(
-          height: 68,
+          height: 66,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOutCubic,
-                width: selected ? 52 : 40,
-                height: 32,
+                width: selected ? 48 : 40,
+                height: 30,
                 decoration: BoxDecoration(
                   color: selected
                       ? activeColor.withValues(alpha: isDark ? 0.16 : 0.14)
                       : Colors.transparent,
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(15),
                 ),
                 child: Icon(
                   selected ? selectedIcon : icon,

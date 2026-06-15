@@ -36,33 +36,33 @@ class SettingsScreen extends ConsumerWidget {
           return Container(
             width: double.infinity,
             height: double.infinity,
-            margin: const EdgeInsets.only(top: 12),
+            margin: const EdgeInsets.only(top: 10),
             decoration: BoxDecoration(
               color: isDark
                   ? const Color(0xFF061525).withValues(alpha: 0.96)
                   : Colors.white,
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(32),
-                topRight: Radius.circular(32),
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
               ),
               border: Border(
                 top: BorderSide(
                   color: isDark
                       ? Colors.white.withValues(alpha: 0.05)
                       : Colors.black.withValues(alpha: 0.04),
-                  width: 1.5,
+                  width: 1,
                 ),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.04),
-                  blurRadius: 24,
-                  offset: const Offset(0, -8),
+                  color: Colors.black.withValues(alpha: isDark ? 0.18 : 0.035),
+                  blurRadius: 18,
+                  offset: const Offset(0, -5),
                 ),
               ],
             ),
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 28, 20, 100),
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 112),
               children: [
                 const SettingSectionTitle(title: 'Personalisasi'),
                 const SizedBox(height: 12),
@@ -84,20 +84,20 @@ class SettingsScreen extends ConsumerWidget {
                 ? const Color(0xFF061525).withValues(alpha: 0.96)
                 : Colors.white,
             borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(32),
-              topRight: Radius.circular(32),
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
             ),
             border: Border(
               top: BorderSide(
                 color: isDark
                     ? Colors.white.withValues(alpha: 0.05)
                     : Colors.black.withValues(alpha: 0.04),
-                width: 1.5,
+                width: 1,
               ),
             ),
           ),
           child: const SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(20, 28, 20, 100),
+            padding: EdgeInsets.fromLTRB(20, 24, 20, 112),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

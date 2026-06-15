@@ -8,7 +8,7 @@ class AppBackground extends StatelessWidget {
   const AppBackground({
     super.key,
     required this.child,
-    this.showBlurShapes = true,
+    this.showBlurShapes = false,
     this.showBatikPattern = true,
   });
 
@@ -18,7 +18,7 @@ class AppBackground extends StatelessWidget {
 
     return Stack(
       children: [
-        // Base gradient with Arjuna navy, teal, and warm ivory tones.
+        // Calm brand wash for all screens.
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -27,13 +27,13 @@ class AppBackground extends StatelessWidget {
               colors: isDark
                   ? [
                       const Color(0xFF031827),
-                      const Color(0xFF062C44),
-                      const Color(0xFF07151D),
+                      const Color(0xFF041D2B),
+                      const Color(0xFF041722),
                     ]
                   : [
                       const Color(0xFFEAF8F4),
-                      const Color(0xFFF9F4E8),
-                      const Color(0xFFF5FAF8),
+                      const Color(0xFFF6FAF8),
+                      const Color(0xFFFAFBF7),
                     ],
             ),
           ),
@@ -45,8 +45,8 @@ class AppBackground extends StatelessWidget {
             child: CustomPaint(
               painter: BatikKawungPainter(
                 color: isDark
-                    ? const Color(0xFFE8C766).withValues(alpha: 0.035)
-                    : const Color(0xFF07345A).withValues(alpha: 0.035),
+                    ? const Color(0xFFE8C766).withValues(alpha: 0.018)
+                    : const Color(0xFF07345A).withValues(alpha: 0.018),
               ),
             ),
           ),

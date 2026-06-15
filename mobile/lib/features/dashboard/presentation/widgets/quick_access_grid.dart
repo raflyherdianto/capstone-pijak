@@ -21,7 +21,9 @@ class QuickAccessGrid extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Take first 4 commodities for quick access (assume sorted by importance from API)
-    final items = commodities.take(4).toList();
+    final items = commodities.length > 4
+        ? commodities.sublist(0, 4)
+        : commodities;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,7 +41,6 @@ class QuickAccessGrid extends ConsumerWidget {
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 fontSize: 16,
-                letterSpacing: -0.2,
                 color: isDark ? Colors.white : const Color(0xFF07345A),
               ),
             ),
@@ -103,14 +104,14 @@ class _QuickCard extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
             color: const Color(
               0xFF07345A,
-            ).withValues(alpha: isDark ? 0.28 : 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 9),
+            ).withValues(alpha: isDark ? 0.18 : 0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -119,7 +120,7 @@ class _QuickCard extends ConsumerWidget {
         clipBehavior: Clip.antiAlias,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(18),
           side: BorderSide(
             color: isDark
                 ? const Color(0xFFE8C766).withValues(alpha: 0.12)
@@ -137,8 +138,8 @@ class _QuickCard extends ConsumerWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: isDark
-                          ? [const Color(0xFF0A2638), const Color(0xFF061D2D)]
-                          : [Colors.white, const Color(0xFFFFFAED)],
+                          ? [const Color(0xFF0A2638), const Color(0xFF071F31)]
+                          : [Colors.white, const Color(0xFFF9FCFA)],
                     ),
                   ),
                 ),
@@ -154,8 +155,8 @@ class _QuickCard extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: trendColor,
                     borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(22),
-                      bottomLeft: Radius.circular(22),
+                      topLeft: Radius.circular(18),
+                      bottomLeft: Radius.circular(18),
                     ),
                   ),
                 ),
@@ -202,7 +203,7 @@ class _QuickCard extends ConsumerWidget {
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w700,
+                                  fontWeight: FontWeight.w800,
                                   height: 1.1,
                                   color: navy,
                                 ),

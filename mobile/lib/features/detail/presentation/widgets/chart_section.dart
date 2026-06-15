@@ -35,7 +35,9 @@ class ChartSection extends ConsumerWidget {
 
     // Calculate trend badge color purely based on the overall trend value
     final double changeValue = isNaik ? 1.0 : (isTurun ? -1.0 : 0.0);
-    final badgeColor = ref.watch(settingsProvider.notifier).getTrendColor(changeValue);
+    final badgeColor = ref
+        .watch(settingsProvider.notifier)
+        .getTrendColor(changeValue);
 
     final IconData trendIcon = isNaik
         ? Icons.trending_up
@@ -57,13 +59,8 @@ class ChartSection extends ConsumerWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.08 : 0.02),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            blurRadius: 12,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -81,14 +78,16 @@ class ChartSection extends ConsumerWidget {
                       'Grafik Harga',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
                         fontFamily: 'Outfit',
                       ),
                     ),
                     if (trend.isNotEmpty) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: badgeColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
@@ -100,11 +99,7 @@ class ChartSection extends ConsumerWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              trendIcon,
-                              size: 12,
-                              color: badgeColor,
-                            ),
+                            Icon(trendIcon, size: 12, color: badgeColor),
                             const SizedBox(width: 4),
                             Text(
                               capitalizedTrend,
@@ -134,7 +129,8 @@ class ChartSection extends ConsumerWidget {
               reliability: reliability,
             ),
             const Divider(height: 24, thickness: 0.5),
-            GestureDetector(
+            InkWell(
+              borderRadius: BorderRadius.circular(12),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -145,31 +141,40 @@ class ChartSection extends ConsumerWidget {
                   ),
                 );
               },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.verified_user_outlined,
-                    size: 14,
-                    color: isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Lihat Audit Akurasi Prediksi AI',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91),
-                      fontFamily: 'Outfit',
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.verified_user_outlined,
+                      size: 15,
+                      color: isDark
+                          ? const Color(0xFFE8C766)
+                          : const Color(0xFF0B9F91),
                     ),
-                  ),
-                  const SizedBox(width: 2),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    size: 14,
-                    color: isDark ? const Color(0xFFE8C766) : const Color(0xFF0B9F91),
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    Text(
+                      'Lihat Audit Akurasi Prediksi AI',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: isDark
+                            ? const Color(0xFFE8C766)
+                            : const Color(0xFF0B9F91),
+                        fontFamily: 'Outfit',
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      size: 15,
+                      color: isDark
+                          ? const Color(0xFFE8C766)
+                          : const Color(0xFF0B9F91),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

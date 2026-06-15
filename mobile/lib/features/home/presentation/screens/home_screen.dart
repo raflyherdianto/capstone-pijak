@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers.dart';
+import '../../../../shared/domain/models.dart';
 import '../../../../shared/widgets/arjuna_brand.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/shimmer_placeholder.dart';
@@ -17,6 +18,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  String _lastFilterKey = '';
+  List<Commodity>? _lastFiltered;
   final FocusNode _searchFocus = FocusNode();
 
   @override
@@ -58,12 +61,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       // ── Body ──────────────────────────────────────────────────────────
       body: commoditiesAsync.when(
         data: (commodities) {
-          final filtered = commodities
-              .where(
-                (c) =>
-                    c.name.toLowerCase().contains(_searchQuery.toLowerCase()),
-              )
-              .toList();
+          final normalizedQuery = _searchQuery.trim().toLowerCase();
+          final filterKey =
+              '${identityHashCode(commodities)}::$normalizedQuery';
+          final filtered = _lastFilterKey == filterKey && _lastFiltered != null
+              ? _lastFiltered!
+              : commodities
+                    .where(
+                      (c) => c.name.toLowerCase().contains(normalizedQuery),
+                    )
+                    .toList();
+          if (_lastFilterKey != filterKey) {
+            _lastFilterKey = filterKey;
+            _lastFiltered = filtered;
+          }
 
           return RefreshIndicator(
             onRefresh: () async => ref.refresh(commoditiesProvider),
@@ -71,10 +82,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
+                const SliverToBoxAdapter(child: SizedBox(height: 4)),
                 // Result count header
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
+                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
                     child: _ResultHeader(
                       filteredCount: filtered.length,
                       totalCount: commodities.length,
@@ -94,10 +106,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 else
                   // Commodity list
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 112),
                     sliver: SliverList.separated(
                       itemCount: filtered.length,
-                      separatorBuilder: (_, i) => const SizedBox(height: 10),
+                      separatorBuilder: (_, i) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final commodity = filtered[index];
                         return CommodityCard(
@@ -173,11 +185,11 @@ class _SearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 44,
+      height: 46,
       decoration: BoxDecoration(
         color: isDark
-            ? Colors.white.withValues(alpha: 0.08)
-            : Colors.white.withValues(alpha: 0.78),
+            ? const Color(0xFF0A2638)
+            : Colors.white.withValues(alpha: 0.96),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isDark
@@ -207,22 +219,14 @@ class _SearchField extends StatelessWidget {
             color: isDark ? Colors.white38 : ArjunaColors.muted,
           ),
           suffixIcon: controller.text.isNotEmpty
-              ? GestureDetector(
-                  onTap: onClear,
-                  child: Container(
-                    margin: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.12)
-                          : ArjunaColors.navy.withValues(alpha: 0.07),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.close_rounded,
-                      size: 14,
-                      color: isDark ? Colors.white60 : ArjunaColors.navy,
-                    ),
+              ? IconButton(
+                  onPressed: onClear,
+                  icon: Icon(
+                    Icons.close_rounded,
+                    size: 18,
+                    color: isDark ? Colors.white60 : ArjunaColors.navy,
                   ),
+                  tooltip: 'Bersihkan pencarian',
                 )
               : null,
           border: InputBorder.none,
@@ -270,7 +274,6 @@ class _ResultHeader extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                   fontSize: 17,
-                  letterSpacing: -0.3,
                 ),
               ),
               Text(
