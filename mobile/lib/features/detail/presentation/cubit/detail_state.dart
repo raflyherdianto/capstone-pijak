@@ -14,6 +14,8 @@ class DetailLoaded extends DetailState {
   final double trend;
   final int horizon;
   final double predictedPrice;
+  final String modelUsed;
+  final String lastHistoricalDate;
 
   DetailLoaded({
     required this.history,
@@ -23,6 +25,8 @@ class DetailLoaded extends DetailState {
     required this.trend,
     required this.horizon,
     required this.predictedPrice,
+    this.modelUsed = '',
+    this.lastHistoricalDate = '',
   });
 
   DetailLoaded copyWith({
@@ -33,6 +37,8 @@ class DetailLoaded extends DetailState {
     double? trend,
     int? horizon,
     double? predictedPrice,
+    String? modelUsed,
+    String? lastHistoricalDate,
   }) {
     return DetailLoaded(
       history: history ?? this.history,
@@ -42,6 +48,8 @@ class DetailLoaded extends DetailState {
       trend: trend ?? this.trend,
       horizon: horizon ?? this.horizon,
       predictedPrice: predictedPrice ?? this.predictedPrice,
+      modelUsed: modelUsed ?? this.modelUsed,
+      lastHistoricalDate: lastHistoricalDate ?? this.lastHistoricalDate,
     );
   }
 }

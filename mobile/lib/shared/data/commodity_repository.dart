@@ -1,3 +1,9 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../core/api_client.dart';
 import '../../core/api_config.dart';
 import '../domain/models.dart';
@@ -18,13 +24,45 @@ abstract class ICommodityRepository {
 }
 
 class CommodityRepository implements ICommodityRepository {
-  final ApiClient _apiClient;
+  static const String _marketSummaryCacheKey = 'market_summary_cache_v1';
 
-  CommodityRepository(this._apiClient);
+  final ApiClient _apiClient;
+  final SharedPreferences _prefs;
+
+  CommodityRepository(this._apiClient, this._prefs);
 
   Future<Map<String, dynamic>> _fetchFullData() async {
-    final response = await _apiClient.dio.get(ApiConfig.marketSummary);
-    return response.data as Map<String, dynamic>;
+    try {
+      final response = await _apiClient.dio.get(ApiConfig.marketSummary);
+      final data = response.data as Map<String, dynamic>;
+      await _prefs.setString(_marketSummaryCacheKey, jsonEncode(data));
+      return data;
+    } on DioException catch (error) {
+      final cachedData = _readCachedMarketSummary();
+      if (cachedData != null) {
+        debugPrint(
+          'Using cached market summary after network failure: ${error.message}',
+        );
+        return cachedData;
+      }
+      rethrow;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Map<String, dynamic>? _readCachedMarketSummary() {
+    final cached = _prefs.getString(_marketSummaryCacheKey);
+    if (cached == null || cached.isEmpty) return null;
+
+    try {
+      final decoded = jsonDecode(cached);
+      if (decoded is Map<String, dynamic>) return decoded;
+      if (decoded is Map) return Map<String, dynamic>.from(decoded);
+    } catch (error) {
+      debugPrint('Failed to read cached market summary: $error');
+    }
+    return null;
   }
 
   @override
@@ -55,7 +93,11 @@ class CommodityRepository implements ICommodityRepository {
   Future<Map<String, dynamic>> getPredictionData(String subcategory) async {
     final response = await _apiClient.dio.get(
       ApiConfig.predict,
-      queryParameters: {'subcategory': subcategory, 'model_type': 'sarimax', 'steps': 7},
+      queryParameters: {
+        'subcategory': subcategory,
+        'model_type': 'sarimax',
+        'steps': 7,
+      },
     );
     return response.data as Map<String, dynamic>;
   }

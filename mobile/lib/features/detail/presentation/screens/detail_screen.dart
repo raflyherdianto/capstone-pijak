@@ -179,6 +179,9 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                             ),
                             themeColor: trendColor,
                             reliability: widget.commodity.reliability,
+                            modelUsed: state.modelUsed,
+                            lastHistoricalDate: state.lastHistoricalDate,
+                            horizon: state.horizon,
                             selectedRange: _selectedRange,
                             onRangeSelected: (range) =>
                                 setState(() => _selectedRange = range),

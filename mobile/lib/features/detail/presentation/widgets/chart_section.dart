@@ -11,6 +11,9 @@ class ChartSection extends ConsumerWidget {
   final ChartData filteredData;
   final Color themeColor;
   final String reliability;
+  final String modelUsed;
+  final String lastHistoricalDate;
+  final int horizon;
   final int selectedRange;
   final Function(int) onRangeSelected;
   final String trend;
@@ -21,6 +24,9 @@ class ChartSection extends ConsumerWidget {
     required this.filteredData,
     required this.themeColor,
     required this.reliability,
+    required this.modelUsed,
+    required this.lastHistoricalDate,
+    required this.horizon,
     required this.selectedRange,
     required this.onRangeSelected,
     required this.trend,
@@ -69,10 +75,14 @@ class ChartSection extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       'Grafik Harga',
@@ -123,6 +133,15 @@ class ChartSection extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 12),
+            PredictionTrustSummary(
+              reliability: reliability,
+              modelUsed: modelUsed,
+              lastHistoricalDate: lastHistoricalDate,
+              horizon: horizon,
+              trend: trend,
+              themeColor: themeColor,
+            ),
+            const SizedBox(height: 14),
             PriceChart(
               data: filteredData,
               themeColor: themeColor,
@@ -179,6 +198,153 @@ class ChartSection extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class PredictionTrustSummary extends StatelessWidget {
+  final String reliability;
+  final String modelUsed;
+  final String lastHistoricalDate;
+  final int horizon;
+  final String trend;
+  final Color themeColor;
+
+  const PredictionTrustSummary({
+    super.key,
+    required this.reliability,
+    required this.modelUsed,
+    required this.lastHistoricalDate,
+    required this.horizon,
+    required this.trend,
+    required this.themeColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final hasModel = modelUsed.trim().isNotEmpty;
+    final hasDate = lastHistoricalDate.trim().isNotEmpty;
+    final confidence = reliability.trim().isEmpty
+        ? 'Belum tersedia'
+        : reliability;
+    final source = hasModel ? modelUsed : 'Model prediksi';
+    final dateLabel = hasDate
+        ? _formatDate(lastHistoricalDate)
+        : 'Data terbaru';
+    final trendLabel = trend.trim().isEmpty ? 'stabil' : trend.toLowerCase();
+
+    return Semantics(
+      container: true,
+      label:
+          'Kepercayaan prediksi $confidence. Sumber $source. Data terakhir $dateLabel.',
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: themeColor.withValues(alpha: isDark ? 0.12 : 0.07),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: themeColor.withValues(alpha: isDark ? 0.20 : 0.14),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _TrustChip(
+                  icon: Icons.verified_outlined,
+                  label: 'Keyakinan: $confidence',
+                  color: themeColor,
+                ),
+                if (hasModel)
+                  _TrustChip(
+                    icon: Icons.memory_rounded,
+                    label: 'Sumber: $source',
+                    color: themeColor,
+                  ),
+                if (hasDate)
+                  _TrustChip(
+                    icon: Icons.update_rounded,
+                    label: 'Data: $dateLabel',
+                    color: themeColor,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Prediksi $horizon hari ke depan membaca tren $trendLabel dari riwayat harga terakhir tanpa mengubah data grafik.',
+              style: TextStyle(
+                fontSize: 12,
+                height: 1.45,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.66)
+                    : Colors.black.withValues(alpha: 0.58),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(String value) {
+    try {
+      final date = DateTime.parse(value);
+      return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    } catch (_) {
+      return value;
+    }
+  }
+}
+
+class _TrustChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _TrustChip({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.black.withValues(alpha: 0.12)
+            : Colors.white.withValues(alpha: 0.76),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: isDark ? Colors.white70 : const Color(0xFF163846),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

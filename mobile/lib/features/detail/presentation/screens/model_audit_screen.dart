@@ -36,17 +36,20 @@ class _ModelAuditScreenState extends ConsumerState<ModelAuditScreen> {
     return BlocProvider(
       create: (context) =>
           AuditCubit(repository)..fetchAuditData(widget.subcategory),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          title: const Text('Audit Akurasi AI'),
-          centerTitle: true,
-          backgroundColor: ArjunaColors.appBarSurface(isDark),
-          surfaceTintColor: Colors.transparent,
-          flexibleSpace: const ArjunaAppBarBackground(),
-        ),
-        body: AppBackground(
-          child: BlocBuilder<AuditCubit, AuditState>(
+      child: AppBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: const Text('Audit Akurasi AI'),
+            centerTitle: true,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            shadowColor: Colors.transparent,
+            backgroundColor: ArjunaColors.appBarSurface(isDark),
+            surfaceTintColor: Colors.transparent,
+            flexibleSpace: const ArjunaAppBarBackground(),
+          ),
+          body: BlocBuilder<AuditCubit, AuditState>(
             builder: (context, state) {
               if (state is AuditLoading || state is AuditInitial) {
                 return const AuditShimmerPlaceholder();
