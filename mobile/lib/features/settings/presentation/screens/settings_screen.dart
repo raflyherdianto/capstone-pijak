@@ -107,7 +107,7 @@ class SettingsScreen extends ConsumerWidget {
                 SizedBox(height: 32),
                 SettingSectionTitle(title: 'Tentang Aplikasi'),
                 SizedBox(height: 12),
-                ShimmerInsightPlaceholder(),
+                SettingsAboutShimmer(),
               ],
             ),
           ),

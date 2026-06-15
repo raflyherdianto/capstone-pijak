@@ -15,18 +15,7 @@ class InsightScreen extends ConsumerWidget {
     final metadataAsync = ref.watch(metadataProvider);
     ref.watch(settingsProvider);
 
-    const loadingPlaceholder = SingleChildScrollView(
-      padding: EdgeInsets.all(20),
-      child: Column(
-        children: [
-          SizedBox(height: 20),
-          ShimmerInsightPlaceholder(),
-          SizedBox(height: 40),
-          ShimmerGridPlaceholder(itemCount: 4),
-          SizedBox(height: 100),
-        ],
-      ),
-    );
+    const loadingPlaceholder = InsightContentShimmer();
 
     return Scaffold(
       backgroundColor: Colors.transparent,

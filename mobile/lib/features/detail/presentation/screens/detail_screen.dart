@@ -75,17 +75,42 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
             return AppBackground(
               child: Scaffold(
                 backgroundColor: Colors.transparent,
-                appBar: AppBar(
-                  title: Text(
-                    'Detail',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  centerTitle: true,
-                  backgroundColor: ArjunaColors.appBarSurface(isDark),
-                  surfaceTintColor: Colors.transparent,
-                  flexibleSpace: const ArjunaAppBarBackground(),
+                body: CustomScrollView(
+                  slivers: [
+                    SliverAppBar(
+                      title: Text(
+                        'Detail',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      pinned: true,
+                      centerTitle: true,
+                      backgroundColor: ArjunaColors.appBarSurface(isDark),
+                      surfaceTintColor: Colors.transparent,
+                      flexibleSpace: const ArjunaAppBarBackground(),
+                    ),
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: StickyPriceHeader(
+                        commodity: widget.commodity,
+                        currencyFormat: _currencyFormat,
+                        trendColor: trendColor,
+                        currentChange: currentChange,
+                      ),
+                    ),
+                    const SliverPadding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      sliver: SliverToBoxAdapter(
+                        child: DetailShimmerPlaceholder(
+                          includePriceHeader: false,
+                          padding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                body: const DetailShimmerPlaceholder(),
               ),
             );
           } else if (state is DetailError) {

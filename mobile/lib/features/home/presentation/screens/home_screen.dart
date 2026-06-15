@@ -196,7 +196,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               sliver: SliverList.separated(
                 itemCount: 5,
                 separatorBuilder: (_, i) => const SizedBox(height: 10),
-                itemBuilder: (_, i) => const ShimmerCardPlaceholder(height: 92),
+                itemBuilder: (_, i) => const CommodityCardShimmer(),
               ),
             ),
           ],
