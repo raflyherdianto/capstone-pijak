@@ -1,10 +1,10 @@
-# Komoditas-AI 🌾📈
+# Arjuna Mobile 🌾📈
 
 <p align="center">
-  <img src="assets/images/app_logo.png" width="160" alt="Komoditas-AI Logo">
+  <img src="assets/images/app_logo.png" width="160" alt="Arjuna Mobile Logo">
 </p>
 
-**Komoditas-AI** adalah aplikasi *mobile* cerdas yang dirancang untuk memantau dan memprediksi pergerakan harga komoditas pangan pokok di Indonesia. Dibangun dengan teknologi mutakhir untuk memberikan wawasan pasar yang akurat dan personal bagi konsumen maupun pelaku usaha.
+**Arjuna Mobile** adalah aplikasi *mobile* cerdas yang dirancang untuk memantau dan memprediksi pergerakan harga komoditas pangan pokok di Indonesia. Dibangun dengan teknologi mutakhir untuk memberikan wawasan pasar yang akurat, analisis model yang transparan, dan wawasan personal bagi konsumen maupun pelaku usaha pangan.
 
 ---
 
@@ -14,39 +14,46 @@
 - **🔄 Mode Perspektif Cerdas**: 
   - 🛒 **Mode Pembeli**: Fokus pada penghematan—kenaikan harga ditandai sebagai peringatan (**Merah**).
   - 🏪 **Mode Pedagang**: Fokus pada profit—kenaikan harga ditandai sebagai peluang (**Hijau**).
-- **💾 Pengaturan Persisten**: Aplikasi mengingat preferensi Anda (Mode Perspektif & Tema) meskipun aplikasi ditutup.
-- **🚀 Splash Screen Modern**: Pengalaman *onboarding* yang halus dengan animasi logo minimalis.
-- **📈 Insight Global AI**: Analisis otomatis mengenai kondisi pasar nasional untuk membantu pengambilan keputusan yang lebih tepat.
-- **🌓 Tema Dinamis**: Dukungan penuh untuk *Dark Mode* dan *Light Mode* dengan desain yang premium dan modern.
-- **🛡️ Manajemen Data Tangguh**: Sinkronisasi API yang efisien dengan penanganan kondisi *offline* yang informatif.
+- **🔍 Audit Akurasi Model**: Akses langsung ke metrik evaluasi model prediksi (MAE, MAPE, RMSE) demi transparansi kualitas peramalan AI.
+- **📰 Berita & Analisis Pasar**: Umpan berita terintegrasi terkait harga komoditas, inflasi, dan ketahanan pangan nasional.
+- **💾 Pengaturan Persisten**: Aplikasi mengingat preferensi Anda (Mode Perspektif & Tema) secara lokal meskipun aplikasi ditutup.
+- **🚀 Splash & Onboarding**: Pengalaman navigasi yang halus dimulai dari animasi logo minimalis hingga panduan pengenalan fitur interaktif.
+- **📈 Insight Global AI**: Analisis otomatis mengenai kondisi pasar nasional untuk membantu pengambilan keputusan yang tepat bagi pemangku kepentingan.
+- **🌓 Tema Dinamis**: Dukungan penuh untuk *Dark Mode* dan *Light Mode* dengan sistem warna yang dirancang secara profesional.
+- **🛡️ Manajemen Data Tangguh**: Sinkronisasi API yang efisien dengan penanganan kondisi *offline* yang informatif serta *shimmer load* yang responsif.
+
+---
 
 ## 🛠️ Teknologi yang Digunakan
 
 ### Frontend (Mobile)
 - **Framework**: [Flutter](https://flutter.dev/) (Dart)
-- **State Management**: [Riverpod](https://riverpod.dev/) (Modern & Type-safe)
+- **State Management**: [Riverpod](https://riverpod.dev/) (Core dependency injection & global states) & [Flutter BLoC/Cubit](https://pub.dev/packages/flutter_bloc) (Screen-specific interactive states)
 - **Persistence**: `shared_preferences`
-- **Networking**: `dio` (dengan interceptors)
+- **Networking**: `dio` (dengan penanganan error & interseptor kustom)
 - **Charting**: `fl_chart`
+- **Design System**: Font kustom *Outfit*, skema warna harmoni dengan dukungan penuh dark/light mode.
 
-### Backend (AI Engine)
+### Backend (AI Engine & API)
 - **API Framework**: [FastAPI](https://fastapi.tiangolo.com/) (Python)
 - **AI/ML**: Model peramalan *Quad-Hybrid* untuk akurasi prediksi maksimal.
+
+---
 
 ## 🚀 Memulai Penggunaan
 
 ### 1. Prasyarat
-- Flutter SDK (^3.10.0)
+- Flutter SDK (^3.10.7)
 - Dart SDK
 - Perangkat Android/iOS atau Emulator/Simulator.
 
 ### 2. Persiapan Proyek
 ```bash
 # Clone repository
-git clone https://github.com/username-anda/komoditas-ai.git
+git clone https://github.com/username-anda/arjuna-mobile.git
 
-# Masuk ke direktori
-cd komoditas_ai
+# Masuk ke direktori mobile
+cd arjuna_mobile
 
 # Ambil dependensi
 flutter pub get
@@ -63,30 +70,36 @@ static const String baseUrl = 'http://127.0.0.1:8000'; // Sesuaikan IP jika meng
 flutter run
 ```
 
+---
+
 ## 📂 Struktur Proyek
+
+Proyek ini menerapkan pendekatan **Clean Architecture** dengan struktur folder berbasis fitur (feature-first) untuk modularitas dan kemudahan pemeliharaan:
 
 ```text
 lib/
 ├── core/
-│   ├── api_client.dart    # Client API dengan penanganan error
-│   ├── api_config.dart    # Konfigurasi endpoint
-│   ├── models.dart        # Model data entitas
-│   ├── providers.dart     # Logika bisnis & State Management
-│   └── theme.dart         # Sistem desain (Colors & Typography)
-├── data/
-│   └── commodity_data.dart # Abstraksi akses data
-├── screens/
-│   ├── splash_screen.dart # Layar awal animasi logo
-│   ├── home_screen.dart   # Dashboard & Ringkasan Pasar
-│   ├── detail_screen.dart # Analisis mendalam & Grafik Prediksi
-│   ├── insight_screen.dart# Analisis AI Global
-│   └── settings_screen.dart # Preferensi & Personalisasi
-├── widgets/
-│   ├── commodity_card.dart# Kartu informasi komoditas
-│   ├── error_state.dart   # UI penanganan kesalahan
-│   └── price_chart.dart   # Visualisasi data harga
-└── main.dart              # Inisialisasi & Navigasi
+│   ├── api_client.dart       # API client dengan dio dan interceptors
+│   ├── api_config.dart       # Konfigurasi basis endpoint
+│   ├── providers.dart        # Riverpod providers untuk core dependencies
+│   └── theme.dart            # Sistem desain (Colors, Typography, Dark & Light themes)
+├── features/
+│   ├── splash/               # Splash screen dengan animasi masuk
+│   ├── onboarding/           # Pengenalan fitur aplikasi bagi pengguna baru
+│   ├── dashboard/            # Dashboard utama dengan ringkasan pergerakan pasar & berita
+│   ├── home/                 # Daftar komoditas pangan pokok
+│   ├── detail/               # Visualisasi prediksi harga, grafik, & mode perspektif cerdas
+│   │   └── presentation/cubit/ # Flutter BLoC (Cubit) untuk manajemen state detail & audit
+│   ├── insight/              # Halaman wawasan AI global mengenai ketahanan pangan
+│   └── settings/             # Personalisasi tema, mode perspektif, & informasi aplikasi
+├── shared/
+│   ├── data/                 # Repository data bersama (CommodityRepository)
+│   ├── domain/               # Model data entitas (Commodity, Price, dll)
+│   └── widgets/              # Widget umum (ErrorState, ArjunaBrand, ShimmerPlaceholder)
+└── main.dart                 # Titik masuk utama aplikasi & inisialisasi state
 ```
+
+---
 
 ## 🤝 Kontribusi
 Aplikasi ini bersifat terbuka untuk pengembangan lebih lanjut. Jika Anda menemukan *bug* atau memiliki ide fitur baru, silakan ajukan melalui *Issue* atau *Pull Request*.
