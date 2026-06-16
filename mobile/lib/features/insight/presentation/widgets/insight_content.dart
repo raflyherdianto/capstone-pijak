@@ -35,7 +35,6 @@ class InsightContent extends ConsumerWidget {
             GlobalAnalysisCard(
               analysis: metadata.globalAnalysis,
               disclaimer: metadata.disclaimer,
-              updatedAt: metadata.updatedAt,
               isSeller: isSeller,
               commodities: commodities,
             ),

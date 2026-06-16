@@ -111,7 +111,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           loading: () => const DashboardHeader(),
                           error: (e, st) => const DashboardHeader(),
                         ),
-                        const SizedBox(height: 24),
 
                         // 2. Market Pulse hero card
                         MarketPulseCard(commodities: commodities),
@@ -119,7 +118,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
                   // Bottom content panel
                   Container(

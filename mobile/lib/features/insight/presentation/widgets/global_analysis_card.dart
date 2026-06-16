@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../../../shared/domain/models.dart';
 import '../../../../shared/widgets/arjuna_brand.dart';
 
 class GlobalAnalysisCard extends StatelessWidget {
   final String analysis;
   final String disclaimer;
-  final String updatedAt;
   final bool isSeller;
   final List<Commodity> commodities;
 
@@ -14,7 +12,6 @@ class GlobalAnalysisCard extends StatelessWidget {
     super.key,
     required this.analysis,
     required this.disclaimer,
-    required this.updatedAt,
     required this.isSeller,
     required this.commodities,
   });
@@ -23,7 +20,6 @@ class GlobalAnalysisCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentColor = ArjunaColors.accent(isDark);
-    final updatedAtLabel = _formatUpdatedAt(updatedAt);
     final mood = _marketMood();
 
     return Container(
@@ -70,24 +66,6 @@ class GlobalAnalysisCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: [
-                                _HeaderChip(
-                                  icon: Icons.auto_awesome_rounded,
-                                  label: mood.label,
-                                  color: accentColor,
-                                ),
-                                if (updatedAtLabel.isNotEmpty)
-                                  _HeaderChip(
-                                    icon: Icons.update_rounded,
-                                    label: updatedAtLabel,
-                                    color: accentColor,
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
                             Text(
                               'Briefing Pasar dari Arjuna',
                               style: Theme.of(context).textTheme.titleLarge
@@ -191,16 +169,6 @@ class GlobalAnalysisCard extends StatelessWidget {
     );
   }
 
-  String _formatUpdatedAt(String value) {
-    if (value.trim().isEmpty) return '';
-    try {
-      final date = DateTime.parse(value).toLocal();
-      return DateFormat('dd/MM HH:mm').format(date);
-    } catch (_) {
-      return value;
-    }
-  }
-
   _MascotMood _marketMood() {
     if (commodities.isEmpty) {
       return const _MascotMood(
@@ -268,46 +236,4 @@ class _MascotMood {
   final String label;
 
   const _MascotMood({required this.asset, required this.label});
-}
-
-class _HeaderChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  const _HeaderChip({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: isDark ? 0.12 : 0.10),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withValues(alpha: 0.14)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: color),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              color: color,
-              fontFamily: 'Outfit',
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

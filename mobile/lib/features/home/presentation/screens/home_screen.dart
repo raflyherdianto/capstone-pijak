@@ -11,6 +11,8 @@ import '../../../../shared/widgets/shimmer_placeholder.dart';
 import '../../../detail/presentation/screens/detail_screen.dart';
 import '../widgets/commodity_card.dart';
 
+enum _CommoditySort { defaultOrder, nameAsc, priceDesc, changeAbsDesc }
+
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -25,6 +27,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _searchQuery = '';
   String _lastFilterKey = '';
   List<Commodity>? _lastFiltered;
+  _CommoditySort _sort = _CommoditySort.defaultOrder;
   final FocusNode _searchFocus = FocusNode();
 
   @override
@@ -56,7 +59,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final commoditiesAsync = ref.watch(commoditiesProvider);
-    final metadataAsync = ref.watch(metadataProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentColor = ArjunaColors.accent(isDark);
 
@@ -98,6 +100,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             _lastFilterKey = filterKey;
             _lastFiltered = filtered;
           }
+          final visibleCommodities = _sortedCommodities(filtered);
 
           return RefreshIndicator(
             onRefresh: () async => ref.refresh(commoditiesProvider),
@@ -113,13 +116,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
                     child: _ResultHeader(
-                      filteredCount: filtered.length,
+                      filteredCount: visibleCommodities.length,
                       totalCount: commodities.length,
                       isFiltering: _searchQuery.isNotEmpty,
-                      lastUpdatedAt: metadataAsync.maybeWhen(
-                        data: (metadata) => metadata.updatedAt,
-                        orElse: () => '',
-                      ),
+                      sort: _sort,
+                      onSortChanged: (sort) => setState(() => _sort = sort),
                       isDark: isDark,
                       accentColor: accentColor,
                     ),
@@ -156,10 +157,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 112),
                     sliver: SliverList.separated(
-                      itemCount: filtered.length,
+                      itemCount: visibleCommodities.length,
                       separatorBuilder: (_, i) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
-                        final commodity = filtered[index];
+                        final commodity = visibleCommodities[index];
                         return CommodityCard(
                           commodity: commodity,
                           onTap: () => Navigator.push(
@@ -208,6 +209,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
     );
+  }
+
+  List<Commodity> _sortedCommodities(List<Commodity> items) {
+    final sorted = [...items];
+    switch (_sort) {
+      case _CommoditySort.defaultOrder:
+        return sorted;
+      case _CommoditySort.nameAsc:
+        sorted.sort((a, b) => a.name.compareTo(b.name));
+        return sorted;
+      case _CommoditySort.priceDesc:
+        sorted.sort((a, b) => b.currentPrice.compareTo(a.currentPrice));
+        return sorted;
+      case _CommoditySort.changeAbsDesc:
+        sorted.sort((a, b) {
+          final aChange = (a.priceChanges['day_1'] ?? 0).abs();
+          final bChange = (b.priceChanges['day_1'] ?? 0).abs();
+          return bChange.compareTo(aChange);
+        });
+        return sorted;
+    }
   }
 }
 
@@ -304,7 +326,8 @@ class _ResultHeader extends StatelessWidget {
   final int filteredCount;
   final int totalCount;
   final bool isFiltering;
-  final String lastUpdatedAt;
+  final _CommoditySort sort;
+  final ValueChanged<_CommoditySort> onSortChanged;
   final bool isDark;
   final Color accentColor;
 
@@ -312,7 +335,8 @@ class _ResultHeader extends StatelessWidget {
     required this.filteredCount,
     required this.totalCount,
     required this.isFiltering,
-    required this.lastUpdatedAt,
+    required this.sort,
+    required this.onSortChanged,
     required this.isDark,
     required this.accentColor,
   });
@@ -335,7 +359,7 @@ class _ResultHeader extends StatelessWidget {
               Text(
                 isFiltering
                     ? '$filteredCount dari $totalCount komoditas'
-                    : _subtitleText,
+                    : '$totalCount komoditas tersedia',
                 style: TextStyle(
                   fontSize: 12,
                   color: isDark
@@ -347,49 +371,72 @@ class _ResultHeader extends StatelessWidget {
             ],
           ),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: accentColor.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: accentColor.withValues(alpha: 0.15)),
+        PopupMenuButton<_CommoditySort>(
+          initialValue: sort,
+          onSelected: onSortChanged,
+          tooltip: 'Urutkan komoditas',
+          color: isDark ? const Color(0xFF0A2638) : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                isFiltering ? Icons.search_rounded : Icons.storefront_rounded,
-                size: 13,
-                color: accentColor,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                isFiltering ? '$filteredCount ditemukan' : '$totalCount item',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: accentColor,
+          itemBuilder: (context) => const [
+            PopupMenuItem(
+              value: _CommoditySort.defaultOrder,
+              child: Text('Urutan default'),
+            ),
+            PopupMenuItem(
+              value: _CommoditySort.nameAsc,
+              child: Text('Nama A-Z'),
+            ),
+            PopupMenuItem(
+              value: _CommoditySort.priceDesc,
+              child: Text('Harga tertinggi'),
+            ),
+            PopupMenuItem(
+              value: _CommoditySort.changeAbsDesc,
+              child: Text('Perubahan terbesar'),
+            ),
+          ],
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+            decoration: BoxDecoration(
+              color: accentColor.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: accentColor.withValues(alpha: 0.15)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.sort_rounded, size: 14, color: accentColor),
+                const SizedBox(width: 5),
+                Text(
+                  _sortLabel,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: accentColor,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 2),
+                Icon(Icons.expand_more_rounded, size: 14, color: accentColor),
+              ],
+            ),
           ),
         ),
       ],
     );
   }
 
-  String get _subtitleText {
-    if (lastUpdatedAt.trim().isEmpty) {
-      return '$totalCount komoditas tersedia';
-    }
-
-    try {
-      final date = DateTime.parse(lastUpdatedAt);
-      final formatted =
-          '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-      return '$totalCount komoditas tersedia - Update $formatted';
-    } catch (_) {
-      return '$totalCount komoditas tersedia - Update $lastUpdatedAt';
+  String get _sortLabel {
+    switch (sort) {
+      case _CommoditySort.defaultOrder:
+        return 'Sort';
+      case _CommoditySort.nameAsc:
+        return 'A-Z';
+      case _CommoditySort.priceDesc:
+        return 'Harga';
+      case _CommoditySort.changeAbsDesc:
+        return 'Gerak';
     }
   }
 }

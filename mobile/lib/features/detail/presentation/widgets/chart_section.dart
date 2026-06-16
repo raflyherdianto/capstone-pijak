@@ -225,22 +225,15 @@ class PredictionTrustSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final hasModel = modelUsed.trim().isNotEmpty;
-    final hasDate = lastHistoricalDate.trim().isNotEmpty;
     final confidence = reliability.trim().isEmpty
         ? 'Belum tersedia'
         : reliability;
     final source = hasModel ? modelUsed : 'Model prediksi';
-    final dateLabel = hasDate
-        ? _formatDate(lastHistoricalDate)
-        : 'Data terbaru';
-    final trendLabel = trend.trim().isEmpty ? 'stabil' : trend.toLowerCase();
 
     return Semantics(
       container: true,
-      label:
-          'Kepercayaan prediksi $confidence. Sumber $source. Data terakhir $dateLabel.',
+      label: 'Kepercayaan prediksi $confidence. Sumber $source.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -259,27 +252,11 @@ class PredictionTrustSummary extends StatelessWidget {
                   label: source,
                   color: themeColor,
                 ),
-              // if (hasDate)
-              //   _TrustChip(
-              //     icon: Icons.update_rounded,
-              //     label: dateLabel,
-              //     color: themeColor,
-              //   ),
             ],
           ),
-          const SizedBox(height: 12),
         ],
       ),
     );
-  }
-
-  String _formatDate(String value) {
-    try {
-      final date = DateTime.parse(value);
-      return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-    } catch (_) {
-      return value;
-    }
   }
 }
 
