@@ -21,7 +21,11 @@ class ArjunaColors {
 
 class ArjunaAssets {
   static const logo = 'assets/images/arjuna-logo.png';
-  static const hero3d = 'assets/images/arjuna_hero_3d.png';
+  static const mascotThinking = 'assets/images/arjuna_mascot_thinking.png';
+  static const mascotAlert = 'assets/images/arjuna_mascot_alert.png';
+  static const mascotCelebrate = 'assets/images/arjuna_mascot_celebrate.png';
+  static const mascotWorried = 'assets/images/arjuna_mascot_worried.png';
+  static const mascotPresenting = 'assets/images/arjuna_mascot_presenting.png';
 }
 
 class ArjunaLogoMark extends StatelessWidget {

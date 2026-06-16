@@ -20,12 +20,19 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   late ScrollController _scrollController;
   bool _showAppBar = false;
+  bool _playEntrance = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() {
+        _playEntrance = true;
+      });
+    });
   }
 
   void _scrollListener() {
@@ -97,78 +104,87 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   Padding(
                     padding: EdgeInsets.fromLTRB(
                       20,
-                      MediaQuery.of(context).padding.top + 16,
+                      MediaQuery.of(context).padding.top + 8,
                       20,
                       0,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 1. Greeting header
-                        metadataAsync.when(
-                          data: (meta) =>
-                              DashboardHeader(lastUpdatedAt: meta.updatedAt),
-                          loading: () => const DashboardHeader(),
-                          error: (e, st) => const DashboardHeader(),
+                        _EntranceReveal(
+                          visible: _playEntrance,
+                          beginOffset: const Offset(0, 0.05),
+                          duration: const Duration(milliseconds: 360),
+                          child: metadataAsync.when(
+                            data: (meta) =>
+                                DashboardHeader(lastUpdatedAt: meta.updatedAt),
+                            loading: () => const DashboardHeader(),
+                            error: (e, st) => const DashboardHeader(),
+                          ),
                         ),
-                        const SizedBox(height: 24),
 
-                        // 2. Market Pulse hero card
-                        MarketPulseCard(commodities: commodities),
+                        const SizedBox(height: 8),
+                        _EntranceReveal(
+                          visible: _playEntrance,
+                          beginOffset: const Offset(0, 0.075),
+                          duration: const Duration(milliseconds: 460),
+                          curve: Curves.easeOutCubic,
+                          child: MarketPulseCard(commodities: commodities),
+                        ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
-                  // Bottom content panel
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF061525).withValues(alpha: 0.98)
-                          : Colors.white,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(24),
-                        topRight: Radius.circular(24),
-                      ),
-                      border: Border(
-                        top: BorderSide(
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.05)
-                              : Colors.black.withValues(alpha: 0.04),
-                          width: 1,
+                  _EntranceReveal(
+                    visible: _playEntrance,
+                    beginOffset: const Offset(0, 0.04),
+                    duration: const Duration(milliseconds: 560),
+                    curve: Curves.easeOutCubic,
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF061525).withValues(alpha: 0.98)
+                            : Colors.white,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
                         ),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(
-                            alpha: isDark ? 0.18 : 0.035,
+                        border: Border(
+                          top: BorderSide(
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.05)
+                                : Colors.black.withValues(alpha: 0.04),
+                            width: 1,
                           ),
-                          blurRadius: 18,
-                          offset: const Offset(0, -5),
                         ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 112),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 3. Quick Access Grid (top 4)
-                        if (commodities.isNotEmpty) ...[
-                          QuickAccessGrid(commodities: commodities),
-                          const SizedBox(height: 28),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(
+                              alpha: isDark ? 0.18 : 0.035,
+                            ),
+                            blurRadius: 18,
+                            offset: const Offset(0, -5),
+                          ),
                         ],
-
-                        // 4. Top Movers section
-                        if (commodities.isNotEmpty) ...[
-                          TopMoversSection(commodities: commodities),
-                          const SizedBox(height: 28),
+                      ),
+                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 112),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (commodities.isNotEmpty) ...[
+                            QuickAccessGrid(commodities: commodities),
+                            const SizedBox(height: 28),
+                          ],
+                          if (commodities.isNotEmpty) ...[
+                            TopMoversSection(commodities: commodities),
+                            const SizedBox(height: 28),
+                          ],
+                          const NewsSection(),
                         ],
-
-                        // 5. Berita Pangan (GNews.io)
-                        const NewsSection(),
-                      ],
+                      ),
                     ),
                   ),
                 ],
@@ -185,6 +201,37 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ref.refresh(metadataProvider);
           },
         ),
+      ),
+    );
+  }
+}
+
+class _EntranceReveal extends StatelessWidget {
+  final bool visible;
+  final Widget child;
+  final Offset beginOffset;
+  final Duration duration;
+  final Curve curve;
+
+  const _EntranceReveal({
+    required this.visible,
+    required this.child,
+    required this.beginOffset,
+    required this.duration,
+    this.curve = Curves.easeOut,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSlide(
+      offset: visible ? Offset.zero : beginOffset,
+      duration: duration,
+      curve: curve,
+      child: AnimatedOpacity(
+        opacity: visible ? 1 : 0,
+        duration: duration,
+        curve: curve,
+        child: child,
       ),
     );
   }
