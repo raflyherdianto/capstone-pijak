@@ -8,12 +8,14 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
   final NumberFormat currencyFormat;
   final Color trendColor;
   final double currentChange;
+  final String heroTag;
 
   StickyPriceHeader({
     required this.commodity,
     required this.currencyFormat,
     required this.trendColor,
     required this.currentChange,
+    required this.heroTag,
   });
 
   @override
@@ -135,7 +137,7 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
                       ),
                     ),
                     Hero(
-                      tag: 'commodity-${commodity.name}',
+                      tag: heroTag,
                       child: Image.asset(
                         commodity.imageAsset,
                         width: 120,

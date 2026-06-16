@@ -11,6 +11,12 @@ import 'features/insight/presentation/screens/insight_screen.dart';
 import 'features/splash/presentation/screens/splash_screen.dart';
 import 'shared/widgets/app_background.dart';
 
+class AppConfig {
+  /// Toggle to true to enable console/network logging.
+  /// Set to false to prevent lags in the simulator caused by heavy terminal output.
+  static const bool enableLogging = false;
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('id_ID', null);

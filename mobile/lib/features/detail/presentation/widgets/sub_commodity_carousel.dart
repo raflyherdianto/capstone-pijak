@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../shared/domain/models.dart';
 import '../../../../core/providers.dart';
+import '../../../../shared/widgets/bouncy_tappable.dart';
 import '../screens/detail_screen.dart';
 
 class SubCommodityCarousel extends ConsumerWidget {
@@ -43,7 +44,7 @@ class SubCommodityCarousel extends ConsumerWidget {
     final trendColor =
         ref.read(settingsProvider.notifier).getTrendColor(sub.changePct);
 
-    return GestureDetector(
+    return BouncyTappable(
       onTap: () {
         final virtualCommodity = Commodity(
           name: sub.name,

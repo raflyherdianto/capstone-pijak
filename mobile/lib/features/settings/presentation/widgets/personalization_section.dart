@@ -22,7 +22,7 @@ class PersonalizationSection extends ConsumerWidget {
             leading: Icon(Icons.person_outline, color: brandColor),
             title: Text(
               'Mode Perspektif',
-              style: TextStyle(fontWeight: FontWeight.w700, color: navy),
+              style: TextStyle(fontWeight: FontWeight.w600, color: navy),
             ),
             subtitle: Text(
               settings.mode == UserMode.buyer
@@ -40,7 +40,7 @@ class PersonalizationSection extends ConsumerWidget {
                 final description = isBuyer
                     ? 'Perspektif akan diubah ke Pedagang. Warna harga naik akan menjadi hijau (menguntungkan) dan harga turun menjadi merah.'
                     : 'Perspektif akan diubah ke Pembeli. Warna harga turun akan menjadi hijau (menguntungkan) dan harga naik menjadi merah.';
-
+ 
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder: (context) {
@@ -113,7 +113,7 @@ class PersonalizationSection extends ConsumerWidget {
                     );
                   },
                 );
-
+ 
                 if (confirm == true) {
                   ref.read(settingsProvider.notifier).toggleMode();
                 }
@@ -126,7 +126,7 @@ class PersonalizationSection extends ConsumerWidget {
             leading: Icon(Icons.dark_mode_outlined, color: brandColor),
             title: Text(
               'Mode Gelap',
-              style: TextStyle(fontWeight: FontWeight.w700, color: navy),
+              style: TextStyle(fontWeight: FontWeight.w600, color: navy),
             ),
             subtitle: Text(
               'Gunakan tema gelap',

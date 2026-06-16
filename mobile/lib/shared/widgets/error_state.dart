@@ -21,12 +21,18 @@ class AppErrorWidget extends StatelessWidget {
     final errorColor = Theme.of(context).colorScheme.error;
     final titleColor = ArjunaColors.title(isDark);
 
+    // Clean up "Exception: " prefix from message if present
+    String cleanedMessage = message;
+    if (cleanedMessage.startsWith('Exception: ')) {
+      cleanedMessage = cleanedMessage.substring('Exception: '.length);
+    }
+
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(28.0),
+        padding: const EdgeInsets.fromLTRB(28.0, 28.0, 28.0, 110.0), // Offsets the bottom nav bar visually
         child: Semantics(
           container: true,
-          label: '$title. $message',
+          label: '$title. $cleanedMessage',
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -48,14 +54,14 @@ class AppErrorWidget extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                   color: titleColor,
                   height: 1.2,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                message,
+                cleanedMessage,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: isDark ? Colors.white54 : ArjunaColors.muted,

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../../shared/domain/models.dart';
 import '../../../../core/providers.dart';
 import '../../../detail/presentation/screens/detail_screen.dart';
+import '../../../../shared/widgets/bouncy_tappable.dart';
 
 class TopMoversSection extends ConsumerWidget {
   final List<Commodity> commodities;
@@ -79,7 +80,10 @@ class TopMoversSection extends ConsumerWidget {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => DetailScreen(commodity: topGainers[i]),
+                    builder: (_) => DetailScreen(
+                      commodity: topGainers[i],
+                      heroTag: 'mover-${topGainers[i].name}',
+                    ),
                   ),
                 ),
               ),
@@ -110,7 +114,10 @@ class TopMoversSection extends ConsumerWidget {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => DetailScreen(commodity: topLosers[i]),
+                    builder: (_) => DetailScreen(
+                      commodity: topLosers[i],
+                      heroTag: 'mover-${topLosers[i].name}',
+                    ),
                   ),
                 ),
               ),
@@ -217,38 +224,37 @@ class _MoverCard extends ConsumerWidget {
         .getTrendColor(dayChange);
     final isPositive = dayChange > 0;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          width: 130,
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF0A2638) : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: trendColor.withValues(alpha: isDark ? 0.24 : 0.16),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(
-                  0xFF07345A,
-                ).withValues(alpha: isDark ? 0.16 : 0.05),
-                blurRadius: 12,
-                offset: const Offset(0, 5),
-              ),
-            ],
+    return BouncyTappable(
+      onTap: onTap,
+      child: Container(
+        width: 130,
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF0A2638) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: trendColor.withValues(alpha: isDark ? 0.12 : 0.08),
           ),
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image + change badge row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Image.asset(
+          boxShadow: [
+            BoxShadow(
+              color: const Color(
+                0xFF07345A,
+              ).withValues(alpha: isDark ? 0.16 : 0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image + change badge row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Hero(
+                  tag: 'mover-${commodity.name}',
+                  child: Image.asset(
                     commodity.imageAsset,
                     width: 42,
                     height: 42,
@@ -256,68 +262,70 @@ class _MoverCard extends ConsumerWidget {
                     errorBuilder: (_, e, st) =>
                         Icon(Icons.eco_rounded, color: trendColor, size: 28),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 3,
-                    ),
-                    decoration: BoxDecoration(
-                      color: trendColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isPositive
-                              ? Icons.arrow_upward_rounded
-                              : Icons.arrow_downward_rounded,
-                          size: 10,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: trendColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isPositive
+                            ? Icons.arrow_upward_rounded
+                            : Icons.arrow_downward_rounded,
+                        size: 10,
+                        color: trendColor,
+                      ),
+                      const SizedBox(width: 2),
+                      Text(
+                        '${dayChange.abs().toStringAsFixed(1)}%',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
                           color: trendColor,
                         ),
-                        const SizedBox(width: 2),
-                        Text(
-                          '${dayChange.abs().toStringAsFixed(1)}%',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: trendColor,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-
-              const Spacer(),
-
-              // Name
-              Text(
-                commodity.name,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  color: isDark ? Colors.white : const Color(0xFF0F0F0F),
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              ],
+            ),
+ 
+            const Spacer(),
+ 
+            // Name
+            Text(
+              commodity.name,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : const Color(0xFF0F0F0F),
               ),
-              const SizedBox(height: 2),
-
-              // Price
-              Text(
-                currencyFormat.format(commodity.currentPrice),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white54 : Colors.black45,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+ 
+            // Price
+            Text(
+              currencyFormat.format(commodity.currentPrice),
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.7)
+                    : const Color(0xFF07345A).withValues(alpha: 0.65),
               ),
-            ],
-          ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );

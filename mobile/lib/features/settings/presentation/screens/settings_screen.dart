@@ -22,7 +22,7 @@ class SettingsScreen extends ConsumerWidget {
         title: Text(
           'Pengaturan',
           style: TextStyle(
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
             color: isDark ? Colors.white : ArjunaColors.navy,
           ),
         ),

@@ -13,6 +13,7 @@ class DetailLoaded extends DetailState {
   final bool isInsightLoading;
   final double trend;
   final int horizon;
+  final double lastPrice;
   final double predictedPrice;
   final String modelUsed;
   final String lastHistoricalDate;
@@ -24,6 +25,7 @@ class DetailLoaded extends DetailState {
     this.isInsightLoading = false,
     required this.trend,
     required this.horizon,
+    required this.lastPrice,
     required this.predictedPrice,
     this.modelUsed = '',
     this.lastHistoricalDate = '',
@@ -36,17 +38,20 @@ class DetailLoaded extends DetailState {
     bool? isInsightLoading,
     double? trend,
     int? horizon,
+    double? lastPrice,
     double? predictedPrice,
     String? modelUsed,
     String? lastHistoricalDate,
+    bool clearLiveInsight = false,
   }) {
     return DetailLoaded(
       history: history ?? this.history,
       forecast: forecast ?? this.forecast,
-      liveInsight: liveInsight ?? this.liveInsight,
+      liveInsight: clearLiveInsight ? null : (liveInsight ?? this.liveInsight),
       isInsightLoading: isInsightLoading ?? this.isInsightLoading,
       trend: trend ?? this.trend,
       horizon: horizon ?? this.horizon,
+      lastPrice: lastPrice ?? this.lastPrice,
       predictedPrice: predictedPrice ?? this.predictedPrice,
       modelUsed: modelUsed ?? this.modelUsed,
       lastHistoricalDate: lastHistoricalDate ?? this.lastHistoricalDate,
@@ -59,3 +64,4 @@ class DetailError extends DetailState {
 
   DetailError(this.message);
 }
+

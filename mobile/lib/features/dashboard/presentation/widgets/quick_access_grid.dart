@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../../shared/domain/models.dart';
 import '../../../../core/providers.dart';
 import '../../../detail/presentation/screens/detail_screen.dart';
+import '../../../../shared/widgets/bouncy_tappable.dart';
 
 class QuickAccessGrid extends ConsumerWidget {
   final List<Commodity> commodities;
@@ -67,7 +68,10 @@ class QuickAccessGrid extends ConsumerWidget {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => DetailScreen(commodity: commodity),
+                  builder: (_) => DetailScreen(
+                    commodity: commodity,
+                    heroTag: 'quick-${commodity.name}',
+                  ),
                 ),
               ),
             );
@@ -102,33 +106,33 @@ class _QuickCard extends ConsumerWidget {
     final isFlat = dayChange == 0;
     final navy = isDark ? const Color(0xFFEAF8F4) : const Color(0xFF07345A);
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(
-              0xFF07345A,
-            ).withValues(alpha: isDark ? 0.18 : 0.06),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Card(
-        margin: EdgeInsets.zero,
-        clipBehavior: Clip.antiAlias,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
+    return BouncyTappable(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          side: BorderSide(
-            color: isDark
-                ? const Color(0xFFE8C766).withValues(alpha: 0.12)
-                : const Color(0xFF07345A).withValues(alpha: 0.06),
-          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(
+                0xFF07345A,
+              ).withValues(alpha: isDark ? 0.18 : 0.06),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
-        child: InkWell(
-          onTap: onTap,
+        child: Card(
+          margin: EdgeInsets.zero,
+          clipBehavior: Clip.antiAlias,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+            side: BorderSide(
+              color: isDark
+                  ? const Color(0xFFE8C766).withValues(alpha: 0.12)
+                  : const Color(0xFF07345A).withValues(alpha: 0.06),
+            ),
+          ),
           child: Stack(
             children: [
               Positioned.fill(
@@ -151,7 +155,7 @@ class _QuickCard extends ConsumerWidget {
                 left: 0,
                 bottom: 0,
                 child: Container(
-                  width: 4,
+                  width: 3,
                   decoration: BoxDecoration(
                     color: trendColor,
                     borderRadius: const BorderRadius.only(
@@ -162,29 +166,37 @@ class _QuickCard extends ConsumerWidget {
                 ),
               ),
 
+              // Decorative circle & Commodity Image (Centered together)
               Positioned(
-                right: -14,
-                bottom: -12,
-                child: Container(
+                right: -8,
+                bottom: -8,
+                child: SizedBox(
                   width: 86,
                   height: 86,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: trendColor.withValues(alpha: 0.05),
+                  child: Stack(
+                     alignment: Alignment.center,
+                     children: [
+                       Container(
+                         width: 86,
+                         height: 86,
+                         decoration: BoxDecoration(
+                           shape: BoxShape.circle,
+                           color: trendColor.withValues(alpha: 0.05),
+                         ),
+                       ),
+                       Hero(
+                         tag: 'quick-${commodity.name}',
+                         child: Image.asset(
+                           commodity.imageAsset,
+                           width: 66,
+                           height: 66,
+                           fit: BoxFit.contain,
+                           errorBuilder: (_, e, st) =>
+                               Icon(Icons.eco_rounded, color: trendColor, size: 34),
+                         ),
+                       ),
+                     ],
                   ),
-                ),
-              ),
-
-              Positioned(
-                right: 10,
-                top: 30,
-                child: Image.asset(
-                  commodity.imageAsset,
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, e, st) =>
-                      Icon(Icons.eco_rounded, color: trendColor, size: 34),
                 ),
               ),
 
@@ -203,7 +215,7 @@ class _QuickCard extends ConsumerWidget {
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.w600,
                                   height: 1.1,
                                   color: navy,
                                 ),
@@ -229,7 +241,7 @@ class _QuickCard extends ConsumerWidget {
                         Text(
                           currencyFormat.format(commodity.currentPrice),
                           style: TextStyle(
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w800,
                             fontSize: 15,
                             color: navy,
                           ),
@@ -294,7 +306,7 @@ class _MiniSparklinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final guide = Paint()
-      ..color = color.withValues(alpha: 0.12)
+      ..color = color.withValues(alpha: 0.04)
       ..strokeWidth = 1;
     canvas.drawLine(
       Offset(0, size.height * 0.62),
@@ -333,7 +345,7 @@ class _MiniSparklinePainter extends CustomPainter {
 
     final paint = Paint()
       ..color = color
-      ..strokeWidth = 2
+      ..strokeWidth = 1.5
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..style = PaintingStyle.stroke;

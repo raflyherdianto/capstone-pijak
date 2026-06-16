@@ -7,6 +7,7 @@ import '../../../../shared/domain/models.dart';
 import '../../../../core/providers.dart';
 import '../../../../shared/widgets/app_background.dart';
 import '../../../../shared/widgets/arjuna_brand.dart';
+import '../../../../shared/widgets/error_state.dart';
 import '../widgets/sticky_price_header.dart';
 import '../widgets/chart_section.dart';
 import '../widgets/sub_commodity_carousel.dart';
@@ -16,8 +17,9 @@ import '../cubit/detail_state.dart';
 
 class DetailScreen extends ConsumerStatefulWidget {
   final Commodity commodity;
+  final String? heroTag;
 
-  const DetailScreen({super.key, required this.commodity});
+  const DetailScreen({super.key, required this.commodity, this.heroTag});
 
   @override
   ConsumerState<DetailScreen> createState() => _DetailScreenState();
@@ -95,6 +97,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                         currencyFormat: _currencyFormat,
                         trendColor: trendColor,
                         currentChange: currentChange,
+                        heroTag: widget.heroTag ?? 'commodity-${widget.commodity.name}',
                       ),
                     ),
                     const SliverPadding(
@@ -127,39 +130,13 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                   surfaceTintColor: Colors.transparent,
                   flexibleSpace: const ArjunaAppBarBackground(),
                 ),
-                body: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          size: 48,
-                          color: Colors.red,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          state.message,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(height: 16),
-                        Builder(
-                          builder: (context) {
-                            return ElevatedButton(
-                              onPressed: () {
-                                BlocProvider.of<DetailCubit>(
-                                  context,
-                                ).fetchDetailData(widget.commodity.name);
-                              },
-                              child: const Text('Coba Lagi'),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+                body: AppErrorWidget(
+                  title: 'Gagal Memuat Detail',
+                  message: state.message,
+                  onRetry: () {
+                    BlocProvider.of<DetailCubit>(context)
+                        .fetchDetailData(widget.commodity.name);
+                  },
                 ),
               ),
             );
@@ -180,13 +157,14 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                       surfaceTintColor: Colors.transparent,
                       flexibleSpace: const ArjunaAppBarBackground(),
                     ),
-                    SliverPersistentHeader(
+                     SliverPersistentHeader(
                       pinned: true,
                       delegate: StickyPriceHeader(
                         commodity: widget.commodity,
                         currencyFormat: _currencyFormat,
                         trendColor: trendColor,
                         currentChange: currentChange,
+                        heroTag: widget.heroTag ?? 'commodity-${widget.commodity.name}',
                       ),
                     ),
                     SliverPadding(
@@ -238,6 +216,10 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                   insight: state.liveInsight,
                   isLoading: state.isInsightLoading,
                   initialPerspective: settings.mode == UserMode.seller ? 1 : 0,
+                  onRefresh: () {
+                    BlocProvider.of<DetailCubit>(context)
+                        .refreshLiveInsight(widget.commodity.name);
+                  },
                 ),
               ),
             );

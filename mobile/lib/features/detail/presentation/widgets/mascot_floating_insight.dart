@@ -6,12 +6,14 @@ class MascotFloatingInsight extends StatefulWidget {
   final Insight? insight;
   final bool isLoading;
   final int initialPerspective;
+  final VoidCallback? onRefresh;
 
   const MascotFloatingInsight({
     super.key,
     this.insight,
     this.isLoading = false,
     this.initialPerspective = 0,
+    this.onRefresh,
   });
 
   @override
@@ -101,6 +103,9 @@ class _MascotFloatingInsightState extends State<MascotFloatingInsight>
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isError = widget.insight != null &&
+        (widget.insight!.disclaimer.contains("gangguan") ||
+            widget.insight!.masyarakat.startsWith("Gagal memuat"));
     final screenWidth = MediaQuery.of(context).size.width;
 
     // Theme color based on current perspective
@@ -244,6 +249,24 @@ class _MascotFloatingInsightState extends State<MascotFloatingInsight>
                                   fontFamily: 'Outfit',
                                 ),
                               ),
+                              if (isError && !widget.isLoading && widget.onRefresh != null) ...[
+                                const SizedBox(height: 10),
+                                Center(
+                                  child: TextButton.icon(
+                                    onPressed: widget.onRefresh,
+                                    icon: const Icon(Icons.refresh_rounded, size: 14),
+                                    label: const Text('Coba Lagi', style: TextStyle(fontSize: 12)),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: activeColor,
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      backgroundColor: activeColor.withValues(alpha: 0.08),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                               const SizedBox(height: 10),
                               if (widget.isLoading)
                                 Row(
@@ -383,7 +406,9 @@ class _MascotFloatingInsightState extends State<MascotFloatingInsight>
                           child: Image.asset(
                             widget.isLoading
                                 ? ArjunaAssets.mascotThinking
-                                : ArjunaAssets.mascotAlert,
+                                : (isError
+                                    ? ArjunaAssets.mascotWorried
+                                    : ArjunaAssets.mascotAlert),
                             fit: BoxFit.cover,
                             alignment: Alignment.topCenter,
                             filterQuality: FilterQuality.high,
