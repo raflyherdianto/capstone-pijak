@@ -4,10 +4,21 @@ import '../../../../shared/domain/models.dart';
 import '../../../../core/providers.dart';
 import '../../../../shared/widgets/arjuna_brand.dart';
 
-class MarketPulseCard extends ConsumerWidget {
+class MarketPulseCard extends ConsumerStatefulWidget {
   final List<Commodity> commodities;
 
   const MarketPulseCard({super.key, required this.commodities});
+
+  @override
+  ConsumerState<MarketPulseCard> createState() => _MarketPulseCardState();
+}
+
+class _MarketPulseCardState extends ConsumerState<MarketPulseCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _mascotScale;
+  late final Animation<Offset> _mascotSlide;
+  late final Animation<double> _mascotLift;
 
   String _getMarketLabel(int upCount, int downCount, int stableCount) {
     final total = upCount + downCount + stableCount;
@@ -29,12 +40,53 @@ class MarketPulseCard extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 820),
+    );
+    _mascotScale = Tween<double>(begin: 0.92, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.18, 0.7, curve: Curves.easeOutBack),
+      ),
+    );
+    _mascotSlide =
+        Tween<Offset>(
+          begin: const Offset(0.12, 0.02),
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.14, 0.68, curve: Curves.easeOutCubic),
+          ),
+        );
+    _mascotLift = Tween<double>(begin: 8, end: 0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.3, 0.82, curve: Curves.easeOutCubic),
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     ref.watch(settingsProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final upColor = ref.read(settingsProvider.notifier).getTrendColor(1.0);
     final downColor = ref.read(settingsProvider.notifier).getTrendColor(-1.0);
 
+    final commodities = widget.commodities;
     final upCount = commodities
         .where((c) => (c.priceChanges['day_1'] ?? 0) > 0)
         .length;
@@ -48,7 +100,7 @@ class MarketPulseCard extends ConsumerWidget {
     final marketIcon = _getMarketIcon(upCount, downCount);
 
     return Padding(
-      padding: const EdgeInsets.only(top: 24, bottom: 14),
+      padding: const EdgeInsets.only(top: 20, bottom: 14),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -138,13 +190,13 @@ class MarketPulseCard extends ConsumerWidget {
                                   children: [
                                     const Text(
                                       'Kondisi Pasar Nasional',
-                                      maxLines: 1,
+                                      maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                        fontSize: 18,
+                                        fontSize: 17,
                                         fontWeight: FontWeight.w900,
                                         color: Colors.white,
-                                        height: 1.05,
+                                        height: 1.1,
                                       ),
                                     ),
                                     const SizedBox(height: 7),
@@ -255,7 +307,15 @@ class MarketPulseCard extends ConsumerWidget {
               ),
             ),
           ),
-          const Positioned(right: -36, top: -56, child: _MascotPeek()),
+          Positioned(
+            right: -36,
+            top: -56,
+            child: _MascotPeek(
+              scale: _mascotScale,
+              slide: _mascotSlide,
+              lift: _mascotLift,
+            ),
+          ),
         ],
       ),
     );
@@ -263,41 +323,61 @@ class MarketPulseCard extends ConsumerWidget {
 }
 
 class _MascotPeek extends StatelessWidget {
-  const _MascotPeek();
+  final Animation<double> scale;
+  final Animation<Offset> slide;
+  final Animation<double> lift;
+
+  const _MascotPeek({
+    required this.scale,
+    required this.slide,
+    required this.lift,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 224,
-      height: 222,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 150,
-            height: 150,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.08),
-              border: Border.all(
-                color: const Color(0xFFE8C766).withValues(alpha: 0.16),
+    return AnimatedBuilder(
+      animation: Listenable.merge([scale, slide, lift]),
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, lift.value),
+          child: SlideTransition(
+            position: slide,
+            child: ScaleTransition(scale: scale, child: child),
+          ),
+        );
+      },
+      child: SizedBox(
+        width: 224,
+        height: 222,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.08),
+                border: Border.all(
+                  color: const Color(0xFFE8C766).withValues(alpha: 0.16),
+                ),
               ),
             ),
-          ),
-          Image.asset(
-            ArjunaAssets.mascotPresenting,
-            width: 156,
-            height: 222,
-            fit: BoxFit.contain,
-            alignment: Alignment.topCenter,
-            filterQuality: FilterQuality.high,
-            errorBuilder: (_, e, st) => Icon(
-              Icons.arrow_outward_rounded,
-              size: 54,
-              color: const Color(0xFFE8C766).withValues(alpha: 0.82),
+            Image.asset(
+              ArjunaAssets.mascotPresenting,
+              width: 156,
+              height: 222,
+              fit: BoxFit.contain,
+              alignment: Alignment.topCenter,
+              filterQuality: FilterQuality.high,
+              errorBuilder: (_, e, st) => Icon(
+                Icons.arrow_outward_rounded,
+                size: 54,
+                color: const Color(0xFFE8C766).withValues(alpha: 0.82),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
