@@ -56,6 +56,7 @@ class DetailCubit extends Cubit<DetailState> {
           isInsightLoading: true,
           trend: trend,
           horizon: horizon,
+          lastPrice: lastPrice,
           predictedPrice: predictedPrice,
           modelUsed: modelUsed,
           lastHistoricalDate: lastHistoricalDate,
@@ -99,6 +100,52 @@ class DetailCubit extends Cubit<DetailState> {
       }
     } catch (e) {
       emit(DetailError(e.toString()));
+    }
+  }
+
+  Future<void> refreshLiveInsight(String subcategory) async {
+    final currentState = state;
+    if (currentState is! DetailLoaded) return;
+
+    emit(
+      currentState.copyWith(
+        isInsightLoading: true,
+        clearLiveInsight: true,
+      ),
+    );
+
+    try {
+      final liveInsight = await _repository.getLiveInsight(
+        subcategory,
+        currentState.trend,
+        currentState.horizon,
+        currentState.lastPrice,
+        currentState.predictedPrice,
+      );
+      if (state is DetailLoaded) {
+        emit(
+          (state as DetailLoaded).copyWith(
+            liveInsight: liveInsight,
+            isInsightLoading: false,
+          ),
+        );
+      }
+    } catch (insightError) {
+      debugPrint("Failed to fetch live AI insight during refresh: $insightError");
+      if (state is DetailLoaded) {
+        emit(
+          (state as DetailLoaded).copyWith(
+            isInsightLoading: false,
+            liveInsight: Insight(
+              masyarakat:
+                  "Gagal memuat rekomendasi otomatis. Silakan coba beberapa saat lagi.",
+              pedagang:
+                  "Gagal memuat rekomendasi otomatis. Silakan coba beberapa saat lagi.",
+              disclaimer: "Terjadi gangguan koneksi ke mesin AI.",
+            ),
+          ),
+        );
+      }
     }
   }
 }

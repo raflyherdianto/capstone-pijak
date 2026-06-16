@@ -67,12 +67,12 @@ class GlobalAnalysisCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Briefing Pasar dari Arjuna',
+                              'Sorotan Pasar dari Arjuna',
                               style: Theme.of(context).textTheme.titleLarge
                                   ?.copyWith(
                                     fontSize: 22,
                                     height: 1.15,
-                                    fontWeight: FontWeight.w800,
+                                    fontWeight: FontWeight.w700,
                                   ),
                             ),
                             const SizedBox(height: 8),

@@ -738,7 +738,7 @@ class DashboardShimmer extends StatelessWidget {
           Padding(
             padding: EdgeInsets.fromLTRB(
               20,
-              MediaQuery.of(context).padding.top + 16,
+              MediaQuery.of(context).padding.top + 8,
               20,
               0,
             ),
@@ -749,36 +749,45 @@ class DashboardShimmer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header greeting shimmer
-                  Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 140,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            width: 200,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  Container(
+                    width: 154,
+                    height: 22,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 9),
+                  Container(
+                    width: 260,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Container(
+                    width: 220,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Container(
+                    width: 170,
+                    height: 25,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   // Market Pulse Shimmer
                   Container(
-                    height: 140,
+                    height: 146,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -789,36 +798,36 @@ class DashboardShimmer extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 16),
 
           // Bottom content panel shimmer
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
               color: isDark
-                  ? const Color(0xFF061525).withValues(alpha: 0.96)
+                  ? const Color(0xFF061525).withValues(alpha: 0.98)
                   : Colors.white,
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(32),
-                topRight: Radius.circular(32),
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
               ),
               border: Border(
                 top: BorderSide(
                   color: isDark
                       ? Colors.white.withValues(alpha: 0.05)
                       : Colors.black.withValues(alpha: 0.04),
-                  width: 1.5,
+                  width: 1,
                 ),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.04),
-                  blurRadius: 24,
-                  offset: const Offset(0, -8),
+                  color: Colors.black.withValues(alpha: isDark ? 0.18 : 0.035),
+                  blurRadius: 18,
+                  offset: const Offset(0, -5),
                 ),
               ],
             ),
-            padding: const EdgeInsets.fromLTRB(20, 28, 20, 120),
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 112),
             child: Shimmer.fromColors(
               baseColor: baseColor,
               highlightColor: highlightColor,
@@ -830,27 +839,50 @@ class DashboardShimmer extends StatelessWidget {
                   const SizedBox(height: 12),
                   GridView.builder(
                     shrinkWrap: true,
+                    padding: EdgeInsets.zero,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
-                          childAspectRatio: 1.34,
+                          childAspectRatio: 1.52,
                         ),
                     itemCount: 4,
                     itemBuilder: (context, index) => Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(22),
+                        borderRadius: BorderRadius.circular(18),
                       ),
                     ),
                   ),
                   const SizedBox(height: 28),
                   // Top Movers Shimmer
-                  const _SectionHeaderShimmer(width: 164),
+                  const _SectionHeaderShimmer(width: 180),
                   const SizedBox(height: 12),
-                  const _SubHeaderShimmer(width: 132),
+                  // Gainers List Shimmer
+                  const _SubHeaderShimmer(width: 120),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 108,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: 3,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 10),
+                      itemBuilder: (context, index) => Container(
+                        width: 130,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  // Losers List Shimmer
+                  const _SubHeaderShimmer(width: 120),
                   const SizedBox(height: 8),
                   SizedBox(
                     height: 108,

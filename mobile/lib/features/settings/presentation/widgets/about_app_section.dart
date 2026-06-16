@@ -31,7 +31,7 @@ class AboutAppSection extends StatelessWidget {
                         'Arjuna Mobile',
                         style: TextStyle(
                           fontSize: 18,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w700,
                           color: ArjunaColors.title(isDark),
                         ),
                       ),
@@ -71,11 +71,11 @@ class AboutAppSection extends StatelessWidget {
       ),
     );
   }
-
+ 
   Widget _buildInfoRow(BuildContext context, String label, String value) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final navy = isDark ? const Color(0xFFEAF8F4) : const Color(0xFF07345A);
-
+ 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -95,7 +95,7 @@ class AboutAppSection extends StatelessWidget {
               textAlign: TextAlign.end,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 fontSize: 13,
                 color: navy,
               ),

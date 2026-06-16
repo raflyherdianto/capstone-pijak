@@ -167,7 +167,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (_) =>
-                                  DetailScreen(commodity: commodity),
+                                  DetailScreen(
+                                    commodity: commodity,
+                                    heroTag: 'list-${commodity.name}',
+                                  ),
                             ),
                           ),
                         );

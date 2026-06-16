@@ -6,12 +6,14 @@ class MascotFloatingInsight extends StatefulWidget {
   final Insight? insight;
   final bool isLoading;
   final int initialPerspective;
+  final VoidCallback? onRefresh;
 
   const MascotFloatingInsight({
     super.key,
     this.insight,
     this.isLoading = false,
     this.initialPerspective = 0,
+    this.onRefresh,
   });
 
   @override
@@ -21,6 +23,9 @@ class MascotFloatingInsight extends StatefulWidget {
 class _MascotFloatingInsightState extends State<MascotFloatingInsight>
     with SingleTickerProviderStateMixin {
   bool _isOpen = false;
+  bool _isExpanded = false;
+  bool _isMascotVisible = false;
+  bool _localThinking = true;
   int _perspective = 0; // 0: Masyarakat, 1: Pedagang
   double _rotationAngle = 0.0;
   double _scale = 1.0;
@@ -34,6 +39,34 @@ class _MascotFloatingInsightState extends State<MascotFloatingInsight>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
+
+    // 1. Delay the mascot FAB entrance animation by 200ms
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) {
+        setState(() {
+          _isMascotVisible = true;
+        });
+      }
+    });
+
+    // 2. Delay the bubble entrance animation by 450ms (pops right as mascot settles)
+    Future.delayed(const Duration(milliseconds: 450), () {
+      if (mounted) {
+        setState(() {
+          _isExpanded = true;
+          _isOpen = true;
+        });
+      }
+    });
+
+    // Enforce a minimum duration of 2200ms for the perceived "thinking" phase
+    Future.delayed(const Duration(milliseconds: 2200), () {
+      if (mounted) {
+        setState(() {
+          _localThinking = false;
+        });
+      }
+    });
   }
 
   @override
@@ -41,6 +74,19 @@ class _MascotFloatingInsightState extends State<MascotFloatingInsight>
     super.didUpdateWidget(oldWidget);
     if (!_isOpen && oldWidget.initialPerspective != widget.initialPerspective) {
       _perspective = widget.initialPerspective;
+    }
+    // Reset thinking phase when a reload occurs
+    if (!oldWidget.isLoading && widget.isLoading) {
+      setState(() {
+        _localThinking = true;
+      });
+      Future.delayed(const Duration(milliseconds: 2200), () {
+        if (mounted) {
+          setState(() {
+            _localThinking = false;
+          });
+        }
+      });
     }
   }
 
@@ -53,6 +99,7 @@ class _MascotFloatingInsightState extends State<MascotFloatingInsight>
   void _toggleMascot() {
     if (!_isOpen) {
       setState(() {
+        _isExpanded = true;
         _isOpen = true;
         _scale = 1.15;
       });
@@ -92,15 +139,28 @@ class _MascotFloatingInsightState extends State<MascotFloatingInsight>
     setState(() {
       _isOpen = false;
     });
+    // Shrink the SizedBox container after the scale-down animation completes (300ms)
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted && !_isOpen) {
+        setState(() {
+          _isExpanded = false;
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.isLoading && widget.insight == null) {
+    final isThinking = widget.isLoading || _localThinking;
+
+    if (!isThinking && widget.insight == null) {
       return const SizedBox.shrink();
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isError = widget.insight != null &&
+        (widget.insight!.disclaimer.contains("gangguan") ||
+            widget.insight!.masyarakat.startsWith("Gagal memuat"));
     final screenWidth = MediaQuery.of(context).size.width;
 
     // Theme color based on current perspective
@@ -108,15 +168,15 @@ class _MascotFloatingInsightState extends State<MascotFloatingInsight>
         ? (isDark ? ArjunaColors.teal : ArjunaColors.tealDark)
         : ArjunaColors.gold;
 
-    final bubbleText = widget.isLoading
-        ? 'Arjuna sedang menyusun rekomendasi AI terbaru. Data harga dan prediksi sudah bisa dilihat dulu, insight akan muncul otomatis sebentar lagi.'
+    final bubbleText = isThinking
+        ? 'siArjuna sedang menyusun rekomendasi AI terbaru. Data harga dan prediksi sudah bisa dilihat dulu, insight akan muncul otomatis sebentar lagi.'
         : (_perspective == 0
               ? widget.insight!.masyarakat
               : widget.insight!.pedagang);
-    final perspectiveLabel = widget.isLoading
+    final perspectiveLabel = isThinking
         ? 'Menyiapkan Insight'
         : (_perspective == 0 ? 'Masyarakat' : 'Pedagang');
-    final perspectiveIcon = widget.isLoading
+    final perspectiveIcon = isThinking
         ? Icons.auto_awesome_rounded
         : (_perspective == 0
               ? Icons.shopping_basket_rounded
@@ -124,22 +184,28 @@ class _MascotFloatingInsightState extends State<MascotFloatingInsight>
     final bubbleWidth = (screenWidth - 48).clamp(240.0, 320.0);
 
     return SizedBox(
-      width: _isOpen ? bubbleWidth : 58,
-      height: _isOpen ? 410 : 58,
+      width: _isExpanded ? bubbleWidth : 58,
+      height: _isExpanded ? 410 : 58,
       child: Stack(
         alignment: Alignment.bottomRight,
         clipBehavior: Clip.none,
         children: [
           // Speech Bubble Card Overlay
-          if (_isOpen)
-            Positioned(
-              bottom: 74,
-              right: 0,
-              child: AnimatedOpacity(
-                opacity: _isOpen ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 250),
-                child: Container(
-                  width: bubbleWidth,
+          Positioned(
+            bottom: 74,
+            right: 0,
+            child: IgnorePointer(
+              ignoring: !_isOpen,
+              child: AnimatedScale(
+                scale: _isOpen ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 320),
+                curve: Curves.easeOutBack, // Springy pop animation
+                alignment: Alignment.bottomRight, // Emerges directly from mascot head
+                child: AnimatedOpacity(
+                  opacity: _isOpen ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 220),
+                  child: Container(
+                    width: bubbleWidth,
                   decoration: BoxDecoration(
                     color: isDark
                         ? const Color(0xFF072135).withValues(alpha: 0.98)
@@ -244,8 +310,26 @@ class _MascotFloatingInsightState extends State<MascotFloatingInsight>
                                   fontFamily: 'Outfit',
                                 ),
                               ),
+                              if (isError && !isThinking && widget.onRefresh != null) ...[
+                                const SizedBox(height: 10),
+                                Center(
+                                  child: TextButton.icon(
+                                    onPressed: widget.onRefresh,
+                                    icon: const Icon(Icons.refresh_rounded, size: 14),
+                                    label: const Text('Coba Lagi', style: TextStyle(fontSize: 12)),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: activeColor,
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      backgroundColor: activeColor.withValues(alpha: 0.08),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                               const SizedBox(height: 10),
-                              if (widget.isLoading)
+                              if (isThinking)
                                 Row(
                                   children: [
                                     SizedBox(
@@ -299,146 +383,155 @@ class _MascotFloatingInsightState extends State<MascotFloatingInsight>
                           ),
                         ),
                       ],
-                    ),
                   ),
                 ),
               ),
             ),
+          ),
+        ),
+      ),
 
           // Mascot FAB Button
-          GestureDetector(
-            onTap: _toggleMascot,
-            child: AnimatedScale(
-              scale: _scale,
-              duration: const Duration(milliseconds: 150),
-              curve: Curves.easeOutBack,
-              child: AnimatedRotation(
-                turns: _rotationAngle,
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeInOutBack,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Pulse outer ring
-                    ScaleTransition(
-                      scale: Tween<double>(begin: 1.0, end: 1.25).animate(
-                        CurvedAnimation(
-                          parent: _pulseController,
-                          curve: Curves.easeOut,
-                        ),
-                      ),
-                      child: FadeTransition(
-                        opacity: Tween<double>(begin: 0.6, end: 0.0).animate(
+          AnimatedScale(
+            scale: _isMascotVisible ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeOutBack,
+            child: GestureDetector(
+              onTap: _toggleMascot,
+              child: AnimatedScale(
+                scale: _scale,
+                duration: const Duration(milliseconds: 150),
+                curve: Curves.easeOutBack,
+                child: AnimatedRotation(
+                  turns: _rotationAngle,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeInOutBack,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Pulse outer ring
+                      ScaleTransition(
+                        scale: Tween<double>(begin: 1.0, end: 1.25).animate(
                           CurvedAnimation(
                             parent: _pulseController,
                             curve: Curves.easeOut,
                           ),
                         ),
-                        child: Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: activeColor,
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Mascot main badge
-                    Container(
-                      width: 58,
-                      height: 58,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: isDark
-                              ? [
-                                  const Color(0xFF031827),
-                                  const Color(0xFF07345A),
-                                ]
-                              : [
-                                  const Color(0xFFFFFDF8),
-                                  const Color(0xFFEAF8F4),
-                                ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        border: Border.all(color: activeColor, width: 2.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: activeColor.withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            spreadRadius: 1,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: ClipOval(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? ArjunaColors.deepNavy
-                                : ArjunaColors.ivory,
-                          ),
-                          child: Image.asset(
-                            widget.isLoading
-                                ? ArjunaAssets.mascotThinking
-                                : ArjunaAssets.mascotAlert,
-                            fit: BoxFit.cover,
-                            alignment: Alignment.topCenter,
-                            filterQuality: FilterQuality.high,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Center(
-                                child: Icon(
-                                  Icons.smart_toy_rounded,
-                                  color: activeColor,
-                                  size: 26,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Notification indicator if bubble is not open yet
-                    if (!_isOpen)
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        child: Container(
-                          width: 14,
-                          height: 14,
-                          decoration: BoxDecoration(
-                            color: ArjunaColors.gold,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isDark
-                                  ? ArjunaColors.deepNavy
-                                  : Colors.white,
-                              width: 1.5,
+                        child: FadeTransition(
+                          opacity: Tween<double>(begin: 0.6, end: 0.0).animate(
+                            CurvedAnimation(
+                              parent: _pulseController,
+                              curve: Curves.easeOut,
                             ),
                           ),
-                          child: Center(
-                            child: widget.isLoading
-                                ? SizedBox(
-                                    width: 8,
-                                    height: 8,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 1.6,
-                                      color: isDark
-                                          ? ArjunaColors.deepNavy
-                                          : Colors.white,
-                                    ),
-                                  )
-                                : const Icon(
-                                    Icons.psychology,
-                                    size: 10,
-                                    color: Colors.white,
-                                  ),
+                          child: Container(
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: activeColor,
+                            ),
                           ),
                         ),
                       ),
-                  ],
+                      // Mascot main badge
+                      Container(
+                        width: 58,
+                        height: 58,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: isDark
+                                ? [
+                                    const Color(0xFF031827),
+                                    const Color(0xFF07345A),
+                                  ]
+                                : [
+                                    const Color(0xFFFFFDF8),
+                                    const Color(0xFFEAF8F4),
+                                  ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          border: Border.all(color: activeColor, width: 2.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: activeColor.withValues(alpha: 0.3),
+                              blurRadius: 10,
+                              spreadRadius: 1,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? ArjunaColors.deepNavy
+                                  : ArjunaColors.ivory,
+                            ),
+                            child: Image.asset(
+                              isThinking
+                                  ? ArjunaAssets.mascotThinking
+                                  : (isError
+                                      ? ArjunaAssets.mascotWorried
+                                      : ArjunaAssets.mascotAlert),
+                              fit: BoxFit.cover,
+                              alignment: Alignment.topCenter,
+                              filterQuality: FilterQuality.high,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                  child: Icon(
+                                    Icons.smart_toy_rounded,
+                                    color: activeColor,
+                                    size: 26,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Notification indicator if bubble is not open yet
+                      if (!_isOpen)
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Container(
+                            width: 14,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              color: ArjunaColors.gold,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isDark
+                                    ? ArjunaColors.deepNavy
+                                    : Colors.white,
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Center(
+                              child: isThinking
+                                  ? SizedBox(
+                                      width: 8,
+                                      height: 8,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 1.6,
+                                        color: isDark
+                                            ? ArjunaColors.deepNavy
+                                            : Colors.white,
+                                      ),
+                                    )
+                                  : const Icon(
+                                      Icons.psychology,
+                                      size: 10,
+                                      color: Colors.white,
+                                    ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),

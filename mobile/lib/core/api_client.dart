@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:komoditas_ai/main.dart';
 import 'api_config.dart';
 
 class ApiClient {
@@ -19,25 +20,31 @@ class ApiClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          debugPrint('🌐 REQUEST[${options.method}] => PATH: ${options.path}');
+          if (AppConfig.enableLogging) {
+            debugPrint('🌐 REQUEST[${options.method}] => PATH: ${options.path}');
+          }
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          String prettyData = '';
-          try {
-            const encoder = JsonEncoder.withIndent('  ');
-            prettyData = encoder.convert(response.data);
-          } catch (_) {
-            prettyData = response.data.toString();
-          }
+          if (AppConfig.enableLogging) {
+            String prettyData = '';
+            try {
+              const encoder = JsonEncoder.withIndent('  ');
+              prettyData = encoder.convert(response.data);
+            } catch (_) {
+              prettyData = response.data.toString();
+            }
 
-          debugPrint(
-            '✅ RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}\n📦 DATA:\n$prettyData',
-          );
+            debugPrint(
+              '✅ RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}\n📦 DATA:\n$prettyData',
+            );
+          }
           return handler.next(response);
         },
         onError: (DioException e, handler) {
-          debugPrint('❌ ERROR[${e.type}] => PATH: ${e.requestOptions.path}');
+          if (AppConfig.enableLogging) {
+            debugPrint('❌ ERROR[${e.type}] => PATH: ${e.requestOptions.path}');
+          }
           final errorMessage = _handleDioError(e);
           return handler.next(e.copyWith(message: errorMessage));
         },
