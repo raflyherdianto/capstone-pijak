@@ -25,38 +25,40 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final progress = shrinkOffset / maxExtent;
+    final scrollRange = maxExtent - minExtent;
+    final progress = (shrinkOffset / scrollRange).clamp(0.0, 1.0);
 
     // Calculate opacity for expanded/collapsed elements
-    final expandedOpacity = (1 - progress * 2).clamp(0.0, 1.0);
-    final collapsedOpacity = (progress * 2 - 1).clamp(0.0, 1.0);
+    final expandedOpacity = (1.0 - progress * 1.5).clamp(0.0, 1.0);
+    final collapsedOpacity = (progress * 1.5 - 0.5).clamp(0.0, 1.0);
 
     final currentHeight = (maxExtent - shrinkOffset).clamp(
       minExtent,
       maxExtent,
     );
 
-    return Container(
-      height: currentHeight,
-      decoration: BoxDecoration(
-        color: shrinkOffset > 0
-            ? ArjunaColors.appBarSurface(isDark)
-            : Colors.transparent,
-        border: progress > 0.5
-            ? Border(
-                bottom: BorderSide(
-                  color: isDark
-                      ? ArjunaColors.gold.withValues(alpha: 0.1)
-                      : ArjunaColors.navy.withValues(alpha: 0.05),
-                ),
-              )
-            : null,
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
+    return ClipRect(
+      child: Container(
+        height: currentHeight,
+        decoration: BoxDecoration(
+          color: shrinkOffset > 0
+              ? ArjunaColors.appBarSurface(isDark)
+              : Colors.transparent,
+          border: progress > 0.5
+              ? Border(
+                  bottom: BorderSide(
+                    color: isDark
+                        ? ArjunaColors.gold.withValues(alpha: 0.1)
+                        : ArjunaColors.navy.withValues(alpha: 0.05),
+                  ),
+                )
+              : null,
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
           // Expanded Header
-          if (progress < 0.7)
+          if (progress < 0.67)
             Opacity(
               opacity: expandedOpacity,
               child: Padding(
@@ -96,6 +98,7 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
                                     : ArjunaColors.muted,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
+                                // Prevent text scaling issues
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -151,7 +154,7 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
             ),
 
           // Collapsed Header (Sticky)
-          if (progress > 0.3)
+          if (progress > 0.33)
             Opacity(
               opacity: collapsedOpacity,
               child: Container(
@@ -230,8 +233,9 @@ class StickyPriceHeader extends SliverPersistentHeaderDelegate {
             ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   @override
   double get maxExtent => 160;

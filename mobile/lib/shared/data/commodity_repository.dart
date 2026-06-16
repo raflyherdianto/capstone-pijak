@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../main.dart';
 import '../../core/api_client.dart';
 import '../../core/api_config.dart';
 import '../domain/models.dart';
@@ -152,9 +153,11 @@ class CommodityRepository implements ICommodityRepository {
       // 1. Check if we already have an insight for these EXACT input parameters
       final cachedSpecific = _cacheBox.get(specificCacheKey);
       if (cachedSpecific != null) {
-        debugPrint(
-          'Using cached live insight for $subcategory (parameters unchanged, API call skipped to save AI tokens)',
-        );
+        if (AppConfig.enableLogging) {
+          debugPrint(
+            'Using cached live insight for $subcategory (parameters unchanged, API call skipped to save AI tokens)',
+          );
+        }
         return Insight.fromJson(cachedSpecific);
       }
 
