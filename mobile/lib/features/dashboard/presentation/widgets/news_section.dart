@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../../core/providers.dart';
 import '../../../../shared/widgets/shimmer_placeholder.dart';
 import '../../data/news_article.dart';
@@ -233,10 +234,39 @@ class _Thumbnail extends StatelessWidget {
         width: double.infinity,
         fit: BoxFit.cover,
         filterQuality: FilterQuality.medium,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const _ThumbnailLoading();
+        },
         errorBuilder: (_, e, st) => _FallbackThumbnail(isDark: isDark),
       );
     }
     return _FallbackThumbnail(isDark: isDark);
+  }
+}
+
+class _ThumbnailLoading extends StatelessWidget {
+  const _ThumbnailLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isDark
+        ? const Color(0xFF0B2637)
+        : const Color(0xFFE6EEEB);
+    final highlightColor = isDark
+        ? const Color(0xFF12384C)
+        : const Color(0xFFF7FAF8);
+
+    return Shimmer.fromColors(
+      baseColor: baseColor,
+      highlightColor: highlightColor,
+      child: Container(
+        height: 96,
+        width: double.infinity,
+        decoration: const BoxDecoration(color: Colors.white),
+      ),
+    );
   }
 }
 

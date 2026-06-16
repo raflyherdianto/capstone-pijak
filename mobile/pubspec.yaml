@@ -67,7 +67,25 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/
+    - assets/images/arjuna-logo.png
+    - assets/images/arjuna_mascot_alert.png
+    - assets/images/arjuna_mascot_celebrate.png
+    - assets/images/arjuna_mascot_presenting.png
+    - assets/images/arjuna_mascot_thinking.png
+    - assets/images/arjuna_mascot_worried.png
+    - assets/images/arjuna_onboard_monitor_v2.png
+    - assets/images/arjuna_onboard_predict_v2.png
+    - assets/images/arjuna_onboard_role_v2.png
+    - assets/images/bawang_merah.png
+    - assets/images/bawang_putih.png
+    - assets/images/beras.png
+    - assets/images/cabai_merah.png
+    - assets/images/cabai_rawit.png
+    - assets/images/daging_ayam.png
+    - assets/images/daging_sapi.png
+    - assets/images/gula_pasir.png
+    - assets/images/minyak_goreng.png
+    - assets/images/telur_ayam.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

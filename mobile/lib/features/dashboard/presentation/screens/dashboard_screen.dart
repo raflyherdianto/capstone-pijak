@@ -122,6 +122,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             error: (e, st) => const DashboardHeader(),
                           ),
                         ),
+
+                        const SizedBox(height: 8),
                         _EntranceReveal(
                           visible: _playEntrance,
                           beginOffset: const Offset(0, 0.075),
