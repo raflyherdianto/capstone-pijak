@@ -510,33 +510,6 @@ class DetailShimmerPlaceholder extends StatelessWidget {
             // Chart Section Shimmer
             const _ChartSectionShimmer(),
             const SizedBox(height: 28),
-            // Insight Header + Card Shimmer
-            const Row(
-              children: [
-                _ShimmerBlock(width: 20, height: 20, radius: 10),
-                SizedBox(width: 8),
-                _ShimmerBlock(width: 164, height: 18, radius: 6),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Container(
-              height: 44,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              height: 178,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-              ),
-            ),
-            const SizedBox(height: 28),
             // Sub-commodities Header Shimmer
             Container(
               height: 22,

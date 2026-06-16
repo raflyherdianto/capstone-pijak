@@ -9,8 +9,8 @@ import '../../../../shared/widgets/app_background.dart';
 import '../../../../shared/widgets/arjuna_brand.dart';
 import '../widgets/sticky_price_header.dart';
 import '../widgets/chart_section.dart';
-import '../widgets/ai_insight_perspective_card.dart';
 import '../widgets/sub_commodity_carousel.dart';
+import '../widgets/mascot_floating_insight.dart';
 import '../cubit/detail_cubit.dart';
 import '../cubit/detail_state.dart';
 
@@ -54,7 +54,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    ref.watch(settingsProvider);
+    final settings = ref.watch(settingsProvider);
     final repository = ref.read(commodityRepositoryProvider);
 
     final changeKey = _selectedRange == 1
@@ -213,11 +213,6 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                             trend: widget.commodity.trend,
                           ),
                           const SizedBox(height: 32),
-                          AIInsightPerspectiveCard(
-                            insight: state.liveInsight,
-                            isLoading: state.isInsightLoading,
-                          ),
-                          const SizedBox(height: 20),
                           if (widget.commodity.subCommodities.isNotEmpty) ...[
                             Text(
                               'Sub-Komoditas',
@@ -231,11 +226,18 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
                               parentUnit: widget.commodity.unit,
                             ),
                           ],
-                          const SizedBox(height: 24),
+                          const SizedBox(
+                            height: 80,
+                          ), // Extra bottom padding for FAB overlap
                         ]),
                       ),
                     ),
                   ],
+                ),
+                floatingActionButton: MascotFloatingInsight(
+                  insight: state.liveInsight,
+                  isLoading: state.isInsightLoading,
+                  initialPerspective: settings.mode == UserMode.seller ? 1 : 0,
                 ),
               ),
             );

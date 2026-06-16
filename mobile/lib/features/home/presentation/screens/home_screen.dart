@@ -321,7 +321,6 @@ class _ResultHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // Left label
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,50 +347,33 @@ class _ResultHeader extends StatelessWidget {
             ],
           ),
         ),
-
-        // Right badge — total pill
-        if (!isFiltering)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: accentColor.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: accentColor.withValues(alpha: 0.15)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.storefront_rounded, size: 13, color: accentColor),
-                const SizedBox(width: 4),
-                Text(
-                  '$totalCount item',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: accentColor,
-                  ),
-                ),
-              ],
-            ),
-          )
-        else
-          // Filter active badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: accentColor.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: accentColor.withValues(alpha: 0.15)),
-            ),
-            child: Text(
-              '$filteredCount ditemukan',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: accentColor.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: accentColor.withValues(alpha: 0.15)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isFiltering ? Icons.search_rounded : Icons.storefront_rounded,
+                size: 13,
                 color: accentColor,
               ),
-            ),
+              const SizedBox(width: 4),
+              Text(
+                isFiltering ? '$filteredCount ditemukan' : '$totalCount item',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: accentColor,
+                ),
+              ),
+            ],
           ),
+        ),
       ],
     );
   }

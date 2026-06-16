@@ -126,27 +126,29 @@ class ChartSection extends ConsumerWidget {
                     ],
                   ],
                 ),
+                PredictionTrustSummary(
+                  reliability: reliability,
+                  modelUsed: modelUsed,
+                  lastHistoricalDate: lastHistoricalDate,
+                  horizon: horizon,
+                  trend: trend,
+                  themeColor: themeColor,
+                ),
                 RangeSelector(
                   selectedRange: selectedRange,
                   onRangeSelected: onRangeSelected,
                 ),
               ],
             ),
+
             const SizedBox(height: 12),
-            PredictionTrustSummary(
-              reliability: reliability,
-              modelUsed: modelUsed,
-              lastHistoricalDate: lastHistoricalDate,
-              horizon: horizon,
-              trend: trend,
-              themeColor: themeColor,
-            ),
-            const SizedBox(height: 14),
             PriceChart(
               data: filteredData,
               themeColor: themeColor,
               reliability: reliability,
             ),
+            const SizedBox(height: 14),
+
             const Divider(height: 24, thickness: 0.5),
             InkWell(
               borderRadius: BorderRadius.circular(12),
@@ -239,56 +241,34 @@ class PredictionTrustSummary extends StatelessWidget {
       container: true,
       label:
           'Kepercayaan prediksi $confidence. Sumber $source. Data terakhir $dateLabel.',
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: themeColor.withValues(alpha: isDark ? 0.12 : 0.07),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: themeColor.withValues(alpha: isDark ? 0.20 : 0.14),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _TrustChip(
+                icon: Icons.verified_outlined,
+                label: 'Keyakinan: $confidence',
+                color: themeColor,
+              ),
+              if (hasModel)
                 _TrustChip(
-                  icon: Icons.verified_outlined,
-                  label: 'Keyakinan: $confidence',
+                  icon: Icons.memory_rounded,
+                  label: source,
                   color: themeColor,
                 ),
-                if (hasModel)
-                  _TrustChip(
-                    icon: Icons.memory_rounded,
-                    label: 'Sumber: $source',
-                    color: themeColor,
-                  ),
-                if (hasDate)
-                  _TrustChip(
-                    icon: Icons.update_rounded,
-                    label: 'Data: $dateLabel',
-                    color: themeColor,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Prediksi $horizon hari ke depan membaca tren $trendLabel dari riwayat harga terakhir tanpa mengubah data grafik.',
-              style: TextStyle(
-                fontSize: 12,
-                height: 1.45,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.66)
-                    : Colors.black.withValues(alpha: 0.58),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
+              // if (hasDate)
+              //   _TrustChip(
+              //     icon: Icons.update_rounded,
+              //     label: dateLabel,
+              //     color: themeColor,
+              //   ),
+            ],
+          ),
+          const SizedBox(height: 12),
+        ],
       ),
     );
   }
@@ -319,13 +299,14 @@ class _TrustChip extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      constraints: const BoxConstraints(minHeight: 32),
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
+      constraints: const BoxConstraints(minHeight: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.black.withValues(alpha: 0.12)
-            : Colors.white.withValues(alpha: 0.76),
-        borderRadius: BorderRadius.circular(10),
+        color: color.withValues(alpha: isDark ? 0.11 : 0.08),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: color.withValues(alpha: isDark ? 0.16 : 0.12),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

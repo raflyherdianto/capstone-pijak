@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/domain/models.dart';
 import '../../../../core/providers.dart';
+import '../../../../shared/widgets/arjuna_brand.dart';
 
 class MarketPulseCard extends ConsumerWidget {
   final List<Commodity> commodities;
@@ -46,197 +47,235 @@ class MarketPulseCard extends ConsumerWidget {
     final marketLabel = _getMarketLabel(upCount, downCount, stableCount);
     final marketIcon = _getMarketIcon(upCount, downCount);
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? const [Color(0xFF07345A), Color(0xFF05243F)]
-              : const [Color(0xFF07345A), Color(0xFF0B756E)],
-        ),
-        border: Border.all(
-          color: const Color(0xFFE8C766).withValues(alpha: isDark ? 0.2 : 0.3),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(
-              0xFF07345A,
-            ).withValues(alpha: isDark ? 0.28 : 0.14),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: CustomPaint(
-                painter: _SignalLinesPainter(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  gold: const Color(0xFFE8C766).withValues(alpha: 0.18),
-                ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 24, bottom: 14),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(22),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? const [Color(0xFF07345A), Color(0xFF05243F)]
+                    : const [Color(0xFF07345A), Color(0xFF0B756E)],
               ),
+              border: Border.all(
+                color: const Color(
+                  0xFFE8C766,
+                ).withValues(alpha: isDark ? 0.2 : 0.3),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(
+                    0xFF07345A,
+                  ).withValues(alpha: isDark ? 0.28 : 0.14),
+                  blurRadius: 22,
+                  offset: const Offset(0, 10),
+                ),
+              ],
             ),
-            Positioned(right: -48, top: -8, child: const _FoodSignalCluster()),
-            Padding(
-              padding: const EdgeInsets.all(18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: Stack(
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(9),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.16),
-                          ),
-                        ),
-                        child: Icon(
-                          marketIcon,
-                          color: const Color(0xFFE8C766),
-                          size: 21,
+                  Positioned.fill(
+                    child: CustomPaint(
+                      painter: _SignalLinesPainter(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        gold: const Color(0xFFE8C766).withValues(alpha: 0.18),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: -70,
+                    top: -10,
+                    child: Container(
+                      width: 164,
+                      height: 164,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withValues(alpha: 0.08),
+                        border: Border.all(
+                          color: const Color(
+                            0xFFE8C766,
+                          ).withValues(alpha: 0.16),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Kondisi Pasar Nasional',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withValues(alpha: 0.68),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 108),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(9),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.16),
+                                  ),
+                                ),
+                                child: Icon(
+                                  marketIcon,
+                                  color: const Color(0xFFE8C766),
+                                  size: 21,
+                                ),
                               ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Kondisi Pasar Nasional',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.white,
+                                        height: 1.05,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 7),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 6,
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color(
+                                              0xFFE8C766,
+                                            ).withValues(alpha: 0.14),
+                                            borderRadius: BorderRadius.circular(
+                                              999,
+                                            ),
+                                            border: Border.all(
+                                              color: const Color(
+                                                0xFFE8C766,
+                                              ).withValues(alpha: 0.18),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            marketLabel,
+                                            style: const TextStyle(
+                                              fontSize: 10.5,
+                                              fontWeight: FontWeight.w800,
+                                              color: Color(0xFFE8C766),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        if (total > 0) ...[
+                          Container(
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.14),
+                              borderRadius: BorderRadius.circular(999),
                             ),
-                            const SizedBox(height: 3),
-                            Text(
-                              marketLabel,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
-                                height: 1.05,
-                              ),
+                            clipBehavior: Clip.antiAlias,
+                            child: Row(
+                              children: [
+                                if (upCount > 0)
+                                  Flexible(
+                                    flex: upCount,
+                                    child: Container(color: upColor),
+                                  ),
+                                if (stableCount > 0)
+                                  Flexible(
+                                    flex: stableCount,
+                                    child: Container(
+                                      color: const Color(
+                                        0xFFA9B4C0,
+                                      ).withValues(alpha: 0.9),
+                                    ),
+                                  ),
+                                if (downCount > 0)
+                                  Flexible(
+                                    flex: downCount,
+                                    child: Container(color: downColor),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                        ],
+
+                        Wrap(
+                          spacing: 14,
+                          runSpacing: 8,
+                          children: [
+                            _LegendDot(
+                              color: upColor,
+                              label: 'Naik',
+                              value: upCount,
+                            ),
+                            _LegendDot(
+                              color: const Color(0xFFA9B4C0),
+                              label: 'Stabil',
+                              value: stableCount,
+                            ),
+                            _LegendDot(
+                              color: downColor,
+                              label: 'Turun',
+                              value: downCount,
                             ),
                           ],
                         ),
-                      ),
-                      // Container(
-                      //   padding: const EdgeInsets.symmetric(
-                      //     horizontal: 10,
-                      //     vertical: 7,
-                      //   ),
-                      //   decoration: BoxDecoration(
-                      //     color: Colors.white.withValues(alpha: 0.12),
-                      //     borderRadius: BorderRadius.circular(14),
-                      //     border: Border.all(
-                      //       color: const Color(
-                      //         0xFFE8C766,
-                      //       ).withValues(alpha: 0.22),
-                      //     ),
-                      //   ),
-                      //   child: Text(
-                      //     '$total\nKomoditas',
-                      //     textAlign: TextAlign.right,
-                      //     style: TextStyle(
-                      //       fontSize: 11,
-                      //       fontWeight: FontWeight.w800,
-                      //       color: Colors.white.withValues(alpha: 0.82),
-                      //       height: 1.18,
-                      //     ),
-                      //   ),
-                      // ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  if (total > 0) ...[
-                    Container(
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: Row(
-                        children: [
-                          if (upCount > 0)
-                            Flexible(
-                              flex: upCount,
-                              child: Container(color: upColor),
-                            ),
-                          if (stableCount > 0)
-                            Flexible(
-                              flex: stableCount,
-                              child: Container(
-                                color: const Color(
-                                  0xFFA9B4C0,
-                                ).withValues(alpha: 0.9),
-                              ),
-                            ),
-                          if (downCount > 0)
-                            Flexible(
-                              flex: downCount,
-                              child: Container(color: downColor),
-                            ),
-                        ],
-                      ),
+                      ],
                     ),
-                    const SizedBox(height: 14),
-                  ],
-
-                  Wrap(
-                    spacing: 14,
-                    runSpacing: 8,
-                    children: [
-                      _LegendDot(color: upColor, label: 'Naik', value: upCount),
-                      _LegendDot(
-                        color: const Color(0xFFA9B4C0),
-                        label: 'Stabil',
-                        value: stableCount,
-                      ),
-                      _LegendDot(
-                        color: downColor,
-                        label: 'Turun',
-                        value: downCount,
-                      ),
-                    ],
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          const Positioned(right: -36, top: -56, child: _MascotPeek()),
+        ],
       ),
     );
   }
 }
 
-class _FoodSignalCluster extends StatelessWidget {
-  const _FoodSignalCluster();
+class _MascotPeek extends StatelessWidget {
+  const _MascotPeek();
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 188,
-      height: 132,
+      width: 224,
+      height: 222,
       child: Stack(
         alignment: Alignment.center,
         children: [
           Container(
-            width: 116,
-            height: 116,
+            width: 150,
+            height: 150,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white.withValues(alpha: 0.08),
@@ -246,10 +285,12 @@ class _FoodSignalCluster extends StatelessWidget {
             ),
           ),
           Image.asset(
-            'assets/images/arjuna_hero_3d.png',
-            width: 176,
-            height: 118,
+            ArjunaAssets.mascotPresenting,
+            width: 156,
+            height: 222,
             fit: BoxFit.contain,
+            alignment: Alignment.topCenter,
+            filterQuality: FilterQuality.high,
             errorBuilder: (_, e, st) => Icon(
               Icons.arrow_outward_rounded,
               size: 54,
