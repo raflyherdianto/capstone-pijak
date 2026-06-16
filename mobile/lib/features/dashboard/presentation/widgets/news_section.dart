@@ -47,7 +47,7 @@ class NewsSection extends ConsumerWidget {
               return _EmptyNews(isDark: isDark);
             }
             return SizedBox(
-              height: 190,
+              height: 205,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: articles.length,
@@ -299,7 +299,7 @@ class _NewsShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 190,
+      height: 205,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: 3,

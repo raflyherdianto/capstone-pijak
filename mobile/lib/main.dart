@@ -9,6 +9,7 @@ import 'features/home/presentation/screens/home_screen.dart';
 import 'features/settings/presentation/screens/settings_screen.dart';
 import 'features/insight/presentation/screens/insight_screen.dart';
 import 'features/splash/presentation/screens/splash_screen.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'shared/widgets/app_background.dart';
 
 class AppConfig {
@@ -19,6 +20,8 @@ class AppConfig {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  await Hive.openBox('commodity_cache');
   await initializeDateFormatting('id_ID', null);
   final prefs = await SharedPreferences.getInstance();
 

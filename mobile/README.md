@@ -28,7 +28,7 @@
 ### Frontend (Mobile)
 - **Framework**: [Flutter](https://flutter.dev/) (Dart)
 - **State Management**: [Riverpod](https://riverpod.dev/) untuk state global dan dependency injection, serta [Flutter BLoC/Cubit](https://pub.dev/packages/flutter_bloc) untuk alur detail dan audit yang lebih interaktif
-- **Persistence**: `shared_preferences`
+- **Persistence**: `hive_flutter` untuk penyimpanan cache komoditas offline berkinerja tinggi, `flutter_secure_storage` untuk enkripsi data sensitif (KeyStore/KeyChain), dan `shared_preferences` untuk pengaturan preferensi aplikasi
 - **Networking**: `dio` (dengan penanganan error & interseptor kustom)
 - **Charting**: `fl_chart`
 - **Motion & Loading**: `shimmer` untuk placeholder loading dan animasi masuk ringan pada area kunci
@@ -65,7 +65,17 @@ Ubah `baseUrl` di `lib/core/api_config.dart` sesuai dengan lokasi server backend
 static const String baseUrl = 'http://127.0.0.1:8000'; // Sesuaikan IP jika menggunakan device fisik
 ```
 
-Untuk feed berita, sediakan `GNEWS_API_KEY` saat menjalankan aplikasi:
+Untuk feed berita, Anda dapat menyediakannya melalui berkas `secrets.json` di root folder proyek:
+```json
+{
+  "GNEWS_API_KEY": "kunci_api_gnews_anda"
+}
+```
+Lalu jalankan aplikasi dengan perintah:
+```bash
+flutter run --dart-define-from-file=secrets.json
+```
+Atau jika ingin menggunakan baris terminal langsung:
 ```bash
 flutter run --dart-define=GNEWS_API_KEY=key_anda
 ```
