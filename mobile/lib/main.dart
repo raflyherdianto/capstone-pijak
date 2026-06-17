@@ -15,7 +15,7 @@ import 'shared/widgets/app_background.dart';
 class AppConfig {
   /// Toggle to true to enable console/network logging.
   /// Set to false to prevent lags in the simulator caused by heavy terminal output.
-  static const bool enableLogging = false;
+  static const bool enableLogging = true;
 }
 
 void main() async {

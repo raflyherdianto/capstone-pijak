@@ -1,7 +1,8 @@
 class ApiConfig {
   static const String baseUrl =
-      'http://127.0.0.1:8000'; // Change to server IP for physical device
+      'https://arjuna-backend-60410062142.asia-southeast2.run.app'; // Change to server IP for physical device
   static const String marketSummary = '/api/market-summary';
+  static const String globalAnalysis = '/api/market-summary/global-analysis';
   static const String historical = '/historical';
   static const String predict = '/predict';
   static const String insight = '/insight';

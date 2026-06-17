@@ -20,6 +20,13 @@ class InsightContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final isSeller = settings.mode == UserMode.seller;
+    final globalAnalysisAsync = ref.watch(globalAnalysisProvider);
+
+    final (analysis, isLoading) = globalAnalysisAsync.when(
+      data: (text) => (text, false),
+      loading: () => ('', true),
+      error: (e, s) => ('Gagal memuat analisis pasar nasional secara otomatis.', false),
+    );
 
     return RefreshIndicator(
       onRefresh: onRefresh,
@@ -33,10 +40,11 @@ class InsightContent extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GlobalAnalysisCard(
-              analysis: metadata.globalAnalysis,
+              analysis: analysis,
               disclaimer: metadata.disclaimer,
               isSeller: isSeller,
               commodities: commodities,
+              isLoading: isLoading,
             ),
             const SizedBox(height: 100),
           ],

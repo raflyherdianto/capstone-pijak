@@ -7,6 +7,7 @@ class GlobalAnalysisCard extends StatelessWidget {
   final String disclaimer;
   final bool isSeller;
   final List<Commodity> commodities;
+  final bool isLoading;
 
   const GlobalAnalysisCard({
     super.key,
@@ -14,6 +15,7 @@ class GlobalAnalysisCard extends StatelessWidget {
     required this.disclaimer,
     required this.isSeller,
     required this.commodities,
+    this.isLoading = false,
   });
 
   @override
@@ -120,14 +122,27 @@ class GlobalAnalysisCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    child: Text(
-                      analysis,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontSize: 15,
-                        height: 1.65,
-                        letterSpacing: 0.1,
-                      ),
-                    ),
+                    child: isLoading
+                        ? const Center(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Text(
+                            analysis,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontSize: 15,
+                              height: 1.65,
+                              letterSpacing: 0.1,
+                            ),
+                          ),
                   ),
                   if (disclaimer.isNotEmpty) ...[
                     const SizedBox(height: 14),

@@ -63,6 +63,9 @@ class FakeCommodityRepository implements ICommodityRepository {
 
   @override
   Future<List<AuditPoint>> getAuditData(String subcategory) async => [];
+
+  @override
+  Future<String> getGlobalAnalysis() async => 'Analisis tiruan';
 }
 
 void main() {

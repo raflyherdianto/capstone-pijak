@@ -38,6 +38,7 @@ class InsightScreen extends ConsumerWidget {
               onRefresh: () async {
                 ref.refresh(commoditiesProvider);
                 ref.refresh(metadataProvider);
+                ref.refresh(globalAnalysisProvider);
               },
             ),
             loading: () => loadingPlaceholder,
@@ -47,6 +48,7 @@ class InsightScreen extends ConsumerWidget {
               onRetry: () {
                 ref.refresh(commoditiesProvider);
                 ref.refresh(metadataProvider);
+                ref.refresh(globalAnalysisProvider);
               },
             ),
           );
@@ -58,6 +60,7 @@ class InsightScreen extends ConsumerWidget {
           onRetry: () {
             ref.refresh(commoditiesProvider);
             ref.refresh(metadataProvider);
+            ref.refresh(globalAnalysisProvider);
           },
         ),
       ),

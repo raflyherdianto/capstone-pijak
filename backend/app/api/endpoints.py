@@ -4,7 +4,7 @@ from sqlalchemy import extract, func
 from app.db.database import get_db
 from app.schemas.prediction import ForecastResponse
 from app.services.forecast import generate_forecast, MODEL_CONFIG, get_in_sample_fit, get_ai_insight
-from app.services.market_summary import get_consolidated_market_summary
+from app.services.market_summary import get_consolidated_market_summary, get_global_market_analysis
 from datetime import datetime, timedelta
 from app.db import models
 from app.core.config import settings
@@ -206,6 +206,15 @@ def get_market_summary(db: Session = Depends(get_db)):
         return data
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal mengambil ringkasan pasar: {str(e)}")
+
+@router.get("/api/market-summary/global-analysis", tags=["Mobile"])
+def get_market_global_analysis(db: Session = Depends(get_db)):
+    """Mengembalikan analisis pasar pangan global dinamis menggunakan kecerdasan buatan (NVIDIA NIM/Gemma)."""
+    try:
+        data = get_global_market_analysis(db)
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Gagal mengambil analisis pasar global: {str(e)}")
 
 @router.post("/api/trigger-sync", tags=["Admin/Sync"])
 def trigger_sync(db: Session = Depends(get_db)):

@@ -124,6 +124,11 @@ final metadataProvider = FutureProvider<AppMetadata>((ref) async {
   return repository.getMetadata();
 });
 
+final globalAnalysisProvider = FutureProvider<String>((ref) async {
+  final repository = ref.watch(commodityRepositoryProvider);
+  return repository.getGlobalAnalysis();
+});
+
 /// Provider for GNews.io food/commodity news feed
 final newsRepositoryProvider = Provider<NewsRepository>((ref) {
   return NewsRepository();

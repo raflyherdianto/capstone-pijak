@@ -21,6 +21,7 @@ abstract class ICommodityRepository {
     double predictedPrice,
   );
   Future<List<AuditPoint>> getAuditData(String subcategory);
+  Future<String> getGlobalAnalysis();
 }
 
 class CommodityRepository implements ICommodityRepository {
@@ -213,6 +214,27 @@ class CommodityRepository implements ICommodityRepository {
         );
         final list = cached as List;
         return list.map((e) => AuditPoint.fromJson(e)).toList();
+      }
+      rethrow;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> getGlobalAnalysis() async {
+    final cacheKey = 'global_analysis_cache';
+    try {
+      final response = await _apiClient.dio.get(ApiConfig.globalAnalysis);
+      final data = response.data as Map<String, dynamic>;
+      final analysis = data['global_analysis'] as String? ?? '';
+      await _cacheBox.put(cacheKey, analysis);
+      return analysis;
+    } on DioException catch (error) {
+      final cached = _cacheBox.get(cacheKey);
+      if (cached != null && cached is String) {
+        debugPrint('Using cached global analysis from Hive: ${error.message}');
+        return cached;
       }
       rethrow;
     } catch (_) {
