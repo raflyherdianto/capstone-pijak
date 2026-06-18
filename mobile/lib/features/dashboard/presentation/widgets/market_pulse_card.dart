@@ -134,10 +134,12 @@ class _MarketPulseCardState extends ConsumerState<MarketPulseCard>
               child: Stack(
                 children: [
                   Positioned.fill(
-                    child: CustomPaint(
-                      painter: _SignalLinesPainter(
-                        color: Colors.white.withValues(alpha: 0.12),
-                        gold: const Color(0xFFE8C766).withValues(alpha: 0.18),
+                    child: RepaintBoundary(
+                      child: CustomPaint(
+                        painter: _SignalLinesPainter(
+                          color: Colors.white.withValues(alpha: 0.12),
+                          gold: const Color(0xFFE8C766).withValues(alpha: 0.18),
+                        ),
                       ),
                     ),
                   ),

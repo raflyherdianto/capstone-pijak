@@ -83,11 +83,13 @@ class ArjunaAppBarBackground extends StatelessWidget {
         ),
       ),
       child: ClipRect(
-        child: CustomPaint(
-          painter: BatikKawungPainter(
-            color: isDark
-                ? ArjunaColors.gold.withValues(alpha: 0.025)
-                : ArjunaColors.navy.withValues(alpha: 0.03),
+        child: RepaintBoundary(
+          child: CustomPaint(
+            painter: BatikKawungPainter(
+              color: isDark
+                  ? ArjunaColors.gold.withValues(alpha: 0.025)
+                  : ArjunaColors.navy.withValues(alpha: 0.03),
+            ),
           ),
         ),
       ),

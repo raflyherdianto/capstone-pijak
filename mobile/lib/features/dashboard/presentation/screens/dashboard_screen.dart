@@ -19,7 +19,7 @@ class DashboardScreen extends ConsumerStatefulWidget {
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   late ScrollController _scrollController;
-  bool _showAppBar = false;
+  final ValueNotifier<bool> _showAppBarNotifier = ValueNotifier<bool>(false);
   bool _playEntrance = false;
 
   @override
@@ -37,16 +37,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   void _scrollListener() {
     final show = _scrollController.offset > 50;
-    if (show != _showAppBar) {
-      setState(() {
-        _showAppBar = show;
-      });
+    if (show != _showAppBarNotifier.value) {
+      _showAppBarNotifier.value = show;
     }
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _showAppBarNotifier.dispose();
     super.dispose();
   }
 
@@ -59,29 +58,37 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: AnimatedOpacity(
-          opacity: _showAppBar ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 200),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const ArjunaLogoMark(size: 30, padding: 2, radius: 10),
-              const SizedBox(width: 8),
-              const Text(
-                'Arjuna',
-                style: TextStyle(fontWeight: FontWeight.bold),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: ValueListenableBuilder<bool>(
+          valueListenable: _showAppBarNotifier,
+          builder: (context, show, child) {
+            return AppBar(
+              title: AnimatedOpacity(
+                opacity: show ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 200),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const ArjunaLogoMark(size: 30, padding: 2, radius: 10),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Arjuna',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+              centerTitle: true,
+              backgroundColor: isDark
+                  ? const Color(0xFF031827).withValues(alpha: show ? 1.0 : 0.0)
+                  : Colors.white.withValues(alpha: show ? 1.0 : 0.0),
+              elevation: show ? 2 : 0,
+              shadowColor: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+              surfaceTintColor: Colors.transparent,
+            );
+          },
         ),
-        centerTitle: true,
-        backgroundColor: isDark
-            ? const Color(0xFF031827).withValues(alpha: _showAppBar ? 1.0 : 0.0)
-            : Colors.white.withValues(alpha: _showAppBar ? 1.0 : 0.0),
-        elevation: _showAppBar ? 2 : 0,
-        shadowColor: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
-        surfaceTintColor: Colors.transparent,
       ),
       body: commoditiesAsync.when(
         data: (commodities) {
@@ -129,7 +136,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           beginOffset: const Offset(0, 0.075),
                           duration: const Duration(milliseconds: 460),
                           curve: Curves.easeOutCubic,
-                          child: MarketPulseCard(commodities: commodities),
+                          child: RepaintBoundary(
+                            child: MarketPulseCard(commodities: commodities),
+                          ),
                         ),
                       ],
                     ),
@@ -146,7 +155,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? const Color(0xFF061525).withValues(alpha: 0.98)
+                            ? const Color(0xFF061525)
                             : Colors.white,
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(24),
@@ -175,14 +184,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (commodities.isNotEmpty) ...[
-                            QuickAccessGrid(commodities: commodities),
+                            RepaintBoundary(
+                              child: QuickAccessGrid(commodities: commodities),
+                            ),
                             const SizedBox(height: 28),
                           ],
                           if (commodities.isNotEmpty) ...[
-                            TopMoversSection(commodities: commodities),
+                            RepaintBoundary(
+                              child: TopMoversSection(commodities: commodities),
+                            ),
                             const SizedBox(height: 28),
                           ],
-                          const NewsSection(),
+                          const RepaintBoundary(
+                            child: NewsSection(),
+                          ),
                         ],
                       ),
                     ),

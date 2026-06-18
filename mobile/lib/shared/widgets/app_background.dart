@@ -42,11 +42,13 @@ class AppBackground extends StatelessWidget {
         // Subtle Batik Kawung pattern background watermark (optional)
         if (showBatikPattern)
           Positioned.fill(
-            child: CustomPaint(
-              painter: BatikKawungPainter(
-                color: isDark
-                    ? const Color(0xFFE8C766).withValues(alpha: 0.018)
-                    : const Color(0xFF07345A).withValues(alpha: 0.018),
+            child: RepaintBoundary(
+              child: CustomPaint(
+                painter: BatikKawungPainter(
+                  color: isDark
+                      ? const Color(0xFFE8C766).withValues(alpha: 0.018)
+                      : const Color(0xFF07345A).withValues(alpha: 0.018),
+                ),
               ),
             ),
           ),

@@ -47,13 +47,20 @@ class _BouncyTappableState extends State<BouncyTappable>
   }
 
   DateTime? _tapTime;
+  bool _isScaledDown = false;
 
   void _onTapDown(TapDownDetails details) {
     _tapTime = DateTime.now();
-    _controller.reverse();
+    _isScaledDown = true;
+    Future.delayed(const Duration(milliseconds: 60), () {
+      if (mounted && _isScaledDown) {
+        _controller.reverse();
+      }
+    });
   }
 
   void _onTapUp(TapUpDetails details) {
+    _isScaledDown = false;
     if (_tapTime != null) {
       final elapsed = DateTime.now().difference(_tapTime!).inMilliseconds;
       const minScaleDuration = 80; // Minimum time in ms to stay scaled down
@@ -72,6 +79,7 @@ class _BouncyTappableState extends State<BouncyTappable>
   }
 
   void _onTapCancel() {
+    _isScaledDown = false;
     _controller.forward();
   }
 

@@ -12,10 +12,12 @@ import 'features/splash/presentation/screens/splash_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'shared/widgets/app_background.dart';
 
+import 'package:flutter/foundation.dart';
+
 class AppConfig {
   /// Toggle to true to enable console/network logging.
   /// Set to false to prevent lags in the simulator caused by heavy terminal output.
-  static const bool enableLogging = true;
+  static const bool enableLogging = kDebugMode;
 }
 
 void main() async {
