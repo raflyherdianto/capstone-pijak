@@ -3,3 +3,75 @@
 *.pdf
 *.ipynb
 !README.md
+
+# Credentials & Secrets
+.env
+.env.local
+.env.*.local
+*.env
+secrets.json
+credentials.json
+*.pem
+*.key
+*.keystore
+*.jks
+**/android/local.properties
+**/android/key.properties
+
+# Dependencies
+node_modules/
+**/node_modules/
+jspm_packages/
+.pnp/
+.pnp.js
+
+# Build Outputs
+dist/
+**/dist/
+build/
+**/build/
+out/
+**/out/
+.next/
+.svelte-kit/
+.nuxt/
+.dart_tool/
+**/Flutter/
+**/GeneratedPluginRegistrant.*
+
+# Python Cache & Virtual Environments
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+*.venv/
+*.venv*/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# IDEs & System Files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+Arjuna-Pitch Desk.pdf
+script slide 1-3.txt
